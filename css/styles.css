@@ -1,0 +1,40 @@
+.expInput{
+    width: 70px;
+    border: 1px solid #ced4da;
+    height: 38px;
+    padding: 6px 12px;
+    border-radius: .25rem;
+}
+#number-container {
+    height: 38px;
+    width: 180px;
+}
+#securityCode-container {
+    height: 38px;
+    width: 46px;
+}
+.flex-microform-focused {
+    background-color: #fff;
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+.flex-microform-invalid {
+    background-color: yellow;
+    border-color: red;
+    outline: 10;
+    box-shadow: 0 0 0 0.2rem rgba(255,0,0,.25);
+}
+ #overlay {
+     position: fixed;
+     display: none;
+     width: 100% ;
+     height: 80%;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background-color: rgba(184, 255, 48, 0.82);
+     z-index: 2;
+     cursor: pointer;
+ }
