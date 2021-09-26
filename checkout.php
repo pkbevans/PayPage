@@ -98,16 +98,22 @@ $shippingAddressRequired = true;
             </form>
             </div>
 <?php endif ?>
-                <h5>Card Details</h5>
 <?php if ($paymentInstrumentCount): ?>
                     <div id="storedCardSection">
+                        <h5>Stored Card Details</h5>
                         <div class="row">
-                            <div class="col-sm-4"><img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
-                                &nbsp;&nbsp;<span id="storedCardNumber"><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></span></div>
-                            <div class="col-sm-2"><span id="storedCardExpiry">Expires: <?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></span></div>
+                            <div class="col-sm-1">
+                                <img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
+                            </div>
+                            <div class="col-sm-1">
+                                <ul class="list-unstyled">
+                                    <li><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></li>
+                                    <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="row">
-                            <label id="mySecurityCodeLabel" class="form-label" for="bill_to_text">Card Billing Address</label>
+                            <h5>Card Billing Address</h5>
                             <div class="col-sm-6">
                                 <span id="bill_to_text" class="form-control form-control-sm" disabled><?php echo $billToText;?></span>
                             </div>
@@ -118,9 +124,9 @@ $shippingAddressRequired = true;
                 <div id="cardDetailsSection">
                     <div class="row">
                         <div class="col-sm-3">
-                            <label class="control-label" for="number-container">Card Number</label>
+                            <h5>Card Number</h5>
                             <div id="number-container" class="form-control form-control-sm"></div>
-                            <label class="control-label" for="expiryContainer" >Expires</label>
+                            <h5>Expires</h5>
                             <div class="col-sm-6" id="expiryContainer">
                                 <input type="number" maxLength="2" id="card_expirationMonth" class="expInput" name="card_expirationMonth" placeholder="MM" pattern="1[0-2]|0[1-9]" required>
                                 <input type="number" min="21" max="30" id="card_expirationYear" class="expInput" name="card_expirationYear" placeholder="YY" required>
@@ -129,7 +135,7 @@ $shippingAddressRequired = true;
                     </div>
                 </div>
                 <div class="row">
-                    <label id="mySecurityCodeLabel" class="form-label">Security Code</label> 
+                    <h5 id="mySecurityCodeLabel">Security Code</h5> 
                     <div class="col-sm-2">
                         <div id="securityCode-container" class="form-control form-control-sm"></div>
                     </div>
@@ -202,6 +208,11 @@ $shippingAddressRequired = true;
                             </div>
                         </div>
                         *Required fields
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-link" onclick="cancelNewCard()">Use a Stored Card</button>
+                            </div>
+                        </div>
                     </div>
 
                 </form>
@@ -229,6 +240,7 @@ echo "var customerId " . ($paymentInstrumentCount?"='".$customerToken."'":"") . 
 echo "var shippingAddressRequired = " . ($shippingAddressRequired?"true":"false") . ";\n"
 ?>
 var paymentInstrumentId = "<?php echo ($paymentInstrumentCount?$defaultPaymentInstrument->id:"");?>";
+var oldPaymentInstrumentId;
 var maskedPan = "<?php echo ($paymentInstrumentCount?$defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number:"");?>";
 var shippingAddressId = "<?php echo ($shippingAddressAvailable?$defaultShippingAddress->id:"");?>";
 var flexToken;
@@ -688,17 +700,23 @@ function stylePaymentInstrument(paymentInstrument){
     } else {
         // TODO
     }
-    xxx = "<div class=\"row\">\n" +
-        "<div class=\"col-sm-1\"><img  src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\"></div>\n" +
-        "<div class=\"col-sm-2\">" + paymentInstrument._embedded.instrumentIdentifier.card.number + "</div>\n" +
-        "<div class=\"col-sm-2\">Expires:&nbsp;" + paymentInstrument.card.expirationMonth + "/" + paymentInstrument.card.expirationYear + "</div>\n" +
-        "</div>\n" +
-        "<div class=\"row\">\n"+
-            "<label id=\"mySecurityCodeLabel\" class=\"form-label\" for=\"billingText\">Card Billing Address</label>" +
-            "<div class=\"col-sm-6\">" +
-                "<span id=\"billingText\" class=\"form-control form-control-sm\" disabled>" + concatinateNameAddress(paymentInstrument.billTo) + "</span>\n" +
-            "</div>\n" +
-        "</div>\n";
+    xxx =   "<h5>Stored Card Details</h5>" +
+            "<div class=\"row\">\n" +
+                "<div class=\"col-sm-1\">\n"+
+                    "<img  src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+
+                "</div>\n" +
+                "<div class=\"col-sm-1\">\n" + 
+                    "<ul class=\"list-unstyled\">" +
+                        "<li><strong>" + paymentInstrument._embedded.instrumentIdentifier.card.number + "</strong></li>\n" +
+                        "<li><small>Expires:&nbsp;" + paymentInstrument.card.expirationMonth + "/" + paymentInstrument.card.expirationYear + "</small></li>\n" +
+                    "</ul>\n" +
+                "</div>\n" +
+                "<div class=\"row\">\n"+
+                    "<h5>Card Billing Address</h5>" +
+                    "<div class=\"col-sm-6\">" +
+                        "<span id=\"billingText\" class=\"form-control form-control-sm\" disabled>" + concatinateNameAddress(paymentInstrument.billTo) + "</span>\n" +
+                    "</div>\n" +
+                "</div>\n";
     return xxx;
 }
 function concatinateNameAddress(nameAddress){
@@ -733,11 +751,19 @@ function editCard(){
     }
 }
 function newCard(){
+    oldPaymentSnstrumentId=paymentInstrumentId;
     paymentInstrumentId = "";
     showPanField(true);
     document.getElementById('billingSection').style.display = "block";
     document.getElementById('defaultBillingSection').style.display = "none";
     document.getElementById('storedCardSection').style.display = "none";
+}
+function cancelNewCard(){
+    paymentInstrumentId = oldPaymentSnstrumentId;
+    showPanField(false);
+    document.getElementById('billingSection').style.display = "none";
+    document.getElementById('defaultBillingSection').style.display = "block";
+    document.getElementById('storedCardSection').style.display = "block";
 }
 function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     finish = "onFinish: " + JSON.stringify({
