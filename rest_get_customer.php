@@ -42,8 +42,8 @@ $billToText="";
 $shipToText="";
 
 if(isset($_REQUEST['customerToken'])){
-    $customerToken = filter_input(INPUT_POST, 'customerToken', FILTER_SANITIZE_SPECIAL_CHARS);
-//    $customerToken = $_REQUEST['customerToken'];
+//    $customerToken = filter_input(INPUT_POST, 'customerToken', FILTER_SANITIZE_SPECIAL_CHARS);
+    $customerToken = $_REQUEST['customerToken'];
     if($customerToken){
         try {
             // Get Payment Instruments

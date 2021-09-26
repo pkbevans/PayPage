@@ -1,5 +1,5 @@
 <?php
-require_once 'Credentials.php';
+require_once '../ppSecure/Credentials.php';
 require_once 'JWT.php';
 final class CGK {
     public static function generateBearerTokenForRequestAndMid($request, $mid, $child=null) {

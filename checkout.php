@@ -51,7 +51,7 @@ $shippingAddressRequired = true;
 <?php if($shippingAddressAvailable): ?>
                 <div class="row">
                     <div class="col-sm-6">
-                        <textarea id="ship_to_text" class="form-control form-control-sm" disabled><?php echo $shipToText;?></textarea>
+                        <span id="ship_to_text" class="form-control form-control-sm" disabled><?php echo $shipToText;?></span>
                     </div>
                 </div>
                 <div class="row">
@@ -102,14 +102,14 @@ $shippingAddressRequired = true;
 <?php if ($paymentInstrumentCount): ?>
                     <div id="storedCardSection">
                         <div class="row">
-                            <div class="col-sm-1"><img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>"></div>
-                            <div class="col-sm-2"><span id="storedCardNumber"><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></span></div>
+                            <div class="col-sm-4"><img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
+                                &nbsp;&nbsp;<span id="storedCardNumber"><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></span></div>
                             <div class="col-sm-2"><span id="storedCardExpiry">Expires: <?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></span></div>
                         </div>
                         <div class="row">
-                            <label id="mySecurityCodeLabel" class="form-label" for="billingText">Card Billing Address</label>
+                            <label id="mySecurityCodeLabel" class="form-label" for="bill_to_text">Card Billing Address</label>
                             <div class="col-sm-6">
-                                <textarea id="bill_to_text" class="form-control form-control-sm" disabled><?php echo $billToText;?></textarea>
+                                <span id="bill_to_text" class="form-control form-control-sm" disabled><?php echo $billToText;?></span>
                             </div>
                         </div>
                     </div>
@@ -663,7 +663,7 @@ function editShippingAddress(){
 function onShippingAddressUpdated(id, shipToText) {
     shippingAddressId = id;
     console.log("onShippingAddressUpdated:\n" + id + "\n"+ shipToText);
-    document.getElementById('ship_to_text').value = shipToText;
+    document.getElementById('ship_to_text').innerHTML = shipToText;
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
 }
@@ -696,7 +696,7 @@ function stylePaymentInstrument(paymentInstrument){
         "<div class=\"row\">\n"+
             "<label id=\"mySecurityCodeLabel\" class=\"form-label\" for=\"billingText\">Card Billing Address</label>" +
             "<div class=\"col-sm-6\">" +
-                "<textArea id=\"billingText\" class=\"form-control form-control-sm\" disabled>" + concatinateNameAddress(paymentInstrument.billTo) + "</textArea>\n" +
+                "<span id=\"billingText\" class=\"form-control form-control-sm\" disabled>" + concatinateNameAddress(paymentInstrument.billTo) + "</span>\n" +
             "</div>\n" +
         "</div>\n";
     return xxx;

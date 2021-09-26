@@ -1,5 +1,5 @@
 <?php
-require_once 'Credentials.php';
+require_once '../ppSecure/Credentials.php';
 final class JWT {
     private static function base64url_encode($data) {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');

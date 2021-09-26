@@ -17,5 +17,3 @@ $cardTypes = [
         "alt" => "Amex logo"
     ]
 ];
-
-echo $cardTypes["001"]['image'];
