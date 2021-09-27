@@ -15,6 +15,11 @@ try {
         if($incoming->storeCard){
             $actionList = [$incoming->paAction, "TOKEN_CREATE"];
             if(empty($incoming->customerId)){
+                $buyerInformation = [
+                    "merchantCustomerID" => "Your customer identifier",
+                    "email" => $incoming->order->bill_to->bill_to_email
+                ];
+                $request->buyerInformation = $buyerInformation;
                 if($incoming->order->shippingAddressRequired){
                     $processingInfo->actionTokenTypes = ["customer", "paymentInstrument", "shippingAddress"];
                 }else{
@@ -51,7 +56,7 @@ try {
             "locality" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_city: $incoming->order->bill_to->bill_to_address_city),
             "postalCode" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_postcode: $incoming->order->bill_to->bill_to_postcode),
             "country" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_country: $incoming->order->bill_to->bill_to_address_country),
-            "email" => $incoming->order->bill_to->bill_to_email,
+            "email" => $incoming->order->bill_to->bill_to_email
         ];
         $orderInformation['billTo'] = $billTo;
     }

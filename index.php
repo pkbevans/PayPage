@@ -29,6 +29,8 @@ function getCookie($name){
             <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="checkout.php" novalidate >
                 <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
                 <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
+                <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
+                <label for="customer_reference" class="form-label">Merchants Customer Reference</label><input id="customerRef" class="form-control" type="text" name="customerRef" value="" />
                 <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value="<?php echo getCookie("customerId")?>"/>
                 <input id="currency" type="hidden" name="currency" value="GBP"/>
                 <label for="local" class="form-label">Local</label><input id="local" class="form-control" type="text" name="local" value="<?php echo $local; ?>"/>

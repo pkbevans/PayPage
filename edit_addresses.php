@@ -40,9 +40,17 @@ $count=0;
 <?php       foreach ($shippingAddresses as $shippingAddress): ?>
             <div class="accordion-item" id="<?php echo $shippingAddress->id;?>_item">
                 <h2 class="accordion-header" id="heading<?php echo $shippingAddress->id;?>">
-                    <button class="accordion-button <?php echo ($shippingAddress->default?"":"collapsed");?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $shippingAddress->id;?>" aria-expanded="true" aria-controls="collapse<?php echo $shippingAddress->id;?>">
-                        <?php $count++;echo ($shippingAddress->default?"Default Delivery Address." :"Delivery Address #". $count );?>
-                        <textarea id="<?php echo $shippingAddress->id;?>_textArea" class="form-control form-control-sm" disabled><?php echo concatinateNameAddress($shippingAddress->shipTo);?></textarea>
+                        <button class="accordion-button <?php echo ($shippingAddress->default?"":"collapsed");?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $shippingAddress->id;?>" aria-expanded="true" aria-controls="collapse<?php echo $shippingAddress->id;?>">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h5><?php $count++;echo ($shippingAddress->default?"Default Delivery Address." :"Delivery Address #". $count );?></h5>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span id="<?php echo $shippingAddress->id;?>_textArea" class="form-control form-control-sm"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></span>
+                                    </div>
+                                </div>
+                            </div>
                     </button>
                 </h2>
                 <div id="collapse<?php echo $shippingAddress->id;?>" class="accordion-collapse collapse <?php echo ($shippingAddress->default?"show":"");?>" aria-labelledby="heading<?php echo $shippingAddress->id;?>" data-bs-parent="#accordionExample">
@@ -256,7 +264,7 @@ foreach ($countries as $key => $value) {
         parent.onIframeCancelled();
     }
     function useShippingAddress(id){
-        shipToText = document.getElementById(id+"_textArea").value;
+        shipToText = document.getElementById(id+"_textArea").innerHTML;
         parent.onShippingAddressUpdated(id, shipToText);
     }
     function addShippingAddress(){

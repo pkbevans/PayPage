@@ -1,10 +1,4 @@
 <?php
-include 'rest_get_customer.php';
-if(strstr($_SERVER['HTTP_HOST'],"localhost")){
-    $local = "true";
-}else{
-    $local = "false";
-}
 //////////////////////FUNCTIONS
 function getCookie($name){
     if(isset($_COOKIE[$name])){
@@ -13,7 +7,6 @@ function getCookie($name){
         return "";
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">
@@ -26,20 +19,47 @@ function getCookie($name){
     </head>
     <body>
         <div class="container-fluid">
-            <pre>
-<?php
-    echo "paymentInstrumentCount:&nbsp;&nbsp;" . $paymentInstrumentCount . "<BR>";
-    echo "shippingAddressAvailable:&nbsp;&nbsp;" . $shippingAddressAvailable . "<BR>"; 
-    echo "storedCards:&nbsp;&nbsp;" . json_encode($storedCards, JSON_PRETTY_PRINT) . "<BR>"; 
-    echo "defaultPaymentInstrument:&nbsp;&nbsp;" . json_encode($defaultPaymentInstrument, JSON_PRETTY_PRINT) . "<BR>";
-    echo "defaultShippingAddress:&nbsp;&nbsp;" . json_encode($defaultShippingAddress, JSON_PRETTY_PRINT) . "<BR>";
-    echo "billToText:&nbsp;&nbsp;" . $billToText . "<BR>";
-    echo "shipToText:&nbsp;&nbsp;" . $shipToText . "<BR>";
-?>
-            </pre>
+            <form>
+                <label for="customerToken">Customer Token ID</label><input id="customerToken" type="text" name="customerToken" value="CCAC2DFA364CFA16E053AF598E0A3AA0">
+                <button type="button" onclick="go()">Go</button>
+            </form>
+            <div id="cardsIframe" style="display: none">
+                <iframe name="cards_iframe" src="" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:50vh; width:100%" ></iframe>
+            </div>
+            <form id="cards_form" method="POST" target="cards_iframe" action="">
+                <input id="customerTokenCards" type="hidden" name="customerToken" value="">
+            </form>
+
+            <div id="shippingIframe" style="display: none">
+                <iframe name="shipping_iframe" src="" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:50vh; width:100%" ></iframe>
+            </div>
+            <form id="shipping_form" method="POST" target="shipping_iframe" action="">
+                <input id="customerTokenShipping" type="hidden" name="customerToken" value="">
+            </form>
+
         </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-    <script>
-    </script>
     </body>
+    <script>
+    document.addEventListener("DOMContentLoaded", function (e) {
+    });
+    function go(){
+        customerToken = document.getElementById('customerToken').value;
+
+        document.getElementById('cardsIframe').style.display = "block";
+        var cardsForm = document.getElementById('cards_form');
+        document.getElementById('customerTokenCards').value = customerToken;
+        if (cardsForm){
+            cardsForm.action = "edit_cards.php";
+            cardsForm.submit();
+        }
+        document.getElementById('shippingIframe').style.display = "block";
+        var shippingForm = document.getElementById('shipping_form');
+        document.getElementById('customerTokenShipping').value = customerToken;
+        if (shippingForm){
+            shippingForm.action = "edit_addresses.php";
+            shippingForm.submit();
+        }
+    }
+    </script>
 </html>

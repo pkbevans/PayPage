@@ -25,9 +25,12 @@ function stylePaymentInstrument($paymentInstrument){
     global $cardTypes;
     return 
     "<div class=\"col-sm-2\"><img  src=\"images/". $cardTypes[$paymentInstrument->card->type]['image'] . "\" class=\"img-fluid\" alt=\"" . $cardTypes[$paymentInstrument->card->type]['alt'] . "\"></div>\n" .
-    "<div class=\"col-sm-8\"><strong><p>" . $paymentInstrument->_embedded->instrumentIdentifier->card->number . "</p></strong>\n".
-    "<p><small>Expires:&nbsp;" . $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear . "</small></p>\n" .
-    "<p><small>" . concatinateNameAddress($paymentInstrument->billTo) . "</small></p></div>\n";
+    "<div class=\"col-sm-1\">\n" .
+        "<ul class=\"list-unstyled\">" .
+            "<li><strong>" . $paymentInstrument->_embedded->instrumentIdentifier->card->number . "</strong></li>\n" .
+            "<li><small>Expires:&nbsp;" . $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear . "</small></li>\n" .
+        "</ul>\n" .
+    "</div>\n";
 }
 ///////////////////////////////////END FUNCTIONS
 ///////////////////////////////////VARIABLES
@@ -52,9 +55,9 @@ $count=0;
                     <button class="accordion-button <?php echo ($paymentInstrument->default?"":"collapsed");?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $paymentInstrument->id;?>" aria-expanded="true" aria-controls="collapse<?php echo $paymentInstrument->id;?>">
                         <div class="container">
                             <div class="row">
-                                <h5><?php $count++;echo ($paymentInstrument->default?"Default Card." :"Card #". $count );?></h5>
-                            </div>
-                            <div class="row">
+                                <div class="col-sm-2">
+                                    <h5><?php $count++;echo ($paymentInstrument->default?"Default Card." :"Card #". $count );?></h5>
+                                </div>
                                 <?php echo stylePaymentInstrument($paymentInstrument);?>
                             </div>
                         </div>

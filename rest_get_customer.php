@@ -46,6 +46,20 @@ if(isset($_REQUEST['customerToken'])){
     $customerToken = $_REQUEST['customerToken'];
     if($customerToken){
         try {
+            // Get Customer TODO - NOT REQUIRED
+            $api = str_replace('{customerId}', $customerToken, API::TMS_V2_CUSTOMERS_id);
+            $strResponse = API::sendRequest(API::TEST_URL,API::GET,$api, "peportfolio","{}",null,null,"pemid03" );
+            $result = new stdClass();
+            $objResponse = json_decode($strResponse);
+            $result->httpCode = $objResponse->response->httpCode;
+            if($result->httpCode == 200){
+                $strResponseBody=$objResponse->response->body;
+                $jsonBody = json_decode($strResponseBody);
+//              echo("<BR> BODY<PRE>" .json_encode($jsonBody, JSON_PRETTY_PRINT). "</PRE><BR>");
+            }
+            $strResponse = API::sendRequest(API::TEST_URL,API::GET,$api, "peportfolio","{}",null,null,"pemid03" );
+            $result = new stdClass();
+
             // Get Payment Instruments
             $api = str_replace('{customerId}', $customerToken, API::TMS_V2_CUSTOMERS_id_PAYMENTINSTRUMENTS);
 

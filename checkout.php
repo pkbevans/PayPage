@@ -1,8 +1,15 @@
 <?php
 include_once 'card_types.php';
+include_once 'countries.php';
 include 'generate_capture_context.php';
 include 'rest_get_customer.php';
 $shippingAddressRequired = true;
+$defaultEmail="";
+if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
+    $defaultEmail = $_REQUEST['email'];
+}else if($paymentInstrumentCount>0){
+    $defaultEmail = $defaultPaymentInstrument->billTo->email;
+}
 ?>
 <!doctype html>
 <head>
@@ -38,116 +45,122 @@ $shippingAddressRequired = true;
             <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
         </div>
         <div id="paymentDetailsSection">
-            <form id="shippingForm" class="needs-validation" novalidate>    
-                <div class="row">
-                    <div class="col-sm-6"><label for="bill_to_email" class="form-label">Email*</label><input id="bill_to_email" type="email" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->email;}?>" placeholder="Enter email" required></div>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
+            <form id="emailForm" class="needs-validation" novalidate>
+            <div class="row">
+                <div class="col-sm-6">
+                    <label for="bill_to_email" class="form-label">Email*</label>
+                    <input id="bill_to_email" type="email" class="form-control form-control-sm" <?php if(!empty($defaultEmail)) echo "readonly";?> value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
                 </div>
-<?php if($shippingAddressRequired): ?>
-                <div id="shippingDetailsSection" class="form-group">
-                <h5>Delivery Address</h5>
-<?php if($shippingAddressAvailable): ?>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <span id="ship_to_text" class="form-control form-control-sm" disabled><?php echo $shipToText;?></span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <button type="button" class="btn btn-link" onclick="editShippingAddress()">Use a different address</button>
-                    </div>
-                </div>
-<?php else: ?>     
-                <div class="row">
-                    <div class="col-sm-2">
-                        <label for="ship_to_forename" class="form-label">First name*</label>
-                        <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->firstName;}?>" placeholder="First name" required>
-                    </div>
-                    <div class="col-sm-2">
-                        <label for="ship_to_surname" class="form-label">Surname*</label>
-                        <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->lastName;}?>" placeholder="Last Name" required>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
-                        <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->address1;}?>" placeholder="1st line of address" required>
-                    </div>
-                    <div class="col-sm-3">
-                        <label for="ship_to_address_line2" class="form-label">Address line 2</label>
-                        <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo (isset($defaultShippingAddress->shipTo->address2)?$defaultShippingAddress->shipTo->address2:"");}?>" placeholder="2nd line of address">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-3"><label for="ship_to_address_city" class="form-label">City/County*</label>
-                        <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->locality;}?>" placeholder="City/County" required>
-                    </div>
-                    <div class="col-sm-3"><label for="ship_to_postcode" class="form-label">PostCode*</label>
-                        <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->postalCode;}?>" placeholder="Postcode" required>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6"><label for="ship_to_address_country" class="form-label">Country*</label>
-                        <input id="ship_to_address_country" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->country;}?>" placeholder="Country" required>
-                    </div>
-                </div>
-                *Required fields
-<?php endif ?>     
-            </form>
             </div>
-<?php endif ?>
-<?php if ($paymentInstrumentCount): ?>
-                    <div id="storedCardSection">
-                        <h5>Stored Card Details</h5>
-                        <div class="row">
-                            <div class="col-sm-1">
-                                <img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
-                            </div>
-                            <div class="col-sm-1">
-                                <ul class="list-unstyled">
-                                    <li><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></li>
-                                    <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <h5>Card Billing Address</h5>
-                            <div class="col-sm-6">
-                                <span id="bill_to_text" class="form-control form-control-sm" disabled><?php echo $billToText;?></span>
-                            </div>
+            </form>
+<?php if($shippingAddressRequired): ?>
+            <form id="shippingForm" class="needs-validation" novalidate>
+                <div id="shippingDetailsSection" class="form-group">
+                    <h5>Delivery Address</h5>
+<?php if($shippingAddressAvailable): ?>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span id="ship_to_text" class="form-control form-control-sm" disabled><?php echo $shipToText;?></span>
                         </div>
                     </div>
-<?php endif ?>
-            <!--<div class="container">-->
-                <div id="cardDetailsSection">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-link" onclick="editShippingAddress()">Use a different address</button>
+                        </div>
+                    </div>
+<?php else: ?>     <!--$shippingAddressAvailable -->
                     <div class="row">
                         <div class="col-sm-3">
-                            <h5>Card Number</h5>
-                            <div id="number-container" class="form-control form-control-sm"></div>
-                            <h5>Expires</h5>
-                            <div class="col-sm-6" id="expiryContainer">
-                                <input type="number" maxLength="2" id="card_expirationMonth" class="expInput" name="card_expirationMonth" placeholder="MM" pattern="1[0-2]|0[1-9]" required>
-                                <input type="number" min="21" max="30" id="card_expirationYear" class="expInput" name="card_expirationYear" placeholder="YY" required>
-                            </div>
+                            <label for="ship_to_forename" class="form-label">First name*</label>
+                            <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->firstName;}?>" placeholder="First name" required>
                         </div>
+                        <div class="col-sm-3">
+                            <label for="ship_to_surname" class="form-label">Surname*</label>
+                            <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->lastName;}?>" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
+                            <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->address1;}?>" placeholder="1st line of address" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="ship_to_address_line2" class="form-label">Address line 2</label>
+                            <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo (isset($defaultShippingAddress->shipTo->address2)?$defaultShippingAddress->shipTo->address2:"");}?>" placeholder="2nd line of address">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3"><label for="ship_to_address_city" class="form-label">City/County*</label>
+                            <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->locality;}?>" placeholder="City/County" required>
+                        </div>
+                        <div class="col-sm-3"><label for="ship_to_postcode" class="form-label">PostCode*</label>
+                            <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->postalCode;}?>" placeholder="Postcode" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6"><label for="ship_to_address_country" class="form-label">Country*</label>
+                            <select id="ship_to_address_country" class="form-control form-control-sm">
+<?php
+foreach ($countries as $key => $value) {
+    echo "<option value=\"". $key ."\"" . ($shippingAddressAvailable && $defaultShippingAddress->shipTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
+}
+?>
+                            </select>
+                        </div>
+                    </div>
+                    *Required fields
+<?php endif ?> <!--$shippingAddressAvailable -->
+                </div>
+            </form>
+<?php endif ?> <!--$shippingAddressRequired -->
+<?php if ($paymentInstrumentCount): ?>
+            <div id="storedCardSection">
+                <h5>Stored Card Details</h5>
+                <div class="row">
+                    <div class="col-sm-1">
+                        <img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
+                    </div>
+                    <div class="col-sm-1">
+                        <ul class="list-unstyled">
+                            <li><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></li>
+                            <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
+                        </ul>
                     </div>
                 </div>
                 <div class="row">
-                    <h5 id="mySecurityCodeLabel">Security Code</h5> 
-                    <div class="col-sm-2">
-                        <div id="securityCode-container" class="form-control form-control-sm"></div>
+                    <h5>Card Billing Address</h5>
+                    <div class="col-sm-6">
+                        <span id="bill_to_text" class="form-control form-control-sm" disabled><?php echo $billToText;?></span>
                     </div>
                 </div>
-                <br>
-                <div id="storeCardSection" class="row">
-                    <div class="col-sm-5">
-                        <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
-                        <label for="storeCard" class="form-check-label">Store my details for future use</label>
+            </div>
+<?php endif ?>
+            <div id="cardDetailsSection">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <h5>Card Number</h5>
+                        <div id="number-container" class="form-control form-control-sm"></div>
+                        <h5>Expires</h5>
+                        <div class="col-sm-6" id="expiryContainer">
+                            <input type="number" maxLength="2" id="card_expirationMonth" class="expInput" name="card_expirationMonth" placeholder="MM" pattern="1[0-2]|0[1-9]" required>
+                            <input type="number" min="21" max="30" id="card_expirationYear" class="expInput" name="card_expirationYear" placeholder="YY" required>
+                        </div>
                     </div>
                 </div>
-            <!--</div>-->
+            </div>
+            <div class="row">
+                <h5 id="securityCodeLabel">Security Code</h5>
+                <div class="col-sm-2">
+                    <div id="securityCode-container" class="form-control form-control-sm"></div>
+                </div>
+            </div>
+            <br>
+            <div id="storeCardSection" class="row">
+                <div class="col-sm-5">
+                    <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
+                    <label for="storeCard" class="form-check-label">Store my details for future use</label>
+                </div>
+            </div>
 <?php if($shippingAddressRequired && !$paymentInstrumentCount): ?>
             <div id="useShippingAsBilling" class="row">
                 <div class="col-sm-5">
@@ -156,67 +169,73 @@ $shippingAddressRequired = true;
                 </div>
             </div>
 <?php endif ?>
-                <div class="form-group">
-                <form id="billingForm" class="needs-validation" novalidate style="display: <?php echo ($shippingAddressRequired && !$paymentInstrumentCount?"none":"block")?>">    
+            <!--<div class="form-group">-->
 <?php if($paymentInstrumentCount): ?>
-                    <div id="defaultBillingSection">
+            <div id="defaultBillingSection">
+                <div class="row">
+                    <div class="col-sm-6">
+<?php if($paymentInstrumentCount>1): ?>
+                        <button type="button" class="btn btn-link" onclick="editCard()">Use a different Stored Card</button>
+<?php endif ?>
+                        <button type="button" class="btn btn-link" onclick="newCard()">Use New Card</button>
+                    </div>
+                </div>
+            </div>
+<?php endif ?>  
+            <form id="billingForm" class="needs-validation" novalidate style="display: none">
+                <div id="billingSection">
+                    <h5>Card Billing Address</h5>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label for="bill_to_forename" class="form-label">First name*</label>
+                            <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->firstName;}?>" placeholder="First name" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="bill_to_surname" class="form-label">Surname*</label>
+                            <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
+                            <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address1;}?>" placeholder="1st line of address" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="bill_to_address_line2" class="form-label">Address line 2</label>
+                            <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address2;}?>" placeholder="2nd line of address">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3"><label for="bill_to_address_city" class="form-label">City/County*</label>
+                            <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->locality;}?>" placeholder="City/County" required>
+                        </div>
+                        <div class="col-sm-3"><label for="bill_to_postcode" class="form-label">PostCode*</label>
+                            <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->postalCode;}?>" placeholder="Postcode" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6"><label for="bill_to_address_country" class="form-label">Country*</label>
+                            <select id="bill_to_address_country" class="form-control form-control-sm">
+<?php
+foreach ($countries as $key => $value) {
+    echo "<option value=\"". $key ."\"" . ($paymentInstrumentCount && $defaultPaymentInstrument->billTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
+}
+?>
+                            </select>
+                        </div>
+                    </div>
+                    *Required fields
+<?php if($paymentInstrumentCount): ?>
                     <div class="row">
                         <div class="col-sm-6">
-<?php if($paymentInstrumentCount>1): ?>
-                            <button type="button" class="btn btn-link" onclick="editCard()">Use a different Stored Card</button>
+                            <button type="button" class="btn btn-link" onclick="cancelNewCard()">Use a Stored Card</button>
+                        </div>
+                    </div>
 <?php endif ?>
-                        <!--</div>-->
-                        <!--<div class="col-sm-2">-->
-                            <button type="button" class="btn btn-link" onclick="newCard()">Use New Card</button>
-                        </div>
-                    </div>
-                    </div>
-<?php endif ?>  
-                    <div id="billingSection" style="display: <?php echo ($paymentInstrumentCount?"none":"block")?>">    
-                        <h5>Card Billing Address</h5>
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <label for="bill_to_forename" class="form-label">First name*</label>
-                                <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->firstName;}?>" placeholder="First name" required>
-                            </div>
-                            <div class="col-sm-3">
-                                <label for="bill_to_surname" class="form-label">Surname*</label>
-                                <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
-                                <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address1;}?>" placeholder="1st line of address" required>
-                            </div>
-                            <div class="col-sm-3">
-                                <label for="bill_to_address_line2" class="form-label">Address line 2</label>
-                                <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address2;}?>" placeholder="2nd line of address">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-3"><label for="bill_to_address_city" class="form-label">City/County*</label>
-                                <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->locality;}?>" placeholder="City/County" required>
-                            </div>
-                            <div class="col-sm-3"><label for="bill_to_postcode" class="form-label">PostCode*</label>
-                                <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->postalCode;}?>" placeholder="Postcode" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6"><label for="bill_to_address_country" class="form-label">Country*</label>
-                                <input id="bill_to_address_country" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->country;}?>" placeholder="Country" required>
-                            </div>
-                        </div>
-                        *Required fields
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <button type="button" class="btn btn-link" onclick="cancelNewCard()">Use a Stored Card</button>
-                            </div>
-                        </div>
-                    </div>
+                </div>
 
-                </form>
-            </div>
+            </form>
+            <!--</div>-->
             <BR><button type="button" id="payButton" class="btn btn-primary" disabled="true">Pay</button><BR><BR>
             <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
         </div>
@@ -313,7 +332,16 @@ document.addEventListener("DOMContentLoaded", function (e) {
     flex = new Flex(captureContext);
     microform = flex.microform({styles: myStyles});
     number = microform.createField('number', {placeholder: 'Card number'});
-    securityCode = microform.createField('securityCode', {placeholder: '•••'});
+<?php
+    if($paymentInstrumentCount && $defaultPaymentInstrument->card->type == "003"){
+        $placeHolder = "'••••'";
+        $cvvLength=4;
+    }else{
+        $placeHolder = "'•••'";
+        $cvvLength=3;
+    }
+    echo "\tsecurityCode = microform.createField('securityCode', {placeholder: ". $placeHolder . ", maxLength: " . $cvvLength ."});\n";
+?>
     payButton = document.querySelector('#payButton');
     numberContainer = document.querySelector('#number-container');
     expYear = document.querySelector('#card_expirationYear');
@@ -321,20 +349,26 @@ document.addEventListener("DOMContentLoaded", function (e) {
     panValid = false;
     cvnValid = false;
 
-    if (paymentInstrumentId !== "") {
-        showPanField(false);
-    } else {
-        showPanField(true);
-    }
     securityCode.load('#securityCode-container');
-    secCodeLbl = document.querySelector('#mySecurityCodeLabel');
+    secCodeLbl = document.querySelector('#securityCodeLabel');
 
-    console.log("\ncaptureContext:\n" + captureContext);
+    if (paymentInstrumentId === "") {
+        showPanField(true);
+    } else {
+        showPanField(false);
+        // We have a default Payment Instrument
+    }
+
+//    console.log("\ncaptureContext:\n" + captureContext);
 
     form = document.querySelector('#payment_form');
     number.on('change', function (data) {
         console.log(data);
+        // Set "CVV" text with name based on scheme
         secCodeLbl.textContent = (data.card && data.card.length > 0) ? data.card[0].securityCode.name : 'CVN';
+        if(data.card && data.card.length > 0){
+            updateSecurityCodeField(data.card[0].cybsCardType);
+        }
         panValid = data.valid;
         fieldsValid(panValid);
     });
@@ -348,6 +382,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
         }
     });
     securityCode.on('change', function (data) {
+        console.log(data);
         cvnValid = data.valid;
         fieldsValid(cvnValid);
     });
@@ -358,27 +393,35 @@ document.addEventListener("DOMContentLoaded", function (e) {
         fieldsValid(true);
     });
     payButton.addEventListener('click', (event) => {
-        if (billingFieldsValid()) {
+        if (formsValidated()) {
             payNow();
         }
     });
 });
+function updateSecurityCodeField(type){
+    // If Amex, CVVis 4 digits, else 3
+    if(type === "003"){
+        securityCode.update({placeholder: "••••", maxLength: 4});
+    }else{
+        securityCode.update({placeholder: "•••", maxLength: 3});
+    }
+}
 function cancel() {
     onFinish("CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
     window.location.assign("index.php");
 }
-function billingFieldsValid() {
-    ret = true;
-    if(shippingAddressRequired){
+function formsValidated() {
+    form = document.getElementById('emailForm');
+    ret = validateForm(form);
+//    ret = true;
+    if(ret && shippingAddressRequired && shippingAddressId === ""){
         orderDetails.useShippingAsBilling = shipAsBill();
         form = document.getElementById('shippingForm');
         ret = validateForm(form);
     }
-    if(ret){
-        if(!shippingAddressRequired || !orderDetails.useShippingAsBilling){
-            form = document.getElementById('billingForm');
-            ret = validateForm(form);
-        }
+    if(ret && paymentInstrumentId === "" && (!shippingAddressRequired || !orderDetails.useShippingAsBilling)){
+        form = document.getElementById('billingForm');
+        ret = validateForm(form);
     }
     return ret;
 }
@@ -635,7 +678,16 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                 }
             } else {
                 // 500 System error or anything else
-                onFinish(status, "", false, false, httpCode, res.response.reason, res.response.message);
+                switch(httpCode){
+                    case "202":
+                        onFinish(status, "", false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                        break;
+                    case "400":
+                        onFinish(status, "", false, false, httpCode, res.response.reason, res.response.details);
+                        break;
+                    default:
+                        onFinish(status, "", false, false, httpCode, res.response.reason, res.response.message);
+                }
             }
         }
     });
@@ -687,6 +739,7 @@ xxx = stylePaymentInstrument(paymentInstrument);
     document.getElementById('storedCardSection').innerHTML  = xxx;
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
+    updateSecurityCodeField(paymentInstrument.card.type);
 }
 function stylePaymentInstrument(paymentInstrument){
     img = "";
@@ -694,11 +747,12 @@ function stylePaymentInstrument(paymentInstrument){
     if (paymentInstrument.card.type === "001") {
         img = "images/Visa.svg";
         alt = "Visa card logo";
-    } else if ($paymentInstrument.card.type === "002") {
+    } else if (paymentInstrument.card.type === "002") {
         img = "images/Mastercard.svg";
-        alt = "Mastercard card logo";
+        alt = "Mastercard logo";
     } else {
-        // TODO
+        img = "images/Amex.svg";
+        alt = "Amex card logo";
     }
     xxx =   "<h5>Stored Card Details</h5>" +
             "<div class=\"row\">\n" +
@@ -754,14 +808,14 @@ function newCard(){
     oldPaymentSnstrumentId=paymentInstrumentId;
     paymentInstrumentId = "";
     showPanField(true);
-    document.getElementById('billingSection').style.display = "block";
+    document.getElementById('billingForm').style.display = "block";
     document.getElementById('defaultBillingSection').style.display = "none";
     document.getElementById('storedCardSection').style.display = "none";
 }
 function cancelNewCard(){
     paymentInstrumentId = oldPaymentSnstrumentId;
     showPanField(false);
-    document.getElementById('billingSection').style.display = "none";
+    document.getElementById('billingForm').style.display = "none";
     document.getElementById('defaultBillingSection').style.display = "block";
     document.getElementById('storedCardSection').style.display = "block";
 }
