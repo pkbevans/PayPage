@@ -1,5 +1,5 @@
-const monthInput = document.querySelector('#card_expirationMonth');
-const yearInput = document.querySelector('#card_expirationYear');
+const expMonth = document.getElementById('card_expirationMonth');
+const expYear = document.getElementById('card_expirationYear');
 
 const focusSibling = function (target, direction, callback) {
     const nextTarget = target[direction];
@@ -8,9 +8,27 @@ const focusSibling = function (target, direction, callback) {
     callback && callback(nextTarget);
 }
 
+expYear.addEventListener('change', (event) => {
+    fieldsValid(true);
+});
+expMonth.addEventListener('change', (event) => {
+    fieldsValid(true);
+});
+function expiryDateValid() {
+    d = new Date();
+    todayYear = d.getFullYear();
+    todayMonth = d.getMonth();
+    xMonth = parseInt(expMonth.value);
+    xYear = 2000 + parseInt(expYear.value);
+    if (xYear < todayYear || (xYear === todayYear && xMonth < todayMonth) || xMonth > 12 || xMonth < 1) {
+        return false;
+    }
+    return true;
+}
+
 // input event only fires if there is space in the input for entry.
 // If an input of x length has x characters, keyboard press will not fire this input event.
-monthInput.addEventListener('input', (event) => {
+expMonth.addEventListener('input', (event) => {
 
     const value = event.target.value.toString();
     // adds 0 to month user input like 9 -> 09
@@ -28,7 +46,7 @@ monthInput.addEventListener('input', (event) => {
     event.stopImmediatePropagation();
 });
 
-yearInput.addEventListener('keydown', (event) => {
+expYear.addEventListener('keydown', (event) => {
     // if the year is empty jump to the month input
     if (event.key === "Backspace" && event.target.selectionStart === 0) {
         focusSibling(event.target, "previousElementSibling");

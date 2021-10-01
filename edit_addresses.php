@@ -7,12 +7,12 @@ function concatinateNameAddress($nameAddress){
     if(!isset($nameAddress->address2)){
         $nameAddress->address2 = "";
     }
-    return xtrim($nameAddress->firstName, " ") . 
-            xtrim($nameAddress->lastName, ", ") . 
-            xtrim($nameAddress->address1, ", ") . 
-            xtrim($nameAddress->address2, ", ") . 
-            xtrim($nameAddress->locality, ", ") . 
-            xtrim($nameAddress->postalCode, ", ") . 
+    return xtrim($nameAddress->firstName, " ") .
+            xtrim($nameAddress->lastName, ", ") .
+            xtrim($nameAddress->address1, ", ") .
+            xtrim($nameAddress->address2, ", ") .
+            xtrim($nameAddress->locality, ", ") .
+            xtrim($nameAddress->postalCode, ", ") .
             xtrim($nameAddress->country, ".");
 }
 
@@ -70,41 +70,58 @@ $count=0;
                             <div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $shippingAddress->id;?>_firstName" class="form-label">First name*</label>
-                                        <input id="<?php echo $shippingAddress->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->firstName;?>" placeholder="First name" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $shippingAddress->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->firstName;?>" placeholder="First name" required>
+                                            <label for="<?php echo $shippingAddress->id;?>_firstName" class="form-label">First name*</label>
+                                        </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $shippingAddress->id;?>_lastName" class="form-label">Surname*</label>
-                                        <input id="<?php echo $shippingAddress->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->lastName;?>" placeholder="Last Name" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $shippingAddress->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->lastName;?>" placeholder="Last Name" required>
+                                            <label for="<?php echo $shippingAddress->id;?>_lastName" class="form-label">Surname*</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $shippingAddress->id;?>_address1" class="form-label">Address line 1*</label>
-                                        <input id="<?php echo $shippingAddress->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->address1;?>" placeholder="1st line of address" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $shippingAddress->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->address1;?>" placeholder="1st line of address" required>
+                                            <label for="<?php echo $shippingAddress->id;?>_address1" class="form-label">Address line 1*</label>
+                                        </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $shippingAddress->id;?>_address2" class="form-label">Address line 2</label>
-                                        <input id="<?php echo $shippingAddress->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($shippingAddress->shipTo->address2)?$shippingAddress->shipTo->address2:"");?>" placeholder="2nd line of address">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $shippingAddress->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($shippingAddress->shipTo->address2)?$shippingAddress->shipTo->address2:"");?>" placeholder="2nd line of address">
+                                            <label for="<?php echo $shippingAddress->id;?>_address2" class="form-label">Address line 2</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3"><label for="<?php echo $shippingAddress->id;?>_locality" class="form-label">City/County*</label>
-                                        <input id="<?php echo $shippingAddress->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->locality;?>" placeholder="City/County" required>
+                                    <div class="col-sm-3">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $shippingAddress->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->locality;?>" placeholder="City/County" required>
+                                            <label for="<?php echo $shippingAddress->id;?>_locality" class="form-label">City/County*</label>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3"><label for="<?php echo $shippingAddress->id;?>_postalCode" class="form-label">PostCode*</label>
-                                        <input id="<?php echo $shippingAddress->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->postalCode;?>" placeholder="Postcode" required>
+                                    <div class="col-sm-3">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $shippingAddress->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->postalCode;?>" placeholder="Postcode" required>
+                                            <label for="<?php echo $shippingAddress->id;?>_postalCode" class="form-label">PostCode*</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-6"><label for="<?php echo $shippingAddress->id;?>_address_country" class="form-label">Country*</label>
-                                        <select id="<?php echo $shippingAddress->id;?>_country" class="form-select">
+                                    <div class="col-sm-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <select id="<?php echo $shippingAddress->id;?>_country" class="form-select">
 <?php
 foreach ($countries as $key => $value) {
     echo "<option value=\"". $key ."\"" . ( $shippingAddress->shipTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
 }
 ?>
-                                        </select>
+                                            </select>
+                                            <label for="<?php echo $shippingAddress->id;?>_address_country" class="form-label">Country*</label>
+                                        </div>
                                     </div>
                                 </div>
                         *Required fields
@@ -139,41 +156,58 @@ foreach ($countries as $key => $value) {
                             <div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label for="add_firstName" class="form-label">First name*</label>
-                                        <input id="add_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="add_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" required>
+                                            <label for="add_firstName" class="form-label">First name*</label>
+                                        </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label for="add_lastName" class="form-label">Surname*</label>
-                                        <input id="add_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <label for="add_lastName" class="form-label">Surname*</label>
+                                            <input id="add_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" required>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label for="add_address1" class="form-label">Address line 1*</label>
-                                        <input id="add_address1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <label for="add_address1" class="form-label">Address line 1*</label>
+                                            <input id="add_address1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" required>
+                                        </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label for="add_address2" class="form-label">Address line 2</label>
-                                        <input id="add_address2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address">
+                                        <div class="form-group form-floating mb-3">
+                                            <label for="add_address2" class="form-label">Address line 2</label>
+                                            <input id="add_address2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3"><label for="add_locality" class="form-label">City/County*</label>
-                                        <input id="add_locality" type="text" class="form-control form-control-sm" value="" placeholder="City/County" required>
+                                    <div class="col-sm-3">
+                                        <div class="form-group form-floating mb-3">
+                                            <label for="add_locality" class="form-label">City/County*</label>
+                                            <input id="add_locality" type="text" class="form-control form-control-sm" value="" placeholder="City/County" required>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3"><label for="add_postalCode" class="form-label">PostCode*</label>
-                                        <input id="add_postalCode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" required>
+                                    <div class="col-sm-3">
+                                        <div class="form-group form-floating mb-3">
+                                            <label for="add_postalCode" class="form-label">PostCode*</label>
+                                            <input id="add_postalCode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" required>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-6"><label for="add_address_country" class="form-label">Country*</label>
-                                        <select id="add_country" class="form-select">
+                                    <div class="col-sm-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <select id="add_country" class="form-select">
 <?php
 foreach ($countries as $key => $value) {
     echo "<option value=\"". $key ."\">" . $value . "</option>\n";
 }
 ?>
-                                        </select>
+                                            </select>
+                                            <label for="add_address_country" class="form-label">Country*</label>
+                                        </div>
                                     </div>
                                 </div>
                         *Required fields

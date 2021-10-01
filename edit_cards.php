@@ -8,12 +8,12 @@ function concatinateNameAddress($nameAddress){
     if(!isset($nameAddress->address2)){
         $nameAddress->address2 = "";
     }
-    return xtrim($nameAddress->firstName, " ") . 
-            xtrim($nameAddress->lastName, "<BR>") . 
-            xtrim($nameAddress->address1, ", ") . 
-            xtrim($nameAddress->address2, ", ") . 
-            xtrim($nameAddress->locality, ", ") . 
-            xtrim($nameAddress->postalCode, ", ") . 
+    return xtrim($nameAddress->firstName, " ") .
+            xtrim($nameAddress->lastName, "<BR>") .
+            xtrim($nameAddress->address1, ", ") .
+            xtrim($nameAddress->address2, ", ") .
+            xtrim($nameAddress->locality, ", ") .
+            xtrim($nameAddress->postalCode, ", ") .
             xtrim($nameAddress->country, ".");
 }
 
@@ -23,7 +23,7 @@ function xtrim($in, $suffix){
 }
 function stylePaymentInstrument($paymentInstrument){
     global $cardTypes;
-    return 
+    return
     "<div class=\"col-sm-2\"><img  src=\"images/". $cardTypes[$paymentInstrument->card->type]['image'] . "\" class=\"img-fluid\" alt=\"" . $cardTypes[$paymentInstrument->card->type]['alt'] . "\"></div>\n" .
     "<div class=\"col-sm-1\">\n" .
         "<ul class=\"list-unstyled\">" .
@@ -80,41 +80,58 @@ $count=0;
                             <div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $paymentInstrument->id;?>_firstName" class="form-label">First name*</label>
-                                        <input id="<?php echo $paymentInstrument->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->firstName;?>" placeholder="First name" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $paymentInstrument->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->firstName;?>" placeholder="First name" required>
+                                            <label for="<?php echo $paymentInstrument->id;?>_firstName" class="form-label">First name*</label>
+                                        </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $paymentInstrument->id;?>_lastName" class="form-label">Surname*</label>
-                                        <input id="<?php echo $paymentInstrument->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->lastName;?>" placeholder="Last Name" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $paymentInstrument->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->lastName;?>" placeholder="Last Name" required>
+                                            <label for="<?php echo $paymentInstrument->id;?>_lastName" class="form-label">Surname*</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $paymentInstrument->id;?>_address1" class="form-label">Address line 1*</label>
-                                        <input id="<?php echo $paymentInstrument->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->address1;?>" placeholder="1st line of address" required>
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $paymentInstrument->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->address1;?>" placeholder="1st line of address" required>
+                                            <label for="<?php echo $paymentInstrument->id;?>_address1" class="form-label">Address line 1*</label>
+                                        </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label for="<?php echo $paymentInstrument->id;?>_address2" class="form-label">Address line 2</label>
-                                        <input id="<?php echo $paymentInstrument->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($paymentInstrument->billTo->address2)?$paymentInstrument->billTo->address2:"");?>" placeholder="2nd line of address">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $paymentInstrument->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($paymentInstrument->billTo->address2)?$paymentInstrument->billTo->address2:"");?>" placeholder="2nd line of address">
+                                            <label for="<?php echo $paymentInstrument->id;?>_address2" class="form-label">Address line 2</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3"><label for="<?php echo $paymentInstrument->id;?>_locality" class="form-label">City/County*</label>
-                                        <input id="<?php echo $paymentInstrument->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->locality;?>" placeholder="City/County" required>
+                                    <div class="col-sm-3">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $paymentInstrument->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->locality;?>" placeholder="City/County" required>
+                                            <label for="<?php echo $paymentInstrument->id;?>_locality" class="form-label">City/County*</label>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3"><label for="<?php echo $paymentInstrument->id;?>_postalCode" class="form-label">PostCode*</label>
-                                        <input id="<?php echo $paymentInstrument->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->postalCode;?>" placeholder="Postcode" required>
+                                    <div class="col-sm-3">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="<?php echo $paymentInstrument->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->postalCode;?>" placeholder="Postcode" required>
+                                            <label for="<?php echo $paymentInstrument->id;?>_postalCode" class="form-label">PostCode*</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-6"><label for="<?php echo $paymentInstrument->id;?>_address_country" class="form-label">Country*</label>
-                                        <select id="<?php echo $paymentInstrument->id;?>_country" class="form-select">
+                                    <div class="col-sm-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <select id="<?php echo $paymentInstrument->id;?>_country" class="form-select">
 <?php
 foreach ($countries as $key => $value) {
     echo "<option value=\"". $key ."\"" . ( $paymentInstrument->billTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
 }
 ?>
-                                        </select>
+                                            </select>
+                                            <label for="<?php echo $paymentInstrument->id;?>_address_country" class="form-label">Country*</label>
+                                        </div>
                                     </div>
                                 </div>
                         *Required fields

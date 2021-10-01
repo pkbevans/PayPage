@@ -114,7 +114,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row mb-3">
                         <div class="col-sm-6">
                             <div class="form-floating">
                                 <select id="ship_to_address_country" class="form-control form-control-sm">
@@ -155,23 +155,24 @@ foreach ($countries as $key => $value) {
             </div>
 <?php endif ?>
             <div id="cardDetailsSection">
-                <div class="row">
+                <div class="row mb-1">
                     <div class="col-sm-3">
                         <label class="form-check-label" for="number-container">Card Number</label>
                         <div id="number-container" class="form-control form-control-sm"></div>
                     </div>
                     <div class="col-sm-3">
-                        <label class="form-check-label" for="exp-wrapper">Expires</label>
-                        <div class="exp-wrapper">
-                          <input autocomplete="off" class="exp form-control" id="card_expirationMonth" name="card_expirationMonth" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="MM" type="text" data-pattern-validate />
-                          <input autocomplete="off" class="exp form-control" id="card_expirationYear" name="card_expirationYear" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="YY" type="text" data-pattern-validate />
+                        <!-- <div class="exp-wrapper"> -->
+                        <label class="form-check-label ms-3" for="expiry">Expires</label>
+                        <div class="expiry input-group ms-3">
+                            <input autocomplete="off" class="form-control exp" id="card_expirationMonth" name="card_expirationMonth" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="MM" type="text" data-pattern-validate />
+                            <input autocomplete="off" class="form-control exp" id="card_expirationYear" name="card_expirationYear" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="YY" type="text" data-pattern-validate />
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <h5 id="securityCodeLabel">Security Code</h5>
+            <div class="row mt-1">
                 <div class="col-sm-2">
+                    <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
                     <div id="securityCode-container" class="form-control form-control-sm"></div>
                 </div>
             </div>
@@ -208,41 +209,58 @@ foreach ($countries as $key => $value) {
                     <h5>Card Billing Address</h5>
                     <div class="row">
                         <div class="col-sm-3">
-                            <label for="bill_to_forename" class="form-label">First name*</label>
-                            <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->firstName;}?>" placeholder="First name" required>
+                            <div class="form-group form-floating mb-3">
+                                <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->firstName;}?>" placeholder="First name" required>
+                                <label for="bill_to_forename" class="form-label">First name*</label>
+                            </div>
                         </div>
                         <div class="col-sm-3">
-                            <label for="bill_to_surname" class="form-label">Surname*</label>
-                            <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" required>
+                            <div class="form-group form-floating mb-3">
+                                <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" required>
+                                <label for="bill_to_surname" class="form-label">Surname*</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-3">
-                            <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
-                            <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address1;}?>" placeholder="1st line of address" required>
+                            <div class="form-group form-floating mb-3">
+                                <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address1;}?>" placeholder="1st line of address" required>
+                                <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
+                            </div>
                         </div>
                         <div class="col-sm-3">
-                            <label for="bill_to_address_line2" class="form-label">Address line 2</label>
-                            <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address2;}?>" placeholder="2nd line of address">
+                            <div class="form-group form-floating mb-3">
+                                <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address2;}?>" placeholder="2nd line of address">
+                                <label for="bill_to_address_line2" class="form-label">Address line 2</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3"><label for="bill_to_address_city" class="form-label">City/County*</label>
-                            <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->locality;}?>" placeholder="City/County" required>
+                        <div class="col-sm-3">
+                            <div class="form-group form-floating mb-3">
+                                <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->locality;}?>" placeholder="City/County" required>
+                                <label for="bill_to_address_city" class="form-label">City/County*</label>
+                            </div>
                         </div>
-                        <div class="col-sm-3"><label for="bill_to_postcode" class="form-label">PostCode*</label>
-                            <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->postalCode;}?>" placeholder="Postcode" required>
+                        <div class="col-sm-3">
+                            <div class="form-group form-floating mb-3">
+                                <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->postalCode;}?>" placeholder="Postcode" required>
+                                <label for="bill_to_postcode" class="form-label">PostCode*</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-6"><label for="bill_to_address_country" class="form-label">Country*</label>
-                            <select id="bill_to_address_country" class="form-control form-control-sm">
+                        <div class="col-sm-6">
+                            <div class="form-group form-floating mb-3">
+                                <select id="bill_to_address_country" class="form-control form-control-sm">
 <?php
 foreach ($countries as $key => $value) {
     echo "<option value=\"". $key ."\"" . ($paymentInstrumentCount && $defaultPaymentInstrument->billTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
 }
 ?>
-                            </select>
+                                </select>
+                                <label for="bill_to_address_country" class="form-label">Country*</label>
+                            </div>
                         </div>
                     </div>
 <?php if($paymentInstrumentCount): ?>
@@ -339,8 +357,6 @@ var cvnValid;
 var secCodeLbl;
 var form;
 var numberContainer;
-var expYear;
-var expMonth;
 <?php
 if ($paymentInstrumentCount) {
     echo "var xxx =  '" . json_encode($storedCards) . "';\n";
@@ -366,8 +382,6 @@ document.addEventListener("DOMContentLoaded", function (e) {
 ?>
     payButton = document.querySelector('#payButton');
     numberContainer = document.querySelector('#number-container');
-    expYear = document.querySelector('#card_expirationYear');
-    expMonth = document.querySelector('#card_expirationMonth');
     panValid = false;
     cvnValid = false;
 
@@ -407,12 +421,6 @@ document.addEventListener("DOMContentLoaded", function (e) {
         console.log(data);
         cvnValid = data.valid;
         fieldsValid(cvnValid);
-    });
-    expYear.addEventListener('change', (event) => {
-        fieldsValid(true);
-    });
-    expMonth.addEventListener('change', (event) => {
-        fieldsValid(true);
     });
     payButton.addEventListener('click', (event) => {
         if (formsValidated()) {
@@ -555,18 +563,6 @@ function showPanField(show) {
             number.unload();
         }
     }
-}
-function expiryDateValid() {
-    d = new Date();
-    todayYear = d.getFullYear();
-    todayMonth = d.getMonth();
-    expMonth = parseInt(document.getElementById('card_expirationMonth').value);
-    expYear = 2000 + parseInt(document.getElementById('card_expirationYear').value);
-    if (expYear < todayYear || (expYear === todayYear && expMonth < todayMonth) || expMonth > 12 || expMonth < 1) {
-        document.getElementById('card_expirationMonth').setCustomValidity('poopants');
-        return false;
-    }
-    return true;
 }
 function setOrderDetails() {
     if(shippingAddressRequired && shippingAddressId === ""){

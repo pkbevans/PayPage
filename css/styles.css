@@ -39,9 +39,10 @@
      cursor: pointer;
  }
  /* Expiry date stuff */
- .exp-wrapper {
+ .expiry {
    position: relative;
-   border: 1px solid #aaa;
+   border: 1px solid #ced4da;
+   border-radius: .2rem;
    display: flex;
    width: 120px;
    justify-content: space-around;
@@ -50,12 +51,12 @@
    font-size: 24px;
  }
 
- .exp-wrapper:after {
+ .expiry:after {
    content: '/';
    position: absolute;
-   left: 50%;
+   left: 40%;
    margin-left: -4px;
-   color: #aaa;
+   color: #ced4da;
  }
 
  input.exp {
@@ -65,5 +66,5 @@
    width: 40px;
    outline: none;
    appearance: none;
-   font-size: 14px;
+   font-size: 16px;
  }
