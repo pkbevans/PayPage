@@ -160,4 +160,3 @@ try {
 } catch (Exception $exception) {
     echo(json_encode($exception));
 }
-?>

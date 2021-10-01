@@ -41,6 +41,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
         <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
     </form>
     <div class="container">
+
         <div id="iframeSection" style="display: none">
             <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
         </div>
@@ -48,8 +49,10 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <form id="emailForm" class="needs-validation" novalidate>
             <div class="row">
                 <div class="col-sm-6">
-                    <label for="bill_to_email" class="form-label">Email*</label>
-                    <input id="bill_to_email" type="email" class="form-control form-control-sm" <?php if(!empty($defaultEmail)) echo "readonly";?> value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                    <div class="form-group form-floating mb-3">
+                        <input id="bill_to_email" type="email" class="form-control form-control-sm" <?php if(!empty($defaultEmail)) echo "readonly";?> value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                        <label for="bill_to_email" class="form-label">Email*</label>
+                    </div>
                 </div>
             </div>
             </form>
@@ -71,44 +74,60 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <?php else: ?>     <!--$shippingAddressAvailable -->
                     <div class="row">
                         <div class="col-sm-3">
-                            <label for="ship_to_forename" class="form-label">First name*</label>
-                            <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->firstName;}?>" placeholder="First name" required>
+                            <div class="form-group form-floating mb-3">
+                                <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->firstName;}?>" placeholder="First name" required>
+                                <label for="ship_to_forename" class="form-label">First name*</label>
+                            </div>
                         </div>
                         <div class="col-sm-3">
-                            <label for="ship_to_surname" class="form-label">Surname*</label>
-                            <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->lastName;}?>" placeholder="Last Name" required>
+                            <div class="form-group form-floating mb-3">
+                                <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->lastName;}?>" placeholder="Last Name" required>
+                                <label for="ship_to_surname" class="form-label">Surname*</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-3">
-                            <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
-                            <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->address1;}?>" placeholder="1st line of address" required>
+                            <div class="form-group form-floating mb-3">
+                                <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->address1;}?>" placeholder="1st line of address" required>
+                                <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
+                            </div>
                         </div>
                         <div class="col-sm-3">
-                            <label for="ship_to_address_line2" class="form-label">Address line 2</label>
-                            <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo (isset($defaultShippingAddress->shipTo->address2)?$defaultShippingAddress->shipTo->address2:"");}?>" placeholder="2nd line of address">
+                            <div class="form-group form-floating mb-3">
+                                <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo (isset($defaultShippingAddress->shipTo->address2)?$defaultShippingAddress->shipTo->address2:"");}?>" placeholder="2nd line of address">
+                                    <label for="ship_to_address_line2" class="form-label">Address line 2</label>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                            <div class="form-group form-floating mb-3">
+                                <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->locality;}?>" placeholder="City/County" required>
+                                <label for="ship_to_address_city" class="form-label">City/County*</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group form-floating mb-3">
+                                <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->postalCode;}?>" placeholder="Postcode" required>
+                                <label for="ship_to_postcode" class="form-label">PostCode*</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3"><label for="ship_to_address_city" class="form-label">City/County*</label>
-                            <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->locality;}?>" placeholder="City/County" required>
-                        </div>
-                        <div class="col-sm-3"><label for="ship_to_postcode" class="form-label">PostCode*</label>
-                            <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->postalCode;}?>" placeholder="Postcode" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6"><label for="ship_to_address_country" class="form-label">Country*</label>
-                            <select id="ship_to_address_country" class="form-control form-control-sm">
+                        <div class="col-sm-6">
+                            <div class="form-floating">
+                                <select id="ship_to_address_country" class="form-control form-control-sm">
 <?php
 foreach ($countries as $key => $value) {
     echo "<option value=\"". $key ."\"" . ($shippingAddressAvailable && $defaultShippingAddress->shipTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
 }
 ?>
-                            </select>
+                                </select>
+                                <label for="ship_to_address_country" class="form-label">Country*</label>
+                            </div>
                         </div>
                     </div>
-                    *Required fields
 <?php endif ?> <!--$shippingAddressAvailable -->
                 </div>
             </form>
@@ -138,12 +157,14 @@ foreach ($countries as $key => $value) {
             <div id="cardDetailsSection">
                 <div class="row">
                     <div class="col-sm-3">
-                        <h5>Card Number</h5>
+                        <label class="form-check-label" for="number-container">Card Number</label>
                         <div id="number-container" class="form-control form-control-sm"></div>
-                        <h5>Expires</h5>
-                        <div class="col-sm-6" id="expiryContainer">
-                            <input type="number" maxLength="2" id="card_expirationMonth" class="expInput" name="card_expirationMonth" placeholder="MM" pattern="1[0-2]|0[1-9]" required>
-                            <input type="number" min="21" max="30" id="card_expirationYear" class="expInput" name="card_expirationYear" placeholder="YY" required>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-check-label" for="exp-wrapper">Expires</label>
+                        <div class="exp-wrapper">
+                          <input autocomplete="off" class="exp form-control" id="card_expirationMonth" name="card_expirationMonth" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="MM" type="text" data-pattern-validate />
+                          <input autocomplete="off" class="exp form-control" id="card_expirationYear" name="card_expirationYear" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="YY" type="text" data-pattern-validate />
                         </div>
                     </div>
                 </div>
@@ -181,7 +202,7 @@ foreach ($countries as $key => $value) {
                     </div>
                 </div>
             </div>
-<?php endif ?>  
+<?php endif ?>
             <form id="billingForm" class="needs-validation" novalidate style="display: none">
                 <div id="billingSection">
                     <h5>Card Billing Address</h5>
@@ -224,7 +245,6 @@ foreach ($countries as $key => $value) {
                             </select>
                         </div>
                     </div>
-                    *Required fields
 <?php if($paymentInstrumentCount): ?>
                     <div class="row">
                         <div class="col-sm-6">
@@ -243,12 +263,14 @@ foreach ($countries as $key => $value) {
             <h5 class="card-title">Result</h5>
             <div id="progressSpinner"  class="spinner-border text-info"></div>
             <p id="result" class="card-text"></p>
+            <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
             <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
+<script src="js/expiryDate.js"></script>
 <script>
 // the capture context that was requested server-side for this transaction
 var captureContext = "<?php echo $captureContext ?>";
@@ -359,7 +381,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
         // We have a default Payment Instrument
     }
 
-//    console.log("\ncaptureContext:\n" + captureContext);
+   console.log("\ncaptureContext:\n" + captureContext);
 
     form = document.querySelector('#payment_form');
     number.on('change', function (data) {
@@ -439,7 +461,7 @@ function validateForm(form){
         form.classList.add('was-validated');
         return false;
     }
-    return true;    
+    return true;
 }
 function payNow() {
     if (paymentInstrumentId !== "") {
@@ -759,7 +781,7 @@ function stylePaymentInstrument(paymentInstrument){
                 "<div class=\"col-sm-1\">\n"+
                     "<img  src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+
                 "</div>\n" +
-                "<div class=\"col-sm-1\">\n" + 
+                "<div class=\"col-sm-1\">\n" +
                     "<ul class=\"list-unstyled\">" +
                         "<li><strong>" + paymentInstrument._embedded.instrumentIdentifier.card.number + "</strong></li>\n" +
                         "<li><small>Expires:&nbsp;" + paymentInstrument.card.expirationMonth + "/" + paymentInstrument.card.expirationYear + "</small></li>\n" +
@@ -838,6 +860,7 @@ function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, http
     console.log(finish);
     if (status === "AUTHORIZED") {
         text = "Thank you.  Your payment has completed" + "<BR><PRE>" + finish +"</PRE>";
+        document.getElementById("newPaymentButton").style.display = "block";
     } else {
         text = "Oh dear. Your payment was not approved.  You can try again or try a different payment method" + "<BR>" + finish;
         document.getElementById("retryButton").style.display = "block";
@@ -851,4 +874,3 @@ function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, http
     }
 }
 </script>
-

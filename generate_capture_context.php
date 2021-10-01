@@ -6,9 +6,9 @@ if(isset($_REQUEST['local']) && $_REQUEST['local'] === "true"){
     $targetOrigin = "https://bondevans.com";
 }
 
-$request = [ 
-        "encryptionType"=> "RsaOaep", 
-        "targetOrigin" => $targetOrigin 
+$request = [
+        "encryptionType"=> "RsaOaep",
+        "targetOrigin" => $targetOrigin
 ];
 $requestQuery = '{"format":"JWT"}';
 
@@ -24,5 +24,5 @@ $result->httpCode = $objResponse->response->httpCode;
 $strResponseBody=$objResponse->response->body;
 $jsonBody = json_decode($strResponseBody);
 $result->response = $jsonBody;
-//echo(json_encode($result));
+// echo(json_encode($result));
 $captureContext = $jsonBody->keyId;
