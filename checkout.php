@@ -34,7 +34,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     </form>
     </<!--Cardinal device data collection code END-->
     <div id="overlay">
-        <iframe id="step_up_iframe" style="border: none; margin-left: auto; margin-right: auto; display: none" height="50%" width="100%" name="stepUpIframe" ></iframe>
+        <iframe id="step_up_iframe" style="border: none; margin-left: auto; margin-right: auto;" height="100%" width="100%" name="stepUpIframe" ></iframe>
     </div>
     <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
         <input id="step_up_form_jwt_input" type="hidden" name="JWT" value=""/>
@@ -273,13 +273,20 @@ foreach ($countries as $key => $value) {
                 </div>
 
             </form>
-            <!--</div>-->
-            <BR><button type="button" id="payButton" class="btn btn-primary" disabled="true">Pay</button><BR><BR>
-            <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+            <div id="payButtonSection" class="row">
+                <div class="col-sm-6">
+                    <button type="button" id="payButton" class="btn btn-primary" disabled="true">Pay</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 d-flex justify-content-center">
+                    <div id="progressSpinner"  class="spinner-border text-info" style="display: none;"></div>
+                </div>
+            </div>
         </div>
         <div class="card card-body" id="resultSection" style="display: none">
             <h5 class="card-title">Result</h5>
-            <div id="progressSpinner"  class="spinner-border text-info"></div>
             <p id="result" class="card-text"></p>
             <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
             <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
@@ -424,6 +431,9 @@ document.addEventListener("DOMContentLoaded", function (e) {
     });
     payButton.addEventListener('click', (event) => {
         if (formsValidated()) {
+            document.getElementById('defaultBillingSection').style.display = "none";
+            document.getElementById('payButtonSection').style.display = "none";
+            document.getElementById("progressSpinner").style.display = "block";
             payNow();
         }
     });
@@ -501,8 +511,6 @@ function payNow() {
             }
             setUpPayerAuth();
         }
-        document.getElementById("resultSection").style.display = "block";
-        document.getElementById('paymentDetailsSection').style.display = "none";
     });
 }
 function getMonth() {
@@ -711,26 +719,19 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
     });
 }
 function showStepUpScreen(stepUpURL, jwt) {
-    on();
+    document.getElementById("overlay").style.display = "block";
     // console.log( "Challenge Screen:\n"+stepUpURL);
-    document.getElementById('step_up_iframe').style.display = "block";
     document.getElementById('step_up_form').action = stepUpURL;
     document.getElementById('step_up_form_jwt_input').value = jwt;
     var stepUpForm = document.getElementById('step_up_form');
-    if (stepUpForm)
+    if (stepUpForm){
         stepUpForm.submit();
+    }
 }
 function hideStepUpScreen(transactionId) {
-    off();
-    console.log("Challenge Complete TransactionId:\n" + transactionId);
-    document.getElementById('step_up_iframe').style.display = "none";
-    authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
-}
-function on() {
-    document.getElementById("overlay").style.display = "block";
-}
-function off() {
     document.getElementById("overlay").style.display = "none";
+    console.log("Challenge Complete TransactionId:\n" + transactionId);
+    authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
 }
 function editShippingAddress(){
     document.getElementById('paymentDetailsSection').style.display = "none";
@@ -753,7 +754,7 @@ function onPaymentInstrumentUpdated(id, paymentInstrument) {
     paymentInstrumentId = id;
     maskedPan = paymentInstrument._embedded.instrumentIdentifier.card.number;
     console.log("onPaymentInstrumentUpdated:\n" + id + "\n"+ JSON.stringify(paymentInstrument, undefined, 2));
-xxx = stylePaymentInstrument(paymentInstrument);
+    xxx = stylePaymentInstrument(paymentInstrument);
     document.getElementById('storedCardSection').innerHTML  = xxx;
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
@@ -838,6 +839,8 @@ function cancelNewCard(){
     document.getElementById('storedCardSection').style.display = "block";
 }
 function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
+    document.getElementById("resultSection").style.display = "block";
+    document.getElementById('paymentDetailsSection').style.display = "none";
     finish = "onFinish: " + JSON.stringify({
         "referenceNumber": orderDetails.referenceNumber,
         "status": status,
