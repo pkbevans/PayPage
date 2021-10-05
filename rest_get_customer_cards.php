@@ -1,4 +1,4 @@
-<?php require_once 'restlib/API.php';
+<?php require_once 'PeRestlib/RestRequest.php';
 ///////////////////////////FUNCTIONS
 /////////////////////////END FUNCTIONS
 $customerToken = "";
@@ -10,18 +10,14 @@ if(isset($_REQUEST['customerToken'])){
     if($customerToken){
         try {
             // Get Payment Instruments
-            $api = str_replace('{customerId}', $customerToken, API::TMS_V2_CUSTOMERS_id_PAYMENTINSTRUMENTS);
+            $api = str_replace('{customerId}', $customerToken, API_TMS_V2_CUSTOMER_PAYMENT_INSTRUMENTS);
 
-            $strResponse = API::sendRequest(API::TEST_URL,API::GET,$api, "peportfolio","{}",null,null,"pemid03" );
-            $result = new stdClass();
-            $objResponse = json_decode($strResponse);
-            $result->httpCode = $objResponse->response->httpCode;
-            if($result->httpCode == 200){
-                $strResponseBody=$objResponse->response->body;
-                $jsonBody = json_decode($strResponseBody);
-//                echo("<BR> BODY<PRE>" .json_encode($jsonBody, JSON_PRETTY_PRINT). "</PRE><BR>");
-                if(isset($jsonBody->_embedded->paymentInstruments)){
-                    $paymentInstruments = $jsonBody->_embedded->paymentInstruments;
+            // $strResponse = API::sendRequest(API::TEST_URL,API::GET,$api, "peportfolio","{}",null,null,"pemid03" );
+            $result = ProcessRequest("peportfolio", $api , METHOD_GET, "", "pemid03", AUTH_TYPE_SIGNATURE );
+            // echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
+            if($result->responseCode === 200){
+                if(isset($result->response->_embedded->paymentInstruments)){
+                    $paymentInstruments = $result->response->_embedded->paymentInstruments;
                     $jsonPaymentInstruments = json_encode($paymentInstruments);
                 }else{
                     // ERROR

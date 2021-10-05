@@ -337,9 +337,9 @@ foreach ($countries as $key => $value) {
                 // Response is a json string - turn it into a javascript object
                 let res = JSON.parse(result);
                 console.log("\Add:\n" + JSON.stringify(res, undefined, 2));
-                let httpCode = res.httpCode;
+                let httpCode = res.responseCode;
                 let status = res.response.status;
-                if (httpCode === "201") {
+                if (httpCode === 201) {
                     // Successfull response
                     location.reload();
                 } else {

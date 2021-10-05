@@ -164,8 +164,7 @@ foreach ($countries as $key => $value) {
                         <!-- <div class="exp-wrapper"> -->
                         <label class="form-check-label ms-3" for="expiry">Expires</label>
                         <div class="expiry input-group ms-3">
-                            <input autocomplete="off" class="form-control exp" id="card_expirationMonth" name="card_expirationMonth" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="MM" type="text" data-pattern-validate />
-                            <input autocomplete="off" class="form-control exp" id="card_expirationYear" name="card_expirationYear" maxlength="2" pattern="[0-9]*" inputmode="numerical" placeholder="YY" type="text" data-pattern-validate />
+                            <input class="form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]\/[2][1-9]" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
                         </div>
                     </div>
                 </div>
@@ -431,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
     });
     payButton.addEventListener('click', (event) => {
         if (formsValidated()) {
-            document.getElementById('defaultBillingSection').style.display = "none";
+            // document.getElementById('defaultBillingSection').style.display = "none";
             document.getElementById('payButtonSection').style.display = "none";
             document.getElementById("progressSpinner").style.display = "block";
             payNow();
@@ -488,7 +487,7 @@ function payNow() {
     } else {
         var options = {
             expirationMonth: getMonth(),
-            expirationYear: 20 + document.getElementById('card_expirationYear').value
+            expirationYear: 20 + document.getElementById('expiryDate').value.substring(3,5)
         };
     }
     microform.createToken(options, function (err, jwt) {
@@ -514,13 +513,13 @@ function payNow() {
     });
 }
 function getMonth() {
-    months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
-    m = parseInt(document.getElementById('card_expirationMonth').value);
+    // months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    return document.getElementById('expiryDate').value.substring(0,2);
     // turn 1,2,3,4 into "01","02","03", etc
-    return(months[m - 1]);
+    // return(months[m - 1]);
 }
 function fieldsValid(valid) {
-    if (!valid || !expiryDateValid() || !(panValid && cvnValid)) {
+    if (!valid || (paymentInstrumentId === "" && !expiryDateValid()) || !(panValid && cvnValid)) {
         // Check PAN and CVN both Populated and valid
         payButton.disabled = true;
         return false;
@@ -612,8 +611,8 @@ function setUpPayerAuth() {
             res = JSON.parse(result);
             console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
             // If OK, set up device collection
-            let httpCode = res.httpCode;
-            if (httpCode === "201") {
+            let httpCode = res.responseCode;
+            if (httpCode === 201) {
                 // Set up device collection
                 deviceDataCollectionURL = res.response.consumerAuthenticationInformation.deviceDataCollectionUrl;
                 accessToken = res.response.consumerAuthenticationInformation.accessToken;
@@ -673,9 +672,9 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
             // Response is a json string - turn it into a javascript object
             let res = JSON.parse(result);
             console.log("\nEnrollment:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.httpCode;
+            let httpCode = res.responseCode;
             let status = res.response.status;
-            if (httpCode === "201") {
+            if (httpCode === 201) {
                 customerCreated = false;
                 paymentInstrumentCreated = false;
                 shippingAddressCreated = false;

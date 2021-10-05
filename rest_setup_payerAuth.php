@@ -1,4 +1,4 @@
-<?php require_once 'restlib/API.php';
+<?php require_once 'PeRestlib/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
 $reference_number = $incoming->order->referenceNumber;
 
@@ -23,14 +23,7 @@ $requestBody = json_encode($request);
 
 try{
     // peportfolio/pemid03
-    $strResponse = API::sendRequest(API::TEST_URL,API::POST,API::RISK_V1_AUTHENTICATION_SETUPS, "peportfolio",$requestBody,null,null, "pemid03" );
-    $result = new stdClass();
-    $result->request = $request;
-    $objResponse = json_decode($strResponse);
-    $result->httpCode = $objResponse->response->httpCode;
-    $strResponseBody=$objResponse->response->body;
-    $jsonBody = json_decode($strResponseBody);
-    $result->response = $jsonBody;
+    $result = ProcessRequest("peportfolio", API_RISK_V1_AUTHENTICATION_SETUPS, METHOD_POST, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
 
 } catch (Exception $exception) {

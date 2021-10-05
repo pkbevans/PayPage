@@ -1,7 +1,7 @@
-<?php require_once 'restlib/API.php';
+<?php require_once 'PeRestlib/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
 $reference_number = $incoming->order->referenceNumber;
-// Key incoming fields: 
+// Key incoming fields:
 //  "storeCard" : If true create a token
 //  "paymentInstrumentId" : if true, use supplied Payment Instrument
 //  "shippingAddressId" : if true, use supplied Shipping Address
@@ -95,7 +95,7 @@ try {
         if(!empty($incoming->shippingAddressId)){
             $request->paymentInformation['shippingAddress']['id'] = $incoming->shippingAddressId;
         }
-       
+
         if(!empty($incoming->paymentInstrumentId)){
             $request->paymentInformation['paymentInstrument']['id'] = $incoming->paymentInstrumentId;
         }
@@ -139,22 +139,15 @@ try {
 
     if($incoming->standAlone){
         if($incoming->paAction == "CONSUMER_AUTHENTICATION"){
-            $api = API::RISK_V1_AUTHENTICATIONS;
+            $api = API_RISK_V1_AUTHENTICATIONS;
         }else{
-            $api = API::RISK_V1_AUTHENTICATION_RESULTS;
+            $api = API_RISK_V1_AUTHENTICATION_RESULTS;
         }
     }else{
-        $api = API::PTS_V2_PAYMENTS;
+        $api = API_PAYMENTS;
     }
-
-    $strResponse = API::sendRequest(API::TEST_URL,API::POST,$api, "peportfolio",$requestBody,null,null, "pemid03" );
-    $result = new stdClass();
-    $result->request = $request;
-    $objResponse = json_decode($strResponse);
-    $result->httpCode = $objResponse->response->httpCode;
-    $strResponseBody=$objResponse->response->body;
-    $jsonBody = json_decode($strResponseBody);
-    $result->response = $jsonBody;
+//   ProcessRequest($mid, $resource, $method, $payload, $child = null, $authentication = AUTH_TYPE_SIGNATURE )
+    $result = ProcessRequest("peportfolio", $api , METHOD_POST, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
 
 } catch (Exception $exception) {

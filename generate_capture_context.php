@@ -1,5 +1,4 @@
-<?php
-require_once 'restlib/API.php';
+<?php require_once 'PeRestlib/RestRequest.php';
 if(isset($_REQUEST['local']) && $_REQUEST['local'] === "true"){
     $targetOrigin = "http://localhost";
 }else{
@@ -15,14 +14,7 @@ $requestQuery = '{"format":"JWT"}';
 $requestBody = json_encode($request);
 
 // peportfolio/pemid03
-$strResponse = API::sendRequest(API::TEST_URL,API::POST,API::FLEX_V1_KEYS, "peportfolio",$requestBody,null,$requestQuery, "pemid03" );
-
-$result = new stdClass();
-$result->request = $request;
-$objResponse = json_decode($strResponse);
-$result->httpCode = $objResponse->response->httpCode;
-$strResponseBody=$objResponse->response->body;
-$jsonBody = json_decode($strResponseBody);
-$result->response = $jsonBody;
+// $strResponse = API::sendRequest(API::TEST_URL,API::POST,API::FLEX_V1_KEYS, "peportfolio",$requestBody,null,$requestQuery, "pemid03" );
+$result = ProcessRequest("peportfolio", API_FLEX_V1_KEYS . "?format=JWT" , METHOD_POST, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
 // echo(json_encode($result));
-$captureContext = $jsonBody->keyId;
+$captureContext = $result->response->keyId;
