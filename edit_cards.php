@@ -216,8 +216,8 @@ foreach ($paymentInstruments as $paymentInstrument){
                 // Response is a json string - turn it into a javascript object
                 let res = JSON.parse(result);
                 console.log("\nUpdate:\n" + JSON.stringify(res, undefined, 2));
-                let httpCode = res.httpCode;
-                if (httpCode === "200") {
+                let httpCode = res.responseCode;
+                if (httpCode === 200) {
                     // Successfull response
                     location.reload();
                 } else {
@@ -243,8 +243,8 @@ foreach ($paymentInstruments as $paymentInstrument){
                 // Response is a json string - turn it into a javascript object
                 let res = JSON.parse(result);
                 console.log("\nDelete:\n" + JSON.stringify(res, undefined, 2));
-                let httpCode = res.httpCode;
-                if (httpCode === "204") {
+                let httpCode = res.responseCode;
+                if (httpCode === 204) {
                     // Successfull response
                     location.reload();
                 } else {

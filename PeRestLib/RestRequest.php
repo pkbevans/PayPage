@@ -32,11 +32,11 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
 
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headerParams);
-    if($method == METHOD_POST ) {
-        curl_setopt($curl, CURLOPT_POST, true);
+    if($method == METHOD_POST || $method == METHOD_PATCH || $method == METHOD_PUT ) {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
     }
     curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($curl, CURLOPT_HEADER, 1);
     curl_setopt($curl, CURLOPT_VERBOSE, 0);
     curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0");
@@ -82,7 +82,7 @@ function GetHttpSignature($resourcePath, $httpMethod, $currentDate, $payload, $m
 
     if($httpMethod == METHOD_GET || $httpMethod == METHOD_DELETE)
     {
-        $signatureString = "host: " . REQUEST_HOST . "\ndate: " . $currentDate . "\n(request-target): " . $httpMethod . " " . $resourcePath . "\nv-c-merchant-id: " . $mid;
+        $signatureString = "host: " . REQUEST_HOST . "\ndate: " . $currentDate . "\n(request-target): " . strtolower($httpMethod) . " " . $resourcePath . "\nv-c-merchant-id: " . $mid;
         // echo "<BR>HELLO 1<BR>";
         $headerString = "host date (request-target) v-c-merchant-id";
 
@@ -93,13 +93,14 @@ function GetHttpSignature($resourcePath, $httpMethod, $currentDate, $payload, $m
         //Get digest data
         $digest = GenerateDigest($payload);
 
-        $signatureString = "host: " . REQUEST_HOST . "\ndate: " . $currentDate . "\n(request-target): " . $httpMethod . " " . $resourcePath . "\ndigest: SHA-256=" . $digest . "\nv-c-merchant-id: " . $mid;
+        $signatureString = "host: " . REQUEST_HOST . "\ndate: " . $currentDate . "\n(request-target): " . strtolower ($httpMethod) . " " . $resourcePath . "\ndigest: SHA-256=" . $digest . "\nv-c-merchant-id: " . $mid;
         $headerString = "host date (request-target) digest v-c-merchant-id";
     }
 
     $signatureByteString = utf8_encode($signatureString);
     $decodeKey = base64_decode($keys[$mid]["secret_key"]);
     $signature = base64_encode(hash_hmac("sha256", $signatureByteString, $decodeKey, true));
+
     $signatureHeader = array(
         'keyid="' . $keys[$mid]["key_id"] . '"',
         'algorithm="HmacSHA256"',

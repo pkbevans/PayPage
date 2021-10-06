@@ -1,4 +1,4 @@
-<?php require_once 'restlib/API.php';
+<?php require_once 'PeRestlib/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
 try {
     if($incoming->setDefaultOnly){
@@ -21,22 +21,11 @@ try {
             ]
         ];
     }
-
     $requestBody = json_encode($request);
+    $api = API_TMS_V2_CUSTOMERS . "/" .$incoming->customerId . "/shipping-addresses/" . $incoming->shippingAddressId;
 
-    $api = API::TMS_V2_CUSTOMERS . "/" .$incoming->customerId . "/shipping-addresses/" . $incoming->shippingAddressId;
-
-    $strResponse = API::sendRequest(API::TEST_URL, API::PATCH, $api, "pemid03", $requestBody, null, null, null );
-    $result = new stdClass();
-    $result->api = $api;
-    $result->request = $request;
-    $objResponse = json_decode($strResponse);
-    $result->httpCode = $objResponse->response->httpCode;
-    $strResponseBody=$objResponse->response->body;
-    $jsonBody = json_decode($strResponseBody);
-    $result->response = $jsonBody;
+    $result = ProcessRequest("peportfolio", $api , METHOD_PATCH, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
-
 } catch (Exception $exception) {
     echo(json_encode($exception));
 }

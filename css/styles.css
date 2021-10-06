@@ -1,10 +1,3 @@
-.expInput{
-    width: 70px;
-    border: 1px solid #ced4da;
-    height: 38px;
-    padding: 6px 12px;
-    border-radius: .25rem;
-}
 #number-container {
     height: 38px;
     width: 180px;
@@ -39,7 +32,10 @@
      cursor: pointer;
  }
  /* Expiry date stuff */
- .expiry {
+ #expiryDate {
+     width: 80px;
+ }
+ .expiryDate {
    position: relative;
    border: 1px solid #ced4da;
    border-radius: .2rem;

@@ -29,11 +29,11 @@ const API_TMS_V2_INSTRUMENT_IDS = '/tms/v1/instrumentidentifiers';
 const API_OMS_V1_ORGANIZATIONS = '/oms/v1/organizations';
 
 // HTTP METHODS
-const METHOD_POST = "post";
-const METHOD_GET = "get";
-const METHOD_PATCH = "patch";
-const METHOD_DELETE = 'delete';
-const METHOD_PUT = 'put';
+const METHOD_POST = "POST";
+const METHOD_GET = "GET";
+const METHOD_PATCH = "PATCH";
+const METHOD_DELETE = 'DELETE';
+const METHOD_PUT = 'PUT';
 
 const AUTH_TYPE_SIGNATURE = "signature";
 const AUTH_TYPE_BEARER = "bearer";

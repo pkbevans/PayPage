@@ -34,7 +34,6 @@
                                                 <img src="https://i.imgur.com/2ISgYja.png" width="30">
                                                 <img src="https://i.imgur.com/W1vtnOV.png" width="30">
                                                 <img src="https://i.imgur.com/35tC99g.png" width="30">
-                                                <img src="https://i.imgur.com/2ISgYja.png" width="30">
                                             </div>
                                         </div>
                                     </button> </h2>
