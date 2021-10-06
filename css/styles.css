@@ -35,24 +35,3 @@
  #expiryDate {
      width: 80px;
  }
- .expiryDate {
-   position: relative;
-   border: 1px solid #ced4da;
-   border-radius: .2rem;
-   display: flex;
-   width: 120px;
-   justify-content: space-around;
-   height: 36px;
-   line-height: 36px;
-   font-size: 24px;
- }
-
- input.exp {
-   float: left;
-   font-family: monospace;
-   border: 0;
-   width: 40px;
-   outline: none;
-   appearance: none;
-   font-size: 16px;
- }

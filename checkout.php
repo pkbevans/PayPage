@@ -3,7 +3,7 @@ include_once 'card_types.php';
 include_once 'countries.php';
 include 'generate_capture_context.php';
 include 'rest_get_customer.php';
-$shippingAddressRequired = true;
+$shippingAddressRequired = false;
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     $defaultEmail = $_REQUEST['email'];
@@ -146,7 +146,7 @@ foreach ($countries as $key => $value) {
                         </ul>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row mb-3">
                     <h5>Card Billing Address</h5>
                     <div class="col-sm-6">
                         <span id="bill_to_text" class="form-control form-control-sm" disabled><?php echo $billToText;?></span>
@@ -155,27 +155,23 @@ foreach ($countries as $key => $value) {
             </div>
 <?php endif ?>
             <div id="cardDetailsSection">
-                <div class="row mb-1">
+                <div class="row mb-3">
                     <div class="col-sm-3">
                         <label class="form-check-label" for="number-container">Card Number</label>
                         <div id="number-container" class="form-control form-control-sm"></div>
                     </div>
                     <div class="col-sm-3">
-                        <!-- <div class="exp-wrapper"> -->
-                        <label class="form-check-label ms-3" for="expiry">Expires</label>
-                        <div class="expiry input-group ms-3">
-                            <input class="form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]\/[2][1-9]" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
-                        </div>
+                        <label class="form-check-label" for="expiryDate">Expires</label>
+                        <input class="expiry form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]\/[2][1-9]" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
                     </div>
                 </div>
             </div>
-            <div class="row mt-1">
+            <div class="row mb-3">
                 <div class="col-sm-2">
                     <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
                     <div id="securityCode-container" class="form-control form-control-sm"></div>
                 </div>
             </div>
-            <br>
             <div id="storeCardSection" class="row">
                 <div class="col-sm-5">
                     <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
@@ -203,7 +199,7 @@ foreach ($countries as $key => $value) {
                 </div>
             </div>
 <?php endif ?>
-            <form id="billingForm" class="needs-validation" novalidate style="display: none">
+            <form id="billingForm" class="needs-validation" novalidate style="display: <?php echo ($paymentInstrumentCount?"none":"block");?>">
                 <div id="billingSection">
                     <h5>Card Billing Address</h5>
                     <div class="row">
@@ -216,7 +212,7 @@ foreach ($countries as $key => $value) {
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
                                 <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" required>
-                                <label for="bill_to_surname" class="form-label">Surname*</label>
+                                <label for="bill_to_surname" class="form-label">Last name*</label>
                             </div>
                         </div>
                     </div>
