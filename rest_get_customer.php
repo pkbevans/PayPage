@@ -1,4 +1,4 @@
-<?php require_once 'PeRestlib/RestRequest.php';
+<?php require_once 'PeRestLib/RestRequest.php';
 ///////////////////////////FUNCTIONS
 function concatinateNameAddress($nameAddress){
     // return name and address string

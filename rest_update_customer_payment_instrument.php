@@ -1,4 +1,4 @@
-<?php require_once 'PeRestlib/RestRequest.php';
+<?php require_once 'PeRestLib/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
 try {
     if($incoming->setDefaultOnly){
