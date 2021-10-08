@@ -38,14 +38,14 @@ $count=0;
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-        <title>Manage Your Cards</title>
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    </head>
+    <title>Manage Your Cards</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
     <body>
         <h5>Your Payment Cards</h5>
         <div class="accordion" id="accordionExample">
@@ -156,105 +156,105 @@ foreach ($countries as $key => $value) {
                 </div>
             </div>
 <?php endforeach; ?>
-        <div class="row">
-            <div class="col-sm-1">
-                <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+                        <div class="row">
+                            <div class="col-sm-1">
+                    <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+                </div>
             </div>
-        </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     </body>
-    <script>
-    var customerId = "<?php echo $customerToken;?>";
+<script>
+var customerId = "<?php echo $customerToken;?>";
 <?php
 foreach ($paymentInstruments as $paymentInstrument){
-    echo "var paymentInstrument_". $paymentInstrument->id . " = '" . json_encode($paymentInstrument) . "';\n";
+echo "var paymentInstrument_". $paymentInstrument->id . " = '" . json_encode($paymentInstrument) . "';\n";
 }
 ?>
 
-    function editPaymentInstrument(id){
-        document.getElementById(id+"_form").style.display = "block";
-        document.getElementById(id+"_buttons").style.display = "none";
+function editPaymentInstrument(id){
+    document.getElementById(id+"_form").style.display = "block";
+    document.getElementById(id+"_buttons").style.display = "none";
+}
+function updatePaymentInstrument(id, setDefaultOnly){
+    console.log("\nUpdating Card: "+id);
+    def = document.getElementById(id+"_defaultCard");
+    if(def){
+        // This card is NOT the default card
+        defaultCard = def.checked;
+    }else{
+        // This card is currently the default card
+        defaultCard = true;
     }
-    function updatePaymentInstrument(id, setDefaultOnly){
-        console.log("\nUpdating Card: "+id);
-        def = document.getElementById(id+"_defaultCard");
-        if(def){
-            // This card is NOT the default card
-            defaultCard = def.checked;
-        }else{
-            // This card is currently the default card
-            defaultCard = true;
-        }
-        firstName = document.getElementById(id+"_firstName").value;
-        lastName = document.getElementById(id+"_lastName").value;
-        address1 = document.getElementById(id+"_address1").value;
-        address2 = document.getElementById(id+"_address2").value;
-        locality = document.getElementById(id+"_locality").value;
-        postalCode = document.getElementById(id+"_postalCode").value;
-        country = document.getElementById(id+"_country").value;
+    firstName = document.getElementById(id+"_firstName").value;
+    lastName = document.getElementById(id+"_lastName").value;
+    address1 = document.getElementById(id+"_address1").value;
+    address2 = document.getElementById(id+"_address2").value;
+    locality = document.getElementById(id+"_locality").value;
+    postalCode = document.getElementById(id+"_postalCode").value;
+    country = document.getElementById(id+"_country").value;
 
-        $.ajax({
-            type: "POST",
-            url: "rest_update_customer_payment_instrument.php",
-            data: JSON.stringify({
-                "setDefaultOnly": setDefaultOnly,
-                "customerId": customerId,
-                "paymentInstrumentId": id,
-                "default": defaultCard,
-                "firstName": firstName,
-                "lastName": lastName,
-                "address1": address1,
-                "address2": address2,
-                "locality": locality,
-                "administrativeArea": "",
-                "postalCode": postalCode,
-                "country": country,
-                "phoneNumber": ""
-            }),
-            success: function (result) {
-                // Response is a json string - turn it into a javascript object
-                let res = JSON.parse(result);
-                console.log("\nUpdate:\n" + JSON.stringify(res, undefined, 2));
-                let httpCode = res.responseCode;
-                if (httpCode === 200) {
-                    // Successfull response
-                    location.reload();
-                } else {
-                    // 500 System error or anything else
-                }
+    $.ajax({
+        type: "POST",
+        url: "rest_update_customer_payment_instrument.php",
+        data: JSON.stringify({
+            "setDefaultOnly": setDefaultOnly,
+            "customerId": customerId,
+            "paymentInstrumentId": id,
+            "default": defaultCard,
+            "firstName": firstName,
+            "lastName": lastName,
+            "address1": address1,
+            "address2": address2,
+            "locality": locality,
+            "administrativeArea": "",
+            "postalCode": postalCode,
+            "country": country,
+            "phoneNumber": ""
+        }),
+        success: function (result) {
+            // Response is a json string - turn it into a javascript object
+            let res = JSON.parse(result);
+            console.log("\nUpdate:\n" + JSON.stringify(res, undefined, 2));
+            let httpCode = res.responseCode;
+            if (httpCode === 200) {
+                // Successfull response
+                location.reload();
+            } else {
+                // 500 System error or anything else
             }
-        });
-    }
-    function usePaymentInstrument(id){
-        xxx = window['paymentInstrument_'+id];
-        parent.onPaymentInstrumentUpdated(id, JSON.parse(xxx));
-    }
-    function deletePaymentInstrument(id){
-        console.log("\nDeleting Card: "+id);
-        $.ajax({
-            type: "POST",
-            url: "rest_delete_customer_payment_instrument.php",
-            data: JSON.stringify({
-                "customerId": customerId,
-                "paymentInstrumentId": id
-            }),
-            success: function (result) {
-                // Response is a json string - turn it into a javascript object
-                let res = JSON.parse(result);
-                console.log("\nDelete:\n" + JSON.stringify(res, undefined, 2));
-                let httpCode = res.responseCode;
-                if (httpCode === 204) {
-                    // Successfull response
-                    location.reload();
-                } else {
-                    // 500 System error or anything else - TODO
-                }
+        }
+    });
+}
+function usePaymentInstrument(id){
+    xxx = window['paymentInstrument_'+id];
+    parent.onPaymentInstrumentUpdated(id, JSON.parse(xxx));
+}
+function deletePaymentInstrument(id){
+    console.log("\nDeleting Card: "+id);
+    $.ajax({
+        type: "POST",
+        url: "rest_delete_customer_payment_instrument.php",
+        data: JSON.stringify({
+            "customerId": customerId,
+            "paymentInstrumentId": id
+        }),
+        success: function (result) {
+            // Response is a json string - turn it into a javascript object
+            let res = JSON.parse(result);
+            console.log("\nDelete:\n" + JSON.stringify(res, undefined, 2));
+            let httpCode = res.responseCode;
+            if (httpCode === 204) {
+                // Successfull response
+                location.reload();
+            } else {
+                // 500 System error or anything else - TODO
             }
-        });
-    }
-    function cancel(){
-        parent.onIframeCancelled();
-    }
-    </script>
+        }
+    });
+}
+function cancel(){
+    parent.onIframeCancelled();
+}
+</script>
 </html>

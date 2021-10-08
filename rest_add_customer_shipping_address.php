@@ -20,10 +20,8 @@ try {
 
     $api = API_TMS_V2_CUSTOMERS . "/" .$incoming->customerId . "/shipping-addresses";
 
-//    $strResponse = API::sendRequest(API::TEST_URL,API::PATCH, $api, "peportfolio", $requestBody, null, null, "pemid03" );
     $result = ProcessRequest("peportfolio", $api , METHOD_POST, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
-
 } catch (Exception $exception) {
     echo(json_encode($exception));
 }
