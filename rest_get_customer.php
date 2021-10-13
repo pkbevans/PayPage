@@ -61,13 +61,13 @@ if(isset($_REQUEST['customerToken'])){
             $result = ProcessRequest("peportfolio", $api , METHOD_GET, "", "pemid03", AUTH_TYPE_SIGNATURE );
             if($result->responseCode === 200){
                 $paymentInstrumentCount = $result->response->count;
-                // echo("<BR> PAYMENT INSTRUMENTS:<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
+//                echo("<BR> PAYMENT INSTRUMENTS:<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
                 if(isset($result->response->_embedded->paymentInstruments)){
                     $storedCards = $result->response->_embedded->paymentInstruments;
 
                     foreach ($storedCards as $storedCard) {
                         // Add default address line 2 if non-existant
-                        if(!isset($storedCard->address2)){
+                        if(!isset($storedCard->billTo->address2)){
                             $storedCard->billTo->address2 = "";
                         }
                         // Find Default Payment Instrument - use this for the default Billing Details

@@ -4,7 +4,7 @@ $reference_number = $incoming->order->referenceNumber;
 // Key incoming fields:
 //  "storeCard" : If true create a token
 //  "paymentInstrumentId" : if true, use supplied Payment Instrument
-//  "shippingAddressId" : if true, use supplied Shipping Address
+//  "shippingAddressId" : if not blank, use supplied Shipping Address
 //  "customerId" : If not blank and storeCard is true, then add new payment Instrument to existing Customer.
 //  "transientToken" :  Always use - will either contain PAN+CVV for new cards or just CVV for existing payment Instruments
 try {
@@ -12,8 +12,14 @@ try {
 
     if(!$incoming->standAlone) {
         $processingInfo = new stdClass();
+        // Dont capture a zero-value auth
+        $processingInfo->capture = $incoming->order->amount>0?$incoming->capture:false;
         if($incoming->storeCard){
-            $actionList = [$incoming->paAction, "TOKEN_CREATE"];
+            if($incoming->paAction === "NO_PA"){
+                $actionList = ["TOKEN_CREATE"];
+            }else{
+                $actionList = [$incoming->paAction, "TOKEN_CREATE"];
+            }
             if(empty($incoming->customerId)){
                 $buyerInformation = [
                     "merchantCustomerID" => "Your customer identifier",
@@ -36,7 +42,6 @@ try {
         } else {
             $actionList = [$incoming->paAction];
         }
-        $processingInfo->capture = "true";
         $processingInfo->actionList = $actionList;
         $request->processingInformation = $processingInfo;
     }
@@ -49,13 +54,13 @@ try {
     ];
     if(empty($incoming->paymentInstrumentId)){
         $billTo = [
-            "firstName" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_forename :$incoming->order->bill_to->bill_to_forename),
-            "lastName" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_surname :$incoming->order->bill_to->bill_to_surname),
-            "address1" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_line1:$incoming->order->bill_to->bill_to_address_line1),
-            "address2" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_line2: $incoming->order->bill_to->bill_to_address_line2),
-            "locality" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_city: $incoming->order->bill_to->bill_to_address_city),
-            "postalCode" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_postcode: $incoming->order->bill_to->bill_to_postcode),
-            "country" => ($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_country: $incoming->order->bill_to->bill_to_address_country),
+            "firstName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_forename :$incoming->order->bill_to->bill_to_forename), 0, MAXSIZE_NAME),
+            "lastName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_surname :$incoming->order->bill_to->bill_to_surname), 0, MAXSIZE_NAME),
+            "address1" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_line1:$incoming->order->bill_to->bill_to_address_line1), 0, MAXSIZE_ADDRESS),
+            "address2" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_line2: $incoming->order->bill_to->bill_to_address_line2), 0, MAXSIZE_ADDRESS),
+            "locality" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_city: $incoming->order->bill_to->bill_to_address_city), 0, MAXSIZE_CITY),
+            "postalCode" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_postcode: $incoming->order->bill_to->bill_to_postcode), 0, MAXSIZE_POSTCODE),
+            "country" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->ship_to_address_country: $incoming->order->bill_to->bill_to_address_country), 0, MAXSIZE_COUNTRY),
             "email" => $incoming->order->bill_to->bill_to_email
         ];
         $orderInformation['billTo'] = $billTo;
@@ -64,13 +69,13 @@ try {
     if($incoming->order->shippingAddressRequired){
         if(empty($incoming->shippingAddressId)){
             $shipTo = [
-                "firstName" => $incoming->order->ship_to->ship_to_forename,
-                "lastName" => $incoming->order->ship_to->ship_to_surname,
-                "address1" => $incoming->order->ship_to->ship_to_address_line1,
-                "address2" => $incoming->order->ship_to->ship_to_address_line2,
-                "locality" => $incoming->order->ship_to->ship_to_address_city,
-                "postalCode" => $incoming->order->ship_to->ship_to_postcode,
-                "country" => $incoming->order->ship_to->ship_to_address_country,
+                "firstName" => substr($incoming->order->ship_to->ship_to_forename, 0, MAXSIZE_NAME),
+                "lastName" => substr($incoming->order->ship_to->ship_to_surname, 0, MAXSIZE_NAME),
+                "address1" => substr($incoming->order->ship_to->ship_to_address_line1, 0, MAXSIZE_ADDRESS),
+                "address2" => substr($incoming->order->ship_to->ship_to_address_line2, 0, MAXSIZE_ADDRESS),
+                "locality" => substr($incoming->order->ship_to->ship_to_address_city, 0, MAXSIZE_CITY),
+                "postalCode" => substr($incoming->order->ship_to->ship_to_postcode, 0, MAXSIZE_POSTCODE),
+                "country" => substr($incoming->order->ship_to->ship_to_address_country, 0, MAXSIZE_COUNTRY),
             ];
             $orderInformation['shipTo'] = $shipTo;
         }
@@ -127,11 +132,13 @@ try {
             "referenceId" => $incoming->referenceID,
             "returnUrl" => $returnUrl
         ];
-    }else{
+    }else if($incoming->paAction == "VALIDATE_CONSUMER_AUTHENTICATION"){
         // PA Validation
         $consumerAuthenticationInformation = [
             "authenticationTransactionId" => $incoming->authenticationTransactionID
         ];
+    }else{
+        $consumerAuthenticationInformation = [];    // empty
     }
     $request->consumerAuthenticationInformation = $consumerAuthenticationInformation;
 

@@ -43,6 +43,7 @@ $count=0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
     <title>Manage Your Cards</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
@@ -156,14 +157,35 @@ foreach ($countries as $key => $value) {
                 </div>
             </div>
 <?php endforeach; ?>
+            <div class="accordion-item" id="add_item">
+                <h2 class="accordion-header" id="headingAdd">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdd" aria-expanded="true" aria-controls="collapseAdd">
+                        Add New Card
+                    </button>
+                </h2>
+                <div id="collapseAdd" class="accordion-collapse collapse" aria-labelledby="headingAdd" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+            <?php include 'new_card_form.php';?>
                         <div class="row">
                             <div class="col-sm-1">
+                                <button type="button" id="newCardButton" class="btn btn-primary" onclick="saveClicked()">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-1">
                     <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
                 </div>
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     </body>
+<script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
+<script src="js/expiryDate.js"></script>
+<script src="js/newCard.js"></script>
 <script>
 var customerId = "<?php echo $customerToken;?>";
 <?php
@@ -171,6 +193,22 @@ foreach ($paymentInstruments as $paymentInstrument){
 echo "var paymentInstrument_". $paymentInstrument->id . " = '" . json_encode($paymentInstrument) . "';\n";
 }
 ?>
+
+function saveClicked(){
+    tokenizeCard();
+}
+function onNewCardReceived(details){
+    cardDetails = JSON.parse(details);
+    // New card details received from newCqard.js
+    if(!cardDetails.cancelled){
+        if(cardDetails.storeCard){
+            addPaymentInstrument(cardDetails);
+        }else{
+            // New card/billing details but not to be stored
+            parent.onNewCardUsed(cardDetails);
+        }
+    }
+}
 
 function editPaymentInstrument(id){
     document.getElementById(id+"_form").style.display = "block";
@@ -229,6 +267,80 @@ function updatePaymentInstrument(id, setDefaultOnly){
 function usePaymentInstrument(id){
     xxx = window['paymentInstrument_'+id];
     parent.onPaymentInstrumentUpdated(id, JSON.parse(xxx));
+}
+function addPaymentInstrument(card){
+    // Zero-value auth without Payer Auth
+    console.log("\nAdding Payment Instrument");
+//    card = JSON.parse(cardDetails);
+    let orderDetails = {
+        referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
+        amount: "0.00",
+        currency: "<?php echo $_REQUEST['currency'];?>",
+        shippingAddressRequired: false,
+        useShippingAsBilling: false,
+        bill_to: {
+            bill_to_forename: card.billTo.firstName,
+            bill_to_surname: card.billTo.lastName,
+            bill_to_email: "<?php echo $_REQUEST['email'];?>",
+            bill_to_address_line1: card.billTo.address1,
+            bill_to_address_line2: card.billTo.address2,
+            bill_to_address_city: card.billTo.locality,
+            bill_to_postcode: card.billTo.postalCode,
+            bill_to_address_country: card.billTo.country
+        }
+    };
+    $.ajax({
+        type: "POST",
+        url: "rest_auth_with_pa.php",
+        data: JSON.stringify({
+            "local": false, // TODO
+            "order": orderDetails,
+            "storeCard": true,
+            "customerId": customerId,
+            "paAction": "NO_PA",
+            "paymentInstrumentId": "",
+            "shippingAddressId": "",
+            "transientToken": card.flexToken,
+            "referenceID": "",
+            "authenticationTransactionID": "",
+            "standAlone": false,
+            "capture": false
+        }),
+        success: function (result) {
+            // Response is a json string - turn it into a javascript object
+            let res = JSON.parse(result);
+            console.log("\Auth:\n" + JSON.stringify(res, undefined, 2));
+            let httpCode = res.responseCode;
+            let status = res.response.status;
+            if (httpCode === 201) {
+                customerCreated = false;
+                paymentInstrumentCreated = false;
+                shippingAddressCreated = false;
+                let requestID = res.response.id;
+                // Successfull response (but could be declined)
+                if (status === "AUTHORIZED") {
+                    location.reload();
+                } else {
+                    // TODO - let user know that it failed
+                }
+            } else {
+                // 500 System error or anything else
+                switch(httpCode){
+                    case "202":
+                        onAuthError(status, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                        break;
+                    case "400":
+                        onAuthError(status, httpCode, res.response.reason, res.response.details);
+                        break;
+                    default:
+                        onAuthError(status, httpCode, res.response.reason, res.response.message);
+                }
+            }
+        }
+    });
+}
+function onAuthError(status, httpCode, reason, message){
+    // TODO
 }
 function deletePaymentInstrument(id){
     console.log("\nDeleting Card: "+id);

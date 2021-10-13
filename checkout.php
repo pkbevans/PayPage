@@ -3,7 +3,7 @@ include_once 'card_types.php';
 include_once 'countries.php';
 include 'generate_capture_context.php';
 include 'rest_get_customer.php';
-$shippingAddressRequired = false;
+$shippingAddressRequired = true;
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     $defaultEmail = $_REQUEST['email'];
@@ -26,6 +26,9 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <body>
     <form id="iframe_form" method="POST" target="shippingAddress_iframe" action="">
         <input id="customerToken" type="hidden" name="customerToken" value="">
+        <input id="currency" type="hidden" name="currency" value="<?php echo $_REQUEST['currency']?>">
+        <input id="email" type="hidden" name="email" value="null@cybersource.com">
+        <input id="reference_number" type="hidden" name="reference_number" value="<?php echo $_REQUEST['reference_number'];?>">
     </form>
     <!--Cardinal device data collection code START-->
     <iframe id="cardinal_collection_iframe" name="collectionIframe" height="1" width="1" style="display: none;"></iframe>
@@ -75,13 +78,13 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->firstName;}?>" placeholder="First name" required>
+                                <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->firstName;}?>" placeholder="First name" maxlength="60" required>
                                 <label for="ship_to_forename" class="form-label">First name*</label>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->lastName;}?>" placeholder="Last Name" required>
+                                <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->lastName;}?>" placeholder="Last Name" maxlength="60" required>
                                 <label for="ship_to_surname" class="form-label">Surname*</label>
                             </div>
                         </div>
@@ -89,13 +92,13 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->address1;}?>" placeholder="1st line of address" required>
+                                <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->address1;}?>" placeholder="1st line of address" maxlength="60" required>
                                 <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo (isset($defaultShippingAddress->shipTo->address2)?$defaultShippingAddress->shipTo->address2:"");}?>" placeholder="2nd line of address">
+                                <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo (isset($defaultShippingAddress->shipTo->address2)?$defaultShippingAddress->shipTo->address2:"");}?>" placeholder="2nd line of address" maxlength="60">
                                     <label for="ship_to_address_line2" class="form-label">Address line 2</label>
                             </div>
                         </div>
@@ -103,13 +106,13 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                         <div class="row">
                             <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->locality;}?>" placeholder="City/County" required>
+                                <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->locality;}?>" placeholder="City/County" maxlength="50" required>
                                 <label for="ship_to_address_city" class="form-label">City/County*</label>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->postalCode;}?>" placeholder="Postcode" required>
+                                <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->postalCode;}?>" placeholder="Postcode" maxlength="10" required>
                                 <label for="ship_to_postcode" class="form-label">PostCode*</label>
                             </div>
                         </div>
@@ -167,7 +170,7 @@ foreach ($countries as $key => $value) {
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-sm-2">
+                <div id="securityCodeSection" class="col-sm-2">
                     <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
                     <div id="securityCode-container" class="form-control form-control-sm"></div>
                 </div>
@@ -191,27 +194,25 @@ foreach ($countries as $key => $value) {
             <div id="defaultBillingSection">
                 <div class="row">
                     <div class="col-sm-6">
-<?php if($paymentInstrumentCount>1): ?>
-                        <button type="button" class="btn btn-link" onclick="editCard()">Use a different Stored Card</button>
-<?php endif ?>
+                        <button type="button" class="btn btn-link" onclick="editCard()">Use a different Card</button>
                         <button type="button" class="btn btn-link" onclick="newCard()">Use New Card</button>
                     </div>
                 </div>
             </div>
 <?php endif ?>
-            <form id="billingForm" class="needs-validation" novalidate style="display: <?php echo ($paymentInstrumentCount?"none":"block");?>">
+            <form id="billingForm" class="needs-validation" novalidate style="display: <?php echo ($paymentInstrumentCount || $shippingAddressRequired?"none":"block");?>">
                 <div id="billingSection">
                     <h5>Card Billing Address</h5>
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->firstName;}?>" placeholder="First name" required>
+                                <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->firstName;}?>" placeholder="First name" maxlength="60" required>
                                 <label for="bill_to_forename" class="form-label">First name*</label>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" required>
+                                <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" maxlength="60" required>
                                 <label for="bill_to_surname" class="form-label">Last name*</label>
                             </div>
                         </div>
@@ -219,13 +220,13 @@ foreach ($countries as $key => $value) {
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address1;}?>" placeholder="1st line of address" required>
+                                <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address1;}?>" placeholder="1st line of address" maxlength="60" required>
                                 <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address2;}?>" placeholder="2nd line of address">
+                                <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address2;}?>" placeholder="2nd line of address" maxlength="60">
                                 <label for="bill_to_address_line2" class="form-label">Address line 2</label>
                             </div>
                         </div>
@@ -233,13 +234,13 @@ foreach ($countries as $key => $value) {
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->locality;}?>" placeholder="City/County" required>
+                                <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->locality;}?>" placeholder="City/County" required maxlength="50">
                                 <label for="bill_to_address_city" class="form-label">City/County*</label>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group form-floating mb-3">
-                                <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->postalCode;}?>" placeholder="Postcode" required>
+                                <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->postalCode;}?>" placeholder="Postcode" required maxlength="10">
                                 <label for="bill_to_postcode" class="form-label">PostCode*</label>
                             </div>
                         </div>
@@ -304,7 +305,7 @@ var paymentInstrumentId = "<?php echo ($paymentInstrumentCount?$defaultPaymentIn
 var oldPaymentInstrumentId;
 var maskedPan = "<?php echo ($paymentInstrumentCount?$defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number:"");?>";
 var shippingAddressId = "<?php echo ($shippingAddressAvailable?$defaultShippingAddress->id:"");?>";
-var flexToken;
+var flexToken="";
 var pan;
 var storeCard = false;
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
@@ -369,7 +370,11 @@ if ($paymentInstrumentCount) {
 ?>
 console.log(paymentInstruments);
 document.addEventListener("DOMContentLoaded", function (e) {
-    flex = new Flex(captureContext);
+    if(captureContext === ""){
+        // TODO Something went wrong - abandon ship
+    }else{
+        flex = new Flex(captureContext);
+    }
     microform = flex.microform({styles: myStyles});
     number = microform.createField('number', {placeholder: 'Card number'});
 <?php
@@ -429,7 +434,11 @@ document.addEventListener("DOMContentLoaded", function (e) {
             // document.getElementById('defaultBillingSection').style.display = "none";
             document.getElementById('payButtonSection').style.display = "none";
             document.getElementById("progressSpinner").style.display = "block";
-            payNow();
+            if(flexToken === ""){
+                tokenizeCard();
+            }else{
+                setUpPayerAuth()
+            }
         }
     });
 });
@@ -476,13 +485,13 @@ function validateForm(form){
     }
     return true;
 }
-function payNow() {
+function tokenizeCard() {
     if (paymentInstrumentId !== "") {
         var options = {
         };
     } else {
         var options = {
-            expirationMonth: getMonth(),
+            expirationMonth: document.getElementById('expiryDate').value.substring(0,2),
             expirationYear: 20 + document.getElementById('expiryDate').value.substring(3,5)
         };
     }
@@ -504,15 +513,13 @@ function payNow() {
             if (sc.checked) {
                 storeCard = true;
             }
+            setOrderDetails();
             setUpPayerAuth();
         }
     });
 }
 function getMonth() {
-    // months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
     return document.getElementById('expiryDate').value.substring(0,2);
-    // turn 1,2,3,4 into "01","02","03", etc
-    // return(months[m - 1]);
 }
 function fieldsValid(valid) {
     if (!valid || (paymentInstrumentId === "" && !expiryDateValid()) || !(panValid && cvnValid)) {
@@ -593,7 +600,6 @@ function setOrderDetails() {
     }
 }
 function setUpPayerAuth() {
-    setOrderDetails();
     $.ajax({
         type: "POST",
         url: "rest_setup_payerAuth.php",
@@ -662,7 +668,8 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
             "transientToken": flexToken,
             "referenceID": dfReferenceId,
             "authenticationTransactionID": authenticationTransactionID,
-            "standAlone": standAlone
+            "standAlone": standAlone,
+            "capture": true     // TODO hardcoded capture
         }),
         success: function (result) {
             // Response is a json string - turn it into a javascript object
@@ -745,47 +752,72 @@ function onShippingAddressUpdated(id, shipToText) {
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
 }
+function onNewCardUsed(details) {
+    console.log(details);
+    // Hide/unload Security code
+    document.getElementById('securityCodeSection').style.display = "none";
+    securityCode.unload();
+    maskedPan = details.cardDetails.number;
+    flexToken = details.flexToken;
+    paymentInstrumentId = "";
+
+    html = stylePaymentInstrument(maskedPan, details.cardDetails, details.billTo);
+    document.getElementById('storedCardSection').innerHTML = html;
+    document.getElementById('iframeSection').style.display = "none";
+    document.getElementById('paymentDetailsSection').style.display = "block";
+
+    orderDetails.bill_to.bill_to_forename = details.billTo.firstName;
+    orderDetails.bill_to.bill_to_surname = details.billTo.lastName;
+    orderDetails.bill_to.bill_to_address_line1 = details.billTo.address1;
+    orderDetails.bill_to.bill_to_address_line2 = details.billTo.address2;
+    orderDetails.bill_to.bill_to_address_city = details.billTo.locality;
+    orderDetails.bill_to.bill_to_postcode = details.billTo.postalCode;
+    orderDetails.bill_to.bill_to_address_country = details.billTo.country;
+    orderDetails.bill_to.bill_to_email = document.getElementById('bill_to_email').value;
+    payButton.disabled = false;
+}
 function onPaymentInstrumentUpdated(id, paymentInstrument) {
     paymentInstrumentId = id;
     maskedPan = paymentInstrument._embedded.instrumentIdentifier.card.number;
     console.log("onPaymentInstrumentUpdated:\n" + id + "\n"+ JSON.stringify(paymentInstrument, undefined, 2));
-    xxx = stylePaymentInstrument(paymentInstrument);
-    document.getElementById('storedCardSection').innerHTML  = xxx;
+    html = stylePaymentInstrument(paymentInstrument._embedded.instrumentIdentifier.card.number,
+                paymentInstrument.card, paymentInstrument.billTo);
+    document.getElementById('storedCardSection').innerHTML  = html;
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
     updateSecurityCodeField(paymentInstrument.card.type);
 }
-function stylePaymentInstrument(paymentInstrument){
+function stylePaymentInstrument(maskedPan, card, billTo){
     img = "";
     alt = "";
-    if (paymentInstrument.card.type === "001") {
+    if (card.type === "001") {
         img = "images/Visa.svg";
         alt = "Visa card logo";
-    } else if (paymentInstrument.card.type === "002") {
+    } else if (card.type === "002") {
         img = "images/Mastercard.svg";
         alt = "Mastercard logo";
     } else {
         img = "images/Amex.svg";
         alt = "Amex card logo";
     }
-    xxx =   "<h5>Stored Card Details</h5>" +
+    html =   "<h5>Stored Card Details</h5>" +
             "<div class=\"row\">\n" +
                 "<div class=\"col-sm-1\">\n"+
                     "<img  src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+
                 "</div>\n" +
                 "<div class=\"col-sm-1\">\n" +
                     "<ul class=\"list-unstyled\">" +
-                        "<li><strong>" + paymentInstrument._embedded.instrumentIdentifier.card.number + "</strong></li>\n" +
-                        "<li><small>Expires:&nbsp;" + paymentInstrument.card.expirationMonth + "/" + paymentInstrument.card.expirationYear + "</small></li>\n" +
+                        "<li><strong>" + maskedPan + "</strong></li>\n" +
+                        "<li><small>Expires:&nbsp;" + card.expirationMonth + "/" + card.expirationYear + "</small></li>\n" +
                     "</ul>\n" +
                 "</div>\n" +
                 "<div class=\"row\">\n"+
                     "<h5>Card Billing Address</h5>" +
                     "<div class=\"col-sm-6\">" +
-                        "<span id=\"billingText\" class=\"form-control form-control-sm\" disabled>" + concatinateNameAddress(paymentInstrument.billTo) + "</span>\n" +
+                        "<span id=\"billingText\" class=\"form-control form-control-sm\" disabled>" + concatinateNameAddress(billTo) + "</span>\n" +
                     "</div>\n" +
                 "</div>\n";
-    return xxx;
+    return html;
 }
 function concatinateNameAddress(nameAddress){
     // return name and address string
