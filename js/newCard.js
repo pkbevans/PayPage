@@ -1,6 +1,8 @@
 newCardButton// the capture context that was requested server-side for this transaction
 var captureContext;
 var maskedPan = "";
+var cardType;
+var cardDetails;
 var flexToken;
 var pan;
 var storeCard = false;
@@ -30,7 +32,8 @@ var cvnValid;
 var secCodeLbl;
 var numberContainer;
 document.addEventListener("DOMContentLoaded", function (e) {
-    getCaptureContext(true);
+    console.log(window.location.href);
+    getCaptureContext(window.location.href.includes("localhost")?true:false);
 });
 function setUpMicroform(){
     flex = new Flex(captureContext);
@@ -105,15 +108,16 @@ function getToken() {
         } else {
             // At this point you may pass the token back to your server as you wish.
             console.log( "\nGot Token:\n" + jwt);
-            maskedPan = getPAN(jwt);
-            console.log( "\nGot PAN:" + pan);
+//            maskedPan = getPAN(jwt);
+            cardDetails = getCardDetails(jwt);
+//            console.log( "\nGot PAN:" + pan);
             flexToken = getJTI(jwt);
             // IF storeCard checked, we will create a Token
             let sc = document.getElementById('storeCard');
             if (sc.checked) {
                 storeCard = true;
             }
-            return onFinish(false, storeCard, flexToken, maskedPan);
+            return onFinish(false, storeCard, flexToken);
         }
     });
 }
@@ -145,6 +149,9 @@ function getPAN(jwt) {
     // console.log("PAN:" + pan);
     return (pan);
 }
+function getCardDetails(jwt) {
+    return getPayload(jwt).data;
+}
 function getPayload(jwt) {
     jwtArray = jwt.split(".");
     payloadB64 = jwtArray[1];
@@ -173,20 +180,22 @@ function getCaptureContext(local) {
         }
     });
 }
-function onFinish(cancelled, storeCard, flexToken, maskedPan){
+function onFinish(cancelled, storeCard, flexToken){
     // document.getElementById('paymentDetailsSection').style.display = "none";
     result = JSON.stringify({
         "cancelled": cancelled,
         "storeCard": storeCard,
         "flexToken": flexToken,
-        "maskedPan": maskedPan,
-        "bill_to_forename": (!cancelled?document.getElementById('bill_to_forename').value:""),
-        "bill_to_surname": (!cancelled?document.getElementById('bill_to_surname').value:""),
-        "bill_to_address_line1": (!cancelled?document.getElementById('bill_to_address_line1').value:""),
-        "bill_to_address_line2": (!cancelled?document.getElementById('bill_to_address_line2').value:""),
-        "bill_to_address_city": (!cancelled?document.getElementById('bill_to_address_city').value:""),
-        "bill_to_postcode": (!cancelled?document.getElementById('bill_to_postcode').value:""),
-        "bill_to_address_country": (!cancelled?document.getElementById('bill_to_address_country').value:"")
+        "cardDetails": cardDetails,
+        "billTo": {
+            "firstName": (!cancelled?document.getElementById('bill_to_forename').value:""),
+            "lastName": (!cancelled?document.getElementById('bill_to_surname').value:""),
+            "address1": (!cancelled?document.getElementById('bill_to_address_line1').value:""),
+            "address2": (!cancelled?document.getElementById('bill_to_address_line2').value:""),
+            "locality": (!cancelled?document.getElementById('bill_to_address_city').value:""),
+            "postalCode": (!cancelled?document.getElementById('bill_to_postcode').value:""),
+            "country": (!cancelled?document.getElementById('bill_to_address_country').value:"")
+        }
     });
     onNewCardReceived(result);
 }

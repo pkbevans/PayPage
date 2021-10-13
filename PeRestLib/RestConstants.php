@@ -1,5 +1,6 @@
 <?php
 include_once '../ppSecure/PeRestLibKeys.php';
+const TARGET_ORIGIN =  "https://bondevans.com";  
 // Endpoints
 const REQUEST_HOST =  "apitest.cybersource.com";  // TEST
 //const REQUEST_HOST = "api.cybersource.com";  // PRODUCTION
@@ -37,3 +38,9 @@ const METHOD_PUT = 'PUT';
 
 const AUTH_TYPE_SIGNATURE = "signature";
 const AUTH_TYPE_BEARER = "bearer";
+
+const MAXSIZE_NAME = 60;
+const MAXSIZE_ADDRESS = 60;
+const MAXSIZE_CITY = 50;
+const MAXSIZE_POSTCODE = 10;
+const MAXSIZE_COUNTRY = 2;

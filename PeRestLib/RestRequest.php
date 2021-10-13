@@ -57,9 +57,10 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
     foreach ($headerParams as $key => $val) {
         $requestHeaders[$key] = $val;
     }
-    $result->requestHeaders = $requestHeaders;
+//    $result->requestHeaders = $requestHeaders;
     $result->request = json_decode($payload);
     $result->responseCode = $response_info['http_code'];
+//    $result->responseInfo = $response_info;
 //    $result->responseHeaders=$http_headers;
     $result->response = $response;
 
