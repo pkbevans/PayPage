@@ -1,4 +1,3 @@
-newCardButton// the capture context that was requested server-side for this transaction
 var captureContext;
 var maskedPan = "";
 var cardType;

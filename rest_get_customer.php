@@ -31,11 +31,11 @@ function setDefaultShippingAddress(){
     $defaultShippingAddress->country = "";
 }
 /////////////////////////END FUNCTIONS
-$paymentInstrumentCount = 0;
+//$paymentInstrumentCount = 0;
 $shippingAddressAvailable = false;
 $customerToken = "";
-$storedCards = new stdClass();
-$shippingAddresses = new stdClass();
+//$storedCards = new stdClass();
+//$shippingAddresses = new stdClass();
 $defaultPaymentInstrument="";
 $defaultShippingAddress;
 $billToText="";
@@ -51,60 +51,15 @@ if(isset($_REQUEST['customerToken'])){
             // $strResponse = API::sendRequest(API::TEST_URL,API::GET,$api, "peportfolio","{}",null,null,"pemid03" );
             $result = ProcessRequest("peportfolio", $api , METHOD_GET, "", "pemid03", AUTH_TYPE_SIGNATURE );
             if($result->responseCode === 200){
-             // echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
-            }
-
-            // Get Payment Instruments
-            $api = str_replace('{customerId}', $customerToken, API_TMS_V2_CUSTOMER_PAYMENT_INSTRUMENTS);
-
-            // $strResponse = API::sendRequest(API::TEST_URL,API::GET,$api, "peportfolio","{}",null,null,"pemid03" );
-            $result = ProcessRequest("peportfolio", $api , METHOD_GET, "", "pemid03", AUTH_TYPE_SIGNATURE );
-            if($result->responseCode === 200){
-                $paymentInstrumentCount = $result->response->count;
-//                echo("<BR> PAYMENT INSTRUMENTS:<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
-                if(isset($result->response->_embedded->paymentInstruments)){
-                    $storedCards = $result->response->_embedded->paymentInstruments;
-
-                    foreach ($storedCards as $storedCard) {
-                        // Add default address line 2 if non-existant
-                        if(!isset($storedCard->billTo->address2)){
-                            $storedCard->billTo->address2 = "";
-                        }
-                        // Find Default Payment Instrument - use this for the default Billing Details
-                        if($storedCard->default){
-                            $defaultPaymentInstrument = $storedCard;
-                        }
-                     // echo "<BR> GOT: ID" . $storedCard->id . " State:" . $storedCard->state . " Type: " . $storedCard->card->type . " Default: " .$storedCard->default .   "<BR>";
-                    }
+//                echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
+                if(isset($result->response->_embedded->defaultPaymentInstrument)){
+                    $defaultPaymentInstrument = $result->response->_embedded->defaultPaymentInstrument;
                     $billToText = concatinateNameAddress($defaultPaymentInstrument->billTo);
                 }
-            }
-
-            // Get Shipping Addresses
-            $api = str_replace('{customerId}', $customerToken, API_TMS_V2_CUSTOMER_SHIPPING_ADDRESSES);
-
-            // $strResponse = API::sendRequest(API::TEST_URL,API::GET,$api, "peportfolio","{}",null,null,"pemid03" );
-            $result = ProcessRequest("peportfolio", $api , METHOD_GET, "", "pemid03", AUTH_TYPE_SIGNATURE );
-            if($result->responseCode === 200){
-                // echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
-                if(isset($result->response->_embedded->shippingAddresses)){
-                    $shippingAddresses = $result->response->_embedded->shippingAddresses;
-                    foreach ($shippingAddresses as $shippingAddress) {
-                        // Find Default Shipping address - use this for the default Shipping Details
-                        if($shippingAddress->default){
-                            $defaultShippingAddress = $shippingAddress;
-                            $shippingAddressAvailable = true;
-                        }
-                     // echo "<BR> GOT: ID" . $storedCard->id . " State:" . $storedCard->state . " Type: " . $storedCard->card->type . " Default: " .$storedCard->default .   "<BR>";
-                    }
+                if(isset($result->response->_embedded->defaultShippingAddress)){
+                    $defaultShippingAddress = $result->response->_embedded->defaultShippingAddress;
                     $shipToText = concatinateNameAddress($defaultShippingAddress->shipTo);
-                }else{
-                    // Somehow, no Shipping addresses
-                    setDefaultShippingAddress();
                 }
-            }else{
-                    // Somehow, no Shipping addresses
-                setDefaultShippingAddress();
             }
         } catch (Exception $exception) {
             echo(json_encode($exception));

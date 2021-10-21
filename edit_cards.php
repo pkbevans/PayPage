@@ -46,6 +46,7 @@ $count=0;
     <link rel="stylesheet" type="text/css" href="css/styles.css"/>
     <title>Manage Your Cards</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
     <body>
         <h5>Your Payment Cards</h5>
@@ -80,13 +81,13 @@ $count=0;
                         <form id="<?php echo $paymentInstrument->id;?>_form" style="display: none">
                             <div>
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $paymentInstrument->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->firstName;?>" placeholder="First name" required>
                                             <label for="<?php echo $paymentInstrument->id;?>_firstName" class="form-label">First name*</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $paymentInstrument->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->lastName;?>" placeholder="Last Name" required>
                                             <label for="<?php echo $paymentInstrument->id;?>_lastName" class="form-label">Surname*</label>
@@ -94,13 +95,13 @@ $count=0;
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $paymentInstrument->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->address1;?>" placeholder="1st line of address" required>
                                             <label for="<?php echo $paymentInstrument->id;?>_address1" class="form-label">Address line 1*</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $paymentInstrument->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($paymentInstrument->billTo->address2)?$paymentInstrument->billTo->address2:"");?>" placeholder="2nd line of address">
                                             <label for="<?php echo $paymentInstrument->id;?>_address2" class="form-label">Address line 2</label>
@@ -108,13 +109,13 @@ $count=0;
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $paymentInstrument->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->locality;?>" placeholder="City/County" required>
                                             <label for="<?php echo $paymentInstrument->id;?>_locality" class="form-label">City/County*</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $paymentInstrument->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $paymentInstrument->billTo->postalCode;?>" placeholder="Postcode" required>
                                             <label for="<?php echo $paymentInstrument->id;?>_postalCode" class="form-label">PostCode*</label>
@@ -122,7 +123,7 @@ $count=0;
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-12">
                                         <div class="form-group form-floating mb-3">
                                             <select id="<?php echo $paymentInstrument->id;?>_country" class="form-select">
 <?php
@@ -148,7 +149,7 @@ foreach ($countries as $key => $value) {
                                     <button type="button" class="btn btn-link" onclick="updatePaymentInstrument('<?php echo $paymentInstrument->id;?>',false)">Save</button>
                                 </div>
                                 <div class="col-sm-1">
-                                    <button type="button" class="btn btn-link" onclick="toDo()">Cancel</button>
+                                    <button type="button" class="btn btn-link" onclick="cancelEdit('<?php echo $paymentInstrument->id;?>')">Cancel</button>
                                 </div>
                             </div>
                         </form>
@@ -165,10 +166,72 @@ foreach ($countries as $key => $value) {
                 </h2>
                 <div id="collapseAdd" class="accordion-collapse collapse" aria-labelledby="headingAdd" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-            <?php include 'new_card_form.php';?>
+                        <div id="cardInputSection">
+                        </div>
+                            <form id="billingForm" class="needs-validation" novalidate style="display: block">
+                                <div id="billingSection">
+                                    <h5>Card Billing Address</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_firstname" type="text" class="form-control form-control-sm" value="" placeholder="First name" required>
+                                                <label for="bill_to_firstname" class="form-label">First name*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_lastname" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" required>
+                                                <label for="bill_to_lastname" class="form-label">Last name*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_address1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" required>
+                                                <label for="bill_to_address1" class="form-label">Address line 1*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_address2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address">
+                                                <label for="bill_to_address2" class="form-label">Address line 2</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_locality" type="text" class="form-control form-control-sm" value="" placeholder="City/County" required>
+                                                <label for="bill_to_locality" class="form-label">City/County*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_postalCode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" required>
+                                                <label for="bill_to_postalCode" class="form-label">PostCode*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group form-floating mb-3">
+                                                <select id="bill_to_country" class="form-control form-control-sm">
+                <?php
+                foreach ($countries as $key => $value) {
+                    echo "<option value=\"". $key ."\">" . $value . "</option>\n";
+                }
+                ?>
+                                                </select>
+                                                <label for="bill_to_country" class="form-label">Country*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         <div class="row">
-                            <div class="col-sm-1">
-                                <button type="button" id="newCardButton" class="btn btn-primary" onclick="saveClicked()">Save</button>
+                            <div class="col-sm-2">
+                                <button type="button" id="newCardButton" class="btn btn-primary" onclick="saveClicked()">Use</button>
                             </div>
                         </div>
                     </div>
@@ -184,8 +247,7 @@ foreach ($countries as $key => $value) {
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
-<script src="js/expiryDate.js"></script>
-<script src="js/newCard.js"></script>
+<script src="js/newCard2.js"></script>
 <script>
 var customerId = "<?php echo $customerToken;?>";
 <?php
@@ -193,26 +255,49 @@ foreach ($paymentInstruments as $paymentInstrument){
 echo "var paymentInstrument_". $paymentInstrument->id . " = '" . json_encode($paymentInstrument) . "';\n";
 }
 ?>
-
+document.addEventListener("DOMContentLoaded", function (e) {
+    createCardInput("cardInputSection", "", "newCardButton");
+});
 function saveClicked(){
-    tokenizeCard();
-}
-function onNewCardReceived(details){
-    cardDetails = JSON.parse(details);
-    // New card details received from newCqard.js
-    if(!cardDetails.cancelled){
-        if(cardDetails.storeCard){
-            addPaymentInstrument(cardDetails);
-        }else{
-            // New card/billing details but not to be stored
-            parent.onNewCardUsed(cardDetails);
-        }
+    form = document.getElementById('billingForm');
+    if(validateForm(form)){
+        getToken(onNewCardReceived, onTokenError);
     }
 }
-
+function onNewCardReceived(flexDetails){
+    // New card details received from newCard.js
+    billTo = {
+        firstName: document.getElementById("bill_to_firstname").value,
+        lastName: document.getElementById("bill_to_lastname").value,
+        address1: document.getElementById("bill_to_address1").value,
+        address2: document.getElementById("bill_to_address2").value,
+        locality: document.getElementById("bill_to_locality").value,
+        postalCode: document.getElementById("bill_to_postalCode").value,
+        country: document.getElementById("bill_to_country").value
+    };
+    // New card/billing details but not to be stored
+    parent.onNewCardUsed(flexDetails, billTo);
+    addPaymentInstrument(flexDetails, billTo);
+}
+function onTokenError(err){
+    console.log(err);
+}
+function validateForm(form){
+    if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        return false;
+    }
+    return true;
+}
 function editPaymentInstrument(id){
     document.getElementById(id+"_form").style.display = "block";
     document.getElementById(id+"_buttons").style.display = "none";
+}
+function cancelEdit(id){
+    document.getElementById(id+"_form").style.display = "none";
+    document.getElementById(id+"_buttons").style.display = "block";
 }
 function updatePaymentInstrument(id, setDefaultOnly){
     console.log("\nUpdating Card: "+id);
@@ -268,7 +353,7 @@ function usePaymentInstrument(id){
     xxx = window['paymentInstrument_'+id];
     parent.onPaymentInstrumentUpdated(id, JSON.parse(xxx));
 }
-function addPaymentInstrument(card){
+function addPaymentInstrument(flexDetails, billToDetails){
     // Zero-value auth without Payer Auth
     console.log("\nAdding Payment Instrument");
 //    card = JSON.parse(cardDetails);
@@ -279,14 +364,14 @@ function addPaymentInstrument(card){
         shippingAddressRequired: false,
         useShippingAsBilling: false,
         bill_to: {
-            bill_to_forename: card.billTo.firstName,
-            bill_to_surname: card.billTo.lastName,
-            bill_to_email: "<?php echo $_REQUEST['email'];?>",
-            bill_to_address_line1: card.billTo.address1,
-            bill_to_address_line2: card.billTo.address2,
-            bill_to_address_city: card.billTo.locality,
-            bill_to_postcode: card.billTo.postalCode,
-            bill_to_address_country: card.billTo.country
+            firstname: billToDetails.firstName,
+            lastname: billToDetails.lastName,
+            email: "<?php echo $_REQUEST['email'];?>",
+            address1: billToDetails.address1,
+            address2: billToDetails.address2,
+            locality: billToDetails.locality,
+            postalCode: billToDetails.postalCode,
+            country: billToDetails.country
         }
     };
     $.ajax({
@@ -300,7 +385,7 @@ function addPaymentInstrument(card){
             "paAction": "NO_PA",
             "paymentInstrumentId": "",
             "shippingAddressId": "",
-            "transientToken": card.flexToken,
+            "transientToken": flexDetails.flexToken,
             "referenceID": "",
             "authenticationTransactionID": "",
             "standAlone": false,

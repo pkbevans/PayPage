@@ -24,14 +24,16 @@ function getCookie($name){
         <title>View Basket</title>
     </head>
     <body>
-        <div class="container-fluid">
+        <div class="container-fluid justify-content-center">
+        <div class="row">
             <div id="formSection">
             <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="checkout.php" novalidate >
                 <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
                 <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
-                <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
+                <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="pkbevans@gmail.com" />
                 <label for="customer_reference" class="form-label">Merchants Customer Reference</label><input id="customerRef" class="form-control" type="text" name="customerRef" value="" />
                 <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value="<?php echo getCookie("customerId")?>"/>
+                <!--<label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>-->
                 <input id="currency" type="hidden" name="currency" value="GBP"/>
                 <label for="local" class="form-label">Local</label><input id="local" class="form-control" type="text" name="local" value="<?php echo $local; ?>"/>
                 <BR><button type="submit" class="btn btn-primary" >Checkout</button>
@@ -39,13 +41,22 @@ function getCookie($name){
             </div>
             <iframe id="checkoutIframe" name="checkout_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
         </div>
+        </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script>
     function buttonClicked(){
         document.getElementById('formSection').style.display="none";
         document.getElementById('checkoutIframe').style.display="block";
         var checkout_form = document.getElementById('checkout_form');
-        if(checkout_form) checkout_form.submit();
+        if(checkout_form){
+            customer = document.getElementById('customerToken').value;
+            if(customer === ""){
+                checkout_form.action = "checkout_new.php"
+            }else{
+                checkout_form.action = "checkout_existing.php"
+            }
+            checkout_form.submit();
+        }
     }
 
     // Example starter JavaScript for disabling form submissions if there are invalid fields

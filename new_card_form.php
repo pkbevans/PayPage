@@ -1,23 +1,5 @@
 
         <div id="paymentDetailsSection">
-            <div id="cardDetailsSection">
-                <div class="row mb-3">
-                    <div class="col-sm-3">
-                        <label class="form-check-label" for="number-container">Card Number</label>
-                        <div id="number-container" class="form-control form-control-sm"></div>
-                    </div>
-                    <div class="col-sm-3">
-                        <label class="form-check-label" for="expiryDate">Expires</label>
-                        <input class="expiry form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]\/[2][1-9]" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
-                    </div>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-sm-2">
-                    <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
-                    <div id="securityCode-container" class="form-control form-control-sm"></div>
-                </div>
-            </div>
             <div id="storeCardSection" class="row">
                 <div class="col-sm-5">
                     <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">

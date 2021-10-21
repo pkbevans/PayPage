@@ -1,11 +1,3 @@
-#number-container {
-    height: 38px;
-    width: 180px;
-}
-#securityCode-container {
-    height: 38px;
-    width: 52px;
-}
 .flex-microform-focused {
     background-color: #fff;
     border-color: #80bdff;
@@ -21,8 +13,8 @@
  #overlay {
      position: fixed;
      display: none;
-     width: 100% ;
-     height: 100%;
+     /*width: 100% ;*/
+     /*height: 100%;*/
      top: 0;
      left: 0;
      right: 0;
@@ -31,7 +23,25 @@
      z-index: 2;
      cursor: pointer;
  }
- /* Expiry date stuff */
- #expiryDate {
-     width: 80px;
- }
+.form-control {
+    height: 50px;
+}
+
+.cardInput {
+    position: relative
+}
+
+.cardInput i {
+    position: absolute;
+    top: 16px;
+    left: 11px;
+    color: #989898
+}
+
+.cardInput input {
+    text-indent: 25px
+}
+
+.cardInput div {
+    text-indent: 25px
+}

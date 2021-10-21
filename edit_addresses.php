@@ -69,13 +69,13 @@ $count=0;
                         <form id="<?php echo $shippingAddress->id;?>_form" style="display: none">
                             <div>
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $shippingAddress->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->firstName;?>" placeholder="First name" maxlength="60" required>
                                             <label for="<?php echo $shippingAddress->id;?>_firstName" class="form-label">First name*</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $shippingAddress->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->lastName;?>" placeholder="Last Name" maxlength="60" required>
                                             <label for="<?php echo $shippingAddress->id;?>_lastName" class="form-label">Surname*</label>
@@ -83,13 +83,13 @@ $count=0;
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $shippingAddress->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->address1;?>" placeholder="1st line of address" maxlength="60" required>
                                             <label for="<?php echo $shippingAddress->id;?>_address1" class="form-label">Address line 1*</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $shippingAddress->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($shippingAddress->shipTo->address2)?$shippingAddress->shipTo->address2:"");?>" placeholder="2nd line of address" maxlength="60">
                                             <label for="<?php echo $shippingAddress->id;?>_address2" class="form-label">Address line 2</label>
@@ -97,13 +97,13 @@ $count=0;
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $shippingAddress->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->locality;?>" placeholder="City/County" maxlength="50" required>
                                             <label for="<?php echo $shippingAddress->id;?>_locality" class="form-label">City/County*</label>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-6">
                                         <div class="form-group form-floating mb-3">
                                             <input id="<?php echo $shippingAddress->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->postalCode;?>" placeholder="Postcode" maxlength="10" required>
                                             <label for="<?php echo $shippingAddress->id;?>_postalCode" class="form-label">PostCode*</label>
@@ -111,7 +111,7 @@ $count=0;
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-12">
                                         <div class="form-group form-floating mb-3">
                                             <select id="<?php echo $shippingAddress->id;?>_country" class="form-select">
 <?php
@@ -153,13 +153,13 @@ foreach ($countries as $key => $value) {
                     <div class="accordion-body">
                         <form id="add_form" style="display: block">
                             <div class="row">
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
                                         <input id="add_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
                                         <label for="add_firstName" class="form-label">First name*</label>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
                                         <input id="add_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
                                         <label for="add_lastName" class="form-label">Surname*</label>
@@ -167,13 +167,13 @@ foreach ($countries as $key => $value) {
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
                                         <input id="add_address1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" maxlength="60" required>
                                         <label for="add_address1" class="form-label">Address line 1*</label>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
                                         <input id="add_address2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address" maxlength="60">
                                         <label for="add_address2" class="form-label">Address line 2</label>
@@ -181,13 +181,13 @@ foreach ($countries as $key => $value) {
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
                                         <input id="add_locality" type="text" class="form-control form-control-sm" value="" placeholder="City/County" maxlength="50" required>
                                         <label for="add_locality" class="form-label">City/County*</label>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
                                         <input id="add_postalCode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" maxlength="10" required>
                                         <label for="add_postalCode" class="form-label">PostCode*</label>
@@ -195,7 +195,7 @@ foreach ($countries as $key => $value) {
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6">
+                                <div class="col-sm-12">
                                     <div class="form-group form-floating mb-3">
                                         <select id="add_country" class="form-select">
 <?php
@@ -214,7 +214,7 @@ foreach ($countries as $key => $value) {
                                 <label class="form-check-label" for="flexCheckDefault">Make this my default address</label>
                             </div>
                             <div class="row">
-                                <div class="col-sm-1">
+                                <div class="col-sm-2">
                                     <button type="button" class="btn btn-link" onclick="addShippingAddress()">Save</button>
                                 </div>
                             </div>

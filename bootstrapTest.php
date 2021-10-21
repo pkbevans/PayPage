@@ -13,36 +13,25 @@
 <body>
     <div class="container d-flex justify-content-center mt-5 mb-5">
         <div class="row g-3">
-            <div class="col-md-6"> <span>Payment Method</span>
+            <div class="col-md-6"> 
                 <div class="card">
                     <div class="accordion" id="accordionExample">
                         <div class="card">
-                            <div class="card-header p-0" id="headingTwo">
-                                <h2 class="mb-0"> <button class="btn btn-light btn-block text-left collapsed p-3 rounded-0 border-bottom-custom" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        <div class="d-flex align-items-center justify-content-between"> <span>Paypal</span> <img src="https://i.imgur.com/7kQEsHU.png" width="30"> </div>
-                                    </button> </h2>
-                            </div>
-                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
-                                <div class="card-body"> <input type="text" class="form-control" placeholder="Paypal email"> </div>
-                            </div>
-                        </div>
-                        <div class="card">
                             <div class="card-header p-0">
-                                <h2 class="mb-0"> <button class="btn btn-light btn-block text-left p-3 rounded-0" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        <div class="d-flex align-items-center justify-content-between"> <span>Credit card</span>
-                                            <div class="icons">
-                                                <img src="https://i.imgur.com/2ISgYja.png" width="30">
-                                                <img src="https://i.imgur.com/W1vtnOV.png" width="30">
-                                                <img src="https://i.imgur.com/35tC99g.png" width="30">
-                                            </div>
-                                        </div>
-                                    </button> </h2>
                             </div>
                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
-                                <div class="card-body payment-card-body"> <span class="font-weight-normal card-text">Card Number</span>
+                                <div class="card-body payment-card-body"> 
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="icons">
+                                                <img src="images/Visa.svg" width="30">
+                                                <img src="images/Mastercard.svg" width="30">
+                                                <img src="images/Amex.svg" width="30">
+                                            </div>
+                                        </div>
+                                    <span class="font-weight-normal card-text">Card Number</span>
                                     <div class="input">
                                         <i class="fa fa-credit-card"></i>
-                                        <input type="text" class="form-control" placeholder="0000 0000 0000 0000">
+                                        <div id="number-container" class="form-control form-control-sm"></div>
                                     </div>
                                     <div class="row mt-3 mb-3">
                                         <div class="col-md-6"> <span class="font-weight-normal card-text">Expiry Date</span>
@@ -51,13 +40,18 @@
                                                 <input class="form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]\/[2][1-9]" inputmode="numeric" autocomplete="cc-exp" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-6"> <span class="font-weight-normal card-text">CVC/CVV</span>
+                                        <div class="col-md-6"> 
+                                            <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
                                             <div class="input"> <i class="fa fa-lock"></i>
-                                                <input type="text" class="form-control" placeholder="000">
+                                                <div id="securityCode-container" class="form-control form-control-sm"></div>
                                             </div>
                                         </div>
                                     </div>
-                                        <span class="text-muted certificate-text"><i class="fa fa-lock"></i> Your transaction is secured with ssl certificate</span>
+                                    <div id="newCardButtonSection" class="row">
+                                        <div class="col-sm-6">
+                                            <button type="button" class="btn btn-primary" onclick="pay()" id="newCardButton" disabled="true">Pay</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -89,6 +83,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script src="js/expiryDate.js"></script>
 </body>
+<script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
+<script src="js/newCard.js"></script>
 <script>
+    function pay(){
+        
+    }
 </script>
 </html>
