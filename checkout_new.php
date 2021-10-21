@@ -1,14 +1,10 @@
 <?php
 include_once 'card_types.php';
 include_once 'countries.php';
-include 'generate_capture_context.php';
 include 'rest_get_customer.php';
-$shippingAddressRequired = true;
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     $defaultEmail = $_REQUEST['email'];
-}else if($paymentInstrumentCount>0){
-    $defaultEmail = $defaultPaymentInstrument->billTo->email;
 }
 ?>
 <!doctype html>
@@ -22,6 +18,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     <link rel="stylesheet" type="text/css" href="css/styles.css"/>
     <title>Payment Page</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <form id="iframe_form" method="POST" target="shippingAddress_iframe" action="">
@@ -44,430 +41,305 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
         <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
     </form>
     <div class="container">
-
+        <div id="progressSpinner2"  class="spinner-border text-info" style="display: block;"></div>
         <div id="iframeSection" style="display: none">
             <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
         </div>
-        <div id="paymentDetailsSection">
-            <form id="emailForm" class="needs-validation" novalidate>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group form-floating mb-3">
-                        <input id="bill_to_email" type="email" class="form-control form-control-sm" <?php if(!empty($defaultEmail)) echo "readonly";?> value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
-                        <label for="bill_to_email" class="form-label">Email*</label>
-                    </div>
-                </div>
-            </div>
-            </form>
-<?php if($shippingAddressRequired): ?>
-            <form id="shippingForm" class="needs-validation" novalidate>
-                <div id="shippingDetailsSection" class="form-group">
-                    <h5>Delivery Address</h5>
-<?php if($shippingAddressAvailable): ?>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <span id="ship_to_text" class="form-control form-control-sm" disabled><?php echo $shipToText;?></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <button type="button" class="btn btn-link" onclick="editShippingAddress()">Use a different address</button>
-                        </div>
-                    </div>
-<?php else: ?>     <!--$shippingAddressAvailable -->
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->firstName;}?>" placeholder="First name" maxlength="60" required>
-                                <label for="ship_to_forename" class="form-label">First name*</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->lastName;}?>" placeholder="Last Name" maxlength="60" required>
-                                <label for="ship_to_surname" class="form-label">Surname*</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->address1;}?>" placeholder="1st line of address" maxlength="60" required>
-                                <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo (isset($defaultShippingAddress->shipTo->address2)?$defaultShippingAddress->shipTo->address2:"");}?>" placeholder="2nd line of address" maxlength="60">
-                                    <label for="ship_to_address_line2" class="form-label">Address line 2</label>
-                            </div>
-                        </div>
-                    </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <div id="paymentDetailsSection">
+                    <form id="emailForm" class="needs-validation" novalidate>
                         <div class="row">
-                            <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->locality;}?>" placeholder="City/County" maxlength="50" required>
-                                <label for="ship_to_address_city" class="form-label">City/County*</label>
+                            <div class="col-sm-12">
+                                <h5>Email</h5>
+                                <div class="form-group form-floating mb-3">
+                                    <input id="bill_to_email" type="email" class="form-control form-control-sm" <?php if(!empty($defaultEmail)) echo "readonly";?> value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                                    <label for="bill_to_email" class="form-label">Email*</label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($shippingAddressAvailable){echo $defaultShippingAddress->shipTo->postalCode;}?>" placeholder="Postcode" maxlength="10" required>
-                                <label for="ship_to_postcode" class="form-label">PostCode*</label>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary" onclick="nextButton('email')">Next</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                    <form id="shippingForm" class="needs-validation" novalidate style="display: none">
+                        <div id="shippingDetailsSection" class="form-group">
+                            <h5>Delivery Address</h5>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
+                                        <label for="ship_to_forename" class="form-label">First name*</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
+                                        <label for="ship_to_surname" class="form-label">Surname*</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" maxlength="60" required>
+                                        <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address" maxlength="60">
+                                            <label for="ship_to_address_line2" class="form-label">Address line 2</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="" placeholder="City/County" maxlength="50" required>
+                                        <label for="ship_to_address_city" class="form-label">City/County*</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" maxlength="10" required>
+                                        <label for="ship_to_postcode" class="form-label">PostCode*</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-12">
+                                    <div class="form-floating">
+                                        <select id="ship_to_address_country" class="form-control form-control-sm">
+        <?php
+        foreach ($countries as $key => $value) {
+            echo "<option value=\"". $key ."\">" . $value . "</option>\n";
+        }
+        ?>
+                                        </select>
+                                        <label for="ship_to_address_country" class="form-label">Country*</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary" onclick="nextButton('shipping')">Next</button>
+                                <button type="button" class="btn btn-secondary" onclick="backButton('shipping')">Back</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="cardSection" style="display: none">
+                        <h5>Card Payment Details</h5>
+                        <div id="cardInputSection">
+                        </div>
+                        <div id="billingAddressSection" style="display: block">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <input type="checkbox" class="form-check-input" onchange="useSameAddressChanged()" id="useShipAsBill" name="useShipAsBill" value="1" checked="checked">
+                                    <label for="useShipAsBill" class="form-check-label">Use Delivery Address as Billing Address</label>
+                                </div>
+                            </div>                            
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
+                                    <label for="storeCard" class="form-check-label">Store my details for future use</label>
+                                </div>
+                            </div>
+                            <form id="billingForm" class="needs-validation" novalidate style="display: none">
+                                <div id="billingSection">
+                                    <h5>Card Billing Address</h5>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
+                                                <label for="bill_to_forename" class="form-label">First name*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
+                                                <label for="bill_to_surname" class="form-label">Last name*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" maxlength="60" required>
+                                                <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address" maxlength="60">
+                                                <label for="bill_to_address_line2" class="form-label">Address line 2</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="" placeholder="City/County" required maxlength="50">
+                                                <label for="bill_to_address_city" class="form-label">City/County*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" required maxlength="10">
+                                                <label for="bill_to_postcode" class="form-label">PostCode*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group form-floating mb-3">
+                                                <select id="bill_to_address_country" class="form-control form-control-sm">
+                <?php
+                foreach ($countries as $key => $value) {
+                    echo "<option value=\"". $key ."\">" . $value . "</option>\n";
+                }
+                ?>
+                                                </select>
+                                                <label for="bill_to_address_country" class="form-label">Country*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div id="payButtonSection" class="row mt-3">
+                                <div class="col-sm-12">
+                                    <button type="button" id="payButton" onclick="nextButton('card')" class="btn btn-primary" disabled="true">Pay</button>
+                                    <button type="button" onclick="backButton('card')" class="btn btn-secondary">Back</button>
+                                    <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                </div>
+                <div class="card card-body" id="resultSection" style="display: none">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <div id="progressSpinner" class="spinner-border text-info"></div>
+                        </div>
+                    </div>
+                    <h5 class="card-title">Result</h5>
+                    <p id="result" class="card-text"></p>
+                    <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
+                    <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div id="summarySection">
+                    <div class="row">
+                        <h3>Your Order</h3>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-6">
-                            <div class="form-floating">
-                                <select id="ship_to_address_country" class="form-control form-control-sm">
-<?php
-foreach ($countries as $key => $value) {
-    echo "<option value=\"". $key ."\"" . ($shippingAddressAvailable && $defaultShippingAddress->shipTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
-}
-?>
-                                </select>
-                                <label for="ship_to_address_country" class="form-label">Country*</label>
-                            </div>
+                            <h5>Your email:</h5>
                         </div>
-                    </div>
-<?php endif ?> <!--$shippingAddressAvailable -->
-                </div>
-            </form>
-<?php endif ?> <!--$shippingAddressRequired -->
-<?php if ($paymentInstrumentCount): ?>
-            <div id="storedCardSection">
-                <h5>Stored Card Details</h5>
-                <div class="row">
-                    <div class="col-sm-1">
-                        <img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
-                    </div>
-                    <div class="col-sm-1">
-                        <ul class="list-unstyled">
-                            <li><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></li>
-                            <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <h5>Card Billing Address</h5>
-                    <div class="col-sm-6">
-                        <span id="bill_to_text" class="form-control form-control-sm" disabled><?php echo $billToText;?></span>
-                    </div>
-                </div>
-            </div>
-<?php endif ?>
-            <div id="cardDetailsSection">
-                <div class="row mb-3">
-                    <div class="col-sm-3">
-                        <label class="form-check-label" for="number-container">Card Number</label>
-                        <div id="number-container" class="form-control form-control-sm"></div>
-                    </div>
-                    <div class="col-sm-3">
-                        <label class="form-check-label" for="expiryDate">Expires</label>
-                        <input class="expiry form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]\/[2][1-9]" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
-                    </div>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div id="securityCodeSection" class="col-sm-2">
-                    <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
-                    <div id="securityCode-container" class="form-control form-control-sm"></div>
-                </div>
-            </div>
-            <div id="storeCardSection" class="row">
-                <div class="col-sm-5">
-                    <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
-                    <label for="storeCard" class="form-check-label">Store my details for future use</label>
-                </div>
-            </div>
-<?php if($shippingAddressRequired && !$paymentInstrumentCount): ?>
-            <div id="useShippingAsBilling" class="row">
-                <div class="col-sm-5">
-                    <input type="checkbox" class="form-check-input" onchange="useSameAddressChanged()" id="useShipAsBill" name="useShipAsBill" value="1" checked="checked">
-                    <label for="useShipAsBill" class="form-check-label">Use Delivery Address as Billing Address</label>
-                </div>
-            </div>
-<?php endif ?>
-            <!--<div class="form-group">-->
-<?php if($paymentInstrumentCount): ?>
-            <div id="defaultBillingSection">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <button type="button" class="btn btn-link" onclick="editCard()">Use a different Card</button>
-                        <button type="button" class="btn btn-link" onclick="newCard()">Use New Card</button>
-                    </div>
-                </div>
-            </div>
-<?php endif ?>
-            <form id="billingForm" class="needs-validation" novalidate style="display: <?php echo ($paymentInstrumentCount || $shippingAddressRequired?"none":"block");?>">
-                <div id="billingSection">
-                    <h5>Card Billing Address</h5>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->firstName;}?>" placeholder="First name" maxlength="60" required>
-                                <label for="bill_to_forename" class="form-label">First name*</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->lastName;}?>" placeholder="Last Name" maxlength="60" required>
-                                <label for="bill_to_surname" class="form-label">Last name*</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address1;}?>" placeholder="1st line of address" maxlength="60" required>
-                                <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->address2;}?>" placeholder="2nd line of address" maxlength="60">
-                                <label for="bill_to_address_line2" class="form-label">Address line 2</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->locality;}?>" placeholder="City/County" required maxlength="50">
-                                <label for="bill_to_address_city" class="form-label">City/County*</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group form-floating mb-3">
-                                <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="<?php if($paymentInstrumentCount){echo $defaultPaymentInstrument->billTo->postalCode;}?>" placeholder="Postcode" required maxlength="10">
-                                <label for="bill_to_postcode" class="form-label">PostCode*</label>
-                            </div>
+                        <div id="summary_email" class="col-sm-6">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-6">
-                            <div class="form-group form-floating mb-3">
-                                <select id="bill_to_address_country" class="form-control form-control-sm">
-<?php
-foreach ($countries as $key => $value) {
-    echo "<option value=\"". $key ."\"" . ($paymentInstrumentCount && $defaultPaymentInstrument->billTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
-}
-?>
-                                </select>
-                                <label for="bill_to_address_country" class="form-label">Country*</label>
-                            </div>
+                            <h5>Delivery Address:</h5>
+                        </div>
+                        <div id="shipToText" class="col-sm-6">
                         </div>
                     </div>
-<?php if($paymentInstrumentCount): ?>
                     <div class="row">
                         <div class="col-sm-6">
-                            <button type="button" class="btn btn-link" onclick="cancelNewCard()">Use a Stored Card</button>
+                        <h5>Billing Address:</h5>
+                        </div>
+                        <div class="col-sm-6" id="billToText">
                         </div>
                     </div>
-<?php endif ?>
-                </div>
-
-            </form>
-            <div id="payButtonSection" class="row">
-                <div class="col-sm-6">
-                    <button type="button" id="payButton" class="btn btn-primary" disabled="true">Pay</button>
-                    <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6 d-flex justify-content-center">
-                    <div id="progressSpinner"  class="spinner-border text-info" style="display: none;"></div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <span><h5>Total:</h5></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span><?php echo "£" . $_REQUEST['amount'];?></span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="card card-body" id="resultSection" style="display: none">
-            <h5 class="card-title">Result</h5>
-            <p id="result" class="card-text"></p>
-            <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
-            <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
-<script src="js/expiryDate.js"></script>
+<script src="js/newCard2.js"></script>
 <script>
-// the capture context that was requested server-side for this transaction
-var captureContext = "<?php echo $captureContext ?>";
 <?php
 if (isset($_REQUEST['standAlone'])){echo "var standAlone = true;\n";}else{echo "var standAlone = false;\n";}
 if (isset($_REQUEST['local']) && $_REQUEST['local'] === "true") {echo "var local = true;\n";}else{echo "var local = false;\n";}
-echo "var customerId " . ($paymentInstrumentCount?"='".$customerToken."'":"") . ";\n";
-echo "var shippingAddressRequired = " . ($shippingAddressRequired?"true":"false") . ";\n"
 ?>
-var paymentInstrumentId = "<?php echo ($paymentInstrumentCount?$defaultPaymentInstrument->id:"");?>";
+var customerId;
+var paymentInstrumentId = "";
 var oldPaymentInstrumentId;
-var maskedPan = "<?php echo ($paymentInstrumentCount?$defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number:"");?>";
-var shippingAddressId = "<?php echo ($shippingAddressAvailable?$defaultShippingAddress->id:"");?>";
-var flexToken="";
-var pan;
+var maskedPan = "";
+var flexToken;
+var shippingAddressId = "";
 var storeCard = false;
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
     referenceNumber: <?php echo '"' . $_REQUEST['reference_number'] . '"'; ?>,
     amount: <?php echo '"' . $_REQUEST['amount'] . '"'; ?>,
     currency: <?php echo '"' . $_REQUEST['currency'] . '"'; ?>,
-    shippingAddressRequired: shippingAddressRequired,
-    useShippingAsBilling: false,
+    shippingAddressRequired: true,
+    useShippingAsBilling: true,
     ship_to: {
-        ship_to_forename: "",
-        ship_to_surname: "",
-        ship_to_address_line1: "",
-        ship_to_address_line2: "",
-        ship_to_address_city: "",
-        ship_to_postcode: "",
-        ship_to_address_country: ""
+        firstname: "",
+        lastname: "",
+        address1: "",
+        address2: "",
+        locality: "",
+        postalCode: "",
+        country: ""
     },
     bill_to: {
-        bill_to_forename: "",
-        bill_to_surname: "",
-        bill_to_email: "",
-        bill_to_address_line1: "",
-        bill_to_address_line2: "",
-        bill_to_address_city: "",
-        bill_to_postcode: "",
-        bill_to_address_country: ""
+        firstname: "",
+        lastname: "",
+        email: "",
+        address1: "",
+        address2: "",
+        locality: "",
+        postalCode: "",
+        country: ""
     }
 };
-// custom styles that will be applied to each field we create using Microform
-var myStyles = {
-    'input': {
-        'font-family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
-        'font-size': '1rem',
-        'line-height': '1.5',
-        'color': '#495057'
-    },
-    '::placeholder': {'color': 'grey'},
-    ':focus': {'color': 'blue'},
-    ':hover': {'font-style': 'italic'},
-    ':disabled': {'cursor': 'not-allowed'},
-    'valid': {'color': 'green'},
-    'invalid': {'color': 'red'}
-};
-var flex;
-var microform;
-var number;
-var securityCode;
-var payButton;
-var panValid;
-var cvnValid;
-var secCodeLbl;
 var form;
-var numberContainer;
-<?php
-if ($paymentInstrumentCount) {
-    echo "var xxx =  '" . json_encode($storedCards) . "';\n";
-    echo "var paymentInstruments = JSON.parse(xxx);\n";
-} else {
-    echo "var paymentInstruments\n;";
-}
-?>
-console.log(paymentInstruments);
 document.addEventListener("DOMContentLoaded", function (e) {
-    if(captureContext === ""){
-        // TODO Something went wrong - abandon ship
-    }else{
-        flex = new Flex(captureContext);
-    }
-    microform = flex.microform({styles: myStyles});
-    number = microform.createField('number', {placeholder: 'Card number'});
-<?php
-    if($paymentInstrumentCount && $defaultPaymentInstrument->card->type == "003"){
-        $placeHolder = "'••••'";
-        $cvvLength=4;
-    }else{
-        $placeHolder = "'•••'";
-        $cvvLength=3;
-    }
-    echo "\tsecurityCode = microform.createField('securityCode', {placeholder: ". $placeHolder . ", maxLength: " . $cvvLength ."});\n";
-?>
-    payButton = document.querySelector('#payButton');
-    numberContainer = document.querySelector('#number-container');
-    panValid = false;
-    cvnValid = false;
-
-    securityCode.load('#securityCode-container');
-    secCodeLbl = document.querySelector('#securityCodeLabel');
-
-    if (paymentInstrumentId === "") {
-        showPanField(true);
-    } else {
-        showPanField(false);
-        // We have a default Payment Instrument
-    }
-
-   console.log("\ncaptureContext:\n" + captureContext);
-
-    form = document.querySelector('#payment_form');
-    number.on('change', function (data) {
-        console.log(data);
-        // Set "CVV" text with name based on scheme
-        secCodeLbl.textContent = (data.card && data.card.length > 0) ? data.card[0].securityCode.name : 'CVN';
-        if(data.card && data.card.length > 0){
-            updateSecurityCodeField(data.card[0].cybsCardType);
-        }
-        panValid = data.valid;
-        fieldsValid(panValid);
-    });
-    number.on('autocomplete', function (data) {
-        console.log(data);
-        if (data.expirationMonth) {
-            document.getElementById('card_expirationMonth').value = data.expirationMonth;
-        }
-        if (data.expirationYear) {
-            document.getElementById('card_expirationYear').value = parseInt(data.expirationYear) - 2000;
-        }
-    });
-    securityCode.on('change', function (data) {
-        console.log(data);
-        cvnValid = data.valid;
-        fieldsValid(cvnValid);
-    });
-    payButton.addEventListener('click', (event) => {
-        if (formsValidated()) {
-            // document.getElementById('defaultBillingSection').style.display = "none";
-            document.getElementById('payButtonSection').style.display = "none";
-            document.getElementById("progressSpinner").style.display = "block";
-            if(flexToken === ""){
-                tokenizeCard();
-            }else{
-                setUpPayerAuth()
-            }
-        }
-    });
+    createCardInput("cardInputSection", "progressSpinner2", "payButton");
 });
-function updateSecurityCodeField(type){
-    // If Amex, CVVis 4 digits, else 3
-    if(type === "003"){
-        securityCode.update({placeholder: "••••", maxLength: 4});
-    }else{
-        securityCode.update({placeholder: "•••", maxLength: 3});
+function payNow(){
+}
+function onTokenCreated(tokenDetails){
+    console.log(tokenDetails);
+    flexToken = tokenDetails.flexToken;
+    maskedPan = tokenDetails.cardDetails.number;
+    // IF storeCard checked, we will create a Token
+    sc = document.getElementById('storeCard');
+    if (sc.checked) {
+        storeCard = true;
     }
+//    setOrderDetails()
+    setUpPayerAuth();
+}
+function onTokenError(err){
+    console.log("Token Creation Error:");
+    console.log(err);
+    onFinish(status, "", false, false, "n/a", err.reason, err.Message)
 }
 function cancel() {
     onFinish("CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
     window.location.assign("index.php");
-}
-function formsValidated() {
-    form = document.getElementById('emailForm');
-    ret = validateForm(form);
-//    ret = true;
-    if(ret && shippingAddressRequired && shippingAddressId === ""){
-        orderDetails.useShippingAsBilling = shipAsBill();
-        form = document.getElementById('shippingForm');
-        ret = validateForm(form);
-    }
-    if(ret && paymentInstrumentId === "" && (!shippingAddressRequired || !orderDetails.useShippingAsBilling)){
-        form = document.getElementById('billingForm');
-        ret = validateForm(form);
-    }
-    return ret;
 }
 function shipAsBill(){
     usb = document.querySelector('#useShipAsBill');
@@ -485,69 +357,6 @@ function validateForm(form){
     }
     return true;
 }
-function tokenizeCard() {
-    if (paymentInstrumentId !== "") {
-        var options = {
-        };
-    } else {
-        var options = {
-            expirationMonth: document.getElementById('expiryDate').value.substring(0,2),
-            expirationYear: 20 + document.getElementById('expiryDate').value.substring(3,5)
-        };
-    }
-    microform.createToken(options, function (err, jwt) {
-        if (err) {
-            // handle error
-            console.log(err);
-            onFinish("FLEXERROR", "", false, false, "", err.reason, "");
-        } else {
-            // At this point you may pass the token back to your server as you wish.
-//          console.log( "\nGot Token:\n" + jwt);
-            if (paymentInstrumentId === "") {
-                maskedPan = getPAN(jwt);
-            }
-//          console.log( "\nGot PAN:" + pan);
-            flexToken = getJTI(jwt);
-            // IF storeCard checked, we will create a Token
-            let sc = document.getElementById('storeCard');
-            if (sc.checked) {
-                storeCard = true;
-            }
-            setOrderDetails();
-            setUpPayerAuth();
-        }
-    });
-}
-function getMonth() {
-    return document.getElementById('expiryDate').value.substring(0,2);
-}
-function fieldsValid(valid) {
-    if (!valid || (paymentInstrumentId === "" && !expiryDateValid()) || !(panValid && cvnValid)) {
-        // Check PAN and CVN both Populated and valid
-        payButton.disabled = true;
-        return false;
-    }
-    payButton.disabled = false;
-    return true;
-}
-function getJTI(jwt) {
-    jti = getPayload(jwt).jti;
-//  console.log("JTI:" + jti);
-    return (jti);
-}
-function getPAN(jwt) {
-    pan = getPayload(jwt).data.number;
-    // console.log("PAN:" + pan);
-    return (pan);
-}
-function getPayload(jwt) {
-    jwtArray = jwt.split(".");
-    payloadB64 = jwtArray[1];
-    payload = window.atob(payloadB64);
-    payloadJ = JSON.parse(payload);
-//  console.log(payloadJ);
-    return payloadJ;
-}
 function useSameAddressChanged() {
     orderDetails.useShippingAsBilling = shipAsBill();
     if (orderDetails.useShippingAsBilling) {
@@ -555,48 +364,6 @@ function useSameAddressChanged() {
         document.getElementById('billingForm').style.display = "none";
     }else{
         document.getElementById('billingForm').style.display = "block";
-    }
-}
-function showPanField(show) {
-    if (show) {
-        panValid = false;
-        document.getElementById('cardDetailsSection').style.display = "block";
-        document.getElementById('storeCardSection').style.display = "block";
-        if (!number._loaded) {
-            number.load('#number-container');
-        }
-    } else {
-        panValid = true;
-        document.getElementById('cardDetailsSection').style.display = "none";
-        document.getElementById('storeCardSection').style.display = "none";
-        if (number._loaded) {
-            number.unload();
-        }
-    }
-}
-function setOrderDetails() {
-    if(shippingAddressRequired && shippingAddressId === ""){
-        orderDetails.useShippingAsBilling = shipAsBill();
-
-        orderDetails.ship_to.ship_to_forename = document.getElementById('ship_to_forename').value;
-        orderDetails.ship_to.ship_to_surname = document.getElementById('ship_to_surname').value;
-        orderDetails.ship_to.ship_to_address_line1 = document.getElementById('ship_to_address_line1').value;
-        orderDetails.ship_to.ship_to_address_line2 = document.getElementById('ship_to_address_line2').value;
-        orderDetails.ship_to.ship_to_address_city = document.getElementById('ship_to_address_city').value;
-        orderDetails.ship_to.ship_to_postcode = document.getElementById('ship_to_postcode').value;
-        orderDetails.ship_to.ship_to_address_country = document.getElementById('ship_to_address_country').value;
-    }
-    if(paymentInstrumentId === ""){
-        if(!orderDetails.useShippingAsBilling){
-            orderDetails.bill_to.bill_to_forename = document.getElementById('bill_to_forename').value;
-            orderDetails.bill_to.bill_to_surname = document.getElementById('bill_to_surname').value;
-            orderDetails.bill_to.bill_to_address_line1 = document.getElementById('bill_to_address_line1').value;
-            orderDetails.bill_to.bill_to_address_line2 = document.getElementById('bill_to_address_line2').value;
-            orderDetails.bill_to.bill_to_address_city = document.getElementById('bill_to_address_city').value;
-            orderDetails.bill_to.bill_to_postcode = document.getElementById('bill_to_postcode').value;
-            orderDetails.bill_to.bill_to_address_country = document.getElementById('bill_to_address_country').value;
-        }
-        orderDetails.bill_to.bill_to_email = document.getElementById('bill_to_email').value;
     }
 }
 function setUpPayerAuth() {
@@ -690,7 +457,7 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                     if (storeCard) {
                         paymentInstrumentCreated = true;
                         paymentInstrumentId = res.response.tokenInformation.paymentInstrument.id;
-                        if(shippingAddressRequired && shippingAddressId === ""){
+                        if(shippingAddressId === ""){
                             // Not using an existing shippingAddress so must be creating a new one
                             shippingAddressId = res.response.tokenInformation.shippingAddress.id;
                         }
@@ -745,97 +512,6 @@ function editShippingAddress(){
         iframeForm.submit();
     }
 }
-function onShippingAddressUpdated(id, shipToText) {
-    shippingAddressId = id;
-    console.log("onShippingAddressUpdated:\n" + id + "\n"+ shipToText);
-    document.getElementById('ship_to_text').innerHTML = shipToText;
-    document.getElementById('iframeSection').style.display = "none";
-    document.getElementById('paymentDetailsSection').style.display = "block";
-}
-function onNewCardUsed(details) {
-    console.log(details);
-    // Hide/unload Security code
-    document.getElementById('securityCodeSection').style.display = "none";
-    securityCode.unload();
-    maskedPan = details.cardDetails.number;
-    flexToken = details.flexToken;
-    paymentInstrumentId = "";
-
-    html = stylePaymentInstrument(maskedPan, details.cardDetails, details.billTo);
-    document.getElementById('storedCardSection').innerHTML = html;
-    document.getElementById('iframeSection').style.display = "none";
-    document.getElementById('paymentDetailsSection').style.display = "block";
-
-    orderDetails.bill_to.bill_to_forename = details.billTo.firstName;
-    orderDetails.bill_to.bill_to_surname = details.billTo.lastName;
-    orderDetails.bill_to.bill_to_address_line1 = details.billTo.address1;
-    orderDetails.bill_to.bill_to_address_line2 = details.billTo.address2;
-    orderDetails.bill_to.bill_to_address_city = details.billTo.locality;
-    orderDetails.bill_to.bill_to_postcode = details.billTo.postalCode;
-    orderDetails.bill_to.bill_to_address_country = details.billTo.country;
-    orderDetails.bill_to.bill_to_email = document.getElementById('bill_to_email').value;
-    payButton.disabled = false;
-}
-function onPaymentInstrumentUpdated(id, paymentInstrument) {
-    paymentInstrumentId = id;
-    maskedPan = paymentInstrument._embedded.instrumentIdentifier.card.number;
-    console.log("onPaymentInstrumentUpdated:\n" + id + "\n"+ JSON.stringify(paymentInstrument, undefined, 2));
-    html = stylePaymentInstrument(paymentInstrument._embedded.instrumentIdentifier.card.number,
-                paymentInstrument.card, paymentInstrument.billTo);
-    document.getElementById('storedCardSection').innerHTML  = html;
-    document.getElementById('iframeSection').style.display = "none";
-    document.getElementById('paymentDetailsSection').style.display = "block";
-    updateSecurityCodeField(paymentInstrument.card.type);
-}
-function stylePaymentInstrument(maskedPan, card, billTo){
-    img = "";
-    alt = "";
-    if (card.type === "001") {
-        img = "images/Visa.svg";
-        alt = "Visa card logo";
-    } else if (card.type === "002") {
-        img = "images/Mastercard.svg";
-        alt = "Mastercard logo";
-    } else {
-        img = "images/Amex.svg";
-        alt = "Amex card logo";
-    }
-    html =   "<h5>Stored Card Details</h5>" +
-            "<div class=\"row\">\n" +
-                "<div class=\"col-sm-1\">\n"+
-                    "<img  src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+
-                "</div>\n" +
-                "<div class=\"col-sm-1\">\n" +
-                    "<ul class=\"list-unstyled\">" +
-                        "<li><strong>" + maskedPan + "</strong></li>\n" +
-                        "<li><small>Expires:&nbsp;" + card.expirationMonth + "/" + card.expirationYear + "</small></li>\n" +
-                    "</ul>\n" +
-                "</div>\n" +
-                "<div class=\"row\">\n"+
-                    "<h5>Card Billing Address</h5>" +
-                    "<div class=\"col-sm-6\">" +
-                        "<span id=\"billingText\" class=\"form-control form-control-sm\" disabled>" + concatinateNameAddress(billTo) + "</span>\n" +
-                    "</div>\n" +
-                "</div>\n";
-    return html;
-}
-function concatinateNameAddress(nameAddress){
-    // return name and address string
-    if(!nameAddress.hasOwnProperty("address2")){
-        nameAddress.address2 = "";
-    }
-    return xtrim(nameAddress.firstName, " ") +
-            xtrim(nameAddress.lastName, "\n") +
-            xtrim(nameAddress.address1, ", ") +
-            xtrim(nameAddress.address2, ", ") +
-            xtrim(nameAddress.locality, ", ") +
-            xtrim(nameAddress.postalCode, ", ") +
-            xtrim(nameAddress.country, ".");
-}
-function xtrim(xin, suffix){
-    xout = xin.trim();
-    return (xout===""? "" : xout + suffix) ;
-}
 function onIframeCancelled(){
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
@@ -850,24 +526,7 @@ function editCard(){
         iframeForm.submit();
     }
 }
-function newCard(){
-    oldPaymentSnstrumentId=paymentInstrumentId;
-    paymentInstrumentId = "";
-    showPanField(true);
-    document.getElementById('billingForm').style.display = "block";
-    document.getElementById('defaultBillingSection').style.display = "none";
-    document.getElementById('storedCardSection').style.display = "none";
-}
-function cancelNewCard(){
-    paymentInstrumentId = oldPaymentSnstrumentId;
-    showPanField(false);
-    document.getElementById('billingForm').style.display = "none";
-    document.getElementById('defaultBillingSection').style.display = "block";
-    document.getElementById('storedCardSection').style.display = "block";
-}
 function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
-    document.getElementById("resultSection").style.display = "block";
-    document.getElementById('paymentDetailsSection').style.display = "none";
     finish = "onFinish: " + JSON.stringify({
         "referenceNumber": orderDetails.referenceNumber,
         "status": status,
@@ -888,7 +547,7 @@ function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, http
         text = "Thank you.  Your payment has completed" + "<BR><PRE>" + finish +"</PRE>";
         document.getElementById("newPaymentButton").style.display = "block";
     } else {
-        text = "Oh dear. Your payment was not approved.  You can try again or try a different payment method" + "<BR>" + finish;
+        text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
         document.getElementById("retryButton").style.display = "block";
     }
     result = document.getElementById("result").innerHTML = text;
@@ -898,5 +557,82 @@ function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, http
         // Write new Customer Token to cookie
         document.cookie = "customerId=" + customerId;
     }
+}
+function nextButton(form){
+    switch(form){
+        case "email":
+            form = document.getElementById('emailForm');
+            if(validateForm(form)){
+                document.getElementById("emailForm").style.display = "none";
+                document.getElementById("shippingForm").style.display = "block";
+                document.getElementById("summary_email").innerHTML = document.getElementById("bill_to_email").value;
+                orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
+            }
+            break;
+        case "shipping":
+            form = document.getElementById('shippingForm');
+            if(validateForm(form)){
+                document.getElementById("shippingForm").style.display = "none";
+                document.getElementById("cardSection").style.display = "block";
+                setShippingDetails();
+            }
+            break;
+        case "card":
+            // Pay Button clicked
+            document.getElementById("cardSection").style.display = "none";
+            document.getElementById("resultSection").style.display = "block";
+            if(shipAsBill()){
+                document.getElementById("billToText").innerHTML = formatNameAddress(orderDetails.ship_to);
+            }else{
+                setBillingDetails();
+            }
+            getToken(onTokenCreated, onTokenError);
+            break;
+    }
+}
+function backButton(form){
+    switch(form){
+        case "shipping":
+            document.getElementById("shippingForm").style.display = "none";
+            document.getElementById("emailForm").style.display = "block";
+            break;
+        case "card":
+            document.getElementById("cardSection").style.display = "none";
+            document.getElementById("shippingForm").style.display = "block";
+            break;
+    }
+}
+function setShippingDetails(){
+    orderDetails.ship_to.firstname = document.getElementById('ship_to_forename').value;
+    orderDetails.ship_to.lastname = document.getElementById('ship_to_surname').value;
+    orderDetails.ship_to.address1 = document.getElementById('ship_to_address_line1').value;
+    orderDetails.ship_to.address2 = document.getElementById('ship_to_address_line2').value;
+    orderDetails.ship_to.locality = document.getElementById('ship_to_address_city').value;
+    orderDetails.ship_to.postalCode = document.getElementById('ship_to_postcode').value;
+    orderDetails.ship_to.country = document.getElementById('ship_to_address_country').value;
+    document.getElementById("shipToText").innerHTML = formatNameAddress(orderDetails.ship_to);
+}
+function setBillingDetails() {
+    orderDetails.bill_to.firstname = document.getElementById('bill_to_forename').value;
+    orderDetails.bill_to.lastname = document.getElementById('bill_to_surname').value;
+    orderDetails.bill_to.address1 = document.getElementById('bill_to_address_line1').value;
+    orderDetails.bill_to.address2 = document.getElementById('bill_to_address_line2').value;
+    orderDetails.bill_to.locality = document.getElementById('bill_to_address_city').value;
+    orderDetails.bill_to.postalCode = document.getElementById('bill_to_postcode').value;
+    orderDetails.bill_to.country = document.getElementById('bill_to_address_country').value;
+    document.getElementById("billToText").innerHTML = formatNameAddress(orderDetails.bill_to);
+}
+function formatNameAddress(nameAddress){
+    return xtrim(nameAddress.firstname, " ") +
+            xtrim(nameAddress.lastname, "<br>") +
+            xtrim(nameAddress.address1, ",<br>") +
+            xtrim(nameAddress.address2, ",<br>") +
+            xtrim(nameAddress.locality, ",<br>") +
+            xtrim(nameAddress.postalCode, ",<br>") +
+            xtrim(nameAddress.country, ".");
+}
+function xtrim(xin, suffix){
+    xout = xin.trim();
+    return (xout===""? "" : xout + suffix) ;
 }
 </script>
