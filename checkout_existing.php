@@ -26,7 +26,7 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
     <form id="iframe_form" method="POST" target="shippingAddress_iframe" action="">
         <input id="customerToken" type="hidden" name="customerToken" value="">
         <input id="currency" type="hidden" name="currency" value="<?php echo $_REQUEST['currency']?>">
-        <input id="email" type="hidden" name="email" value="null@cybersource.com">
+        <input id="email" type="hidden" name="email" value="<?php echo $_REQUEST['email']?>">
         <input id="reference_number" type="hidden" name="reference_number" value="<?php echo $_REQUEST['reference_number'];?>">
     </form>
     <!--Cardinal device data collection code START-->
@@ -119,14 +119,13 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                             <h5>Delivery Address:</h5>
                         </div>
                         <div id="shipToText" class="col-sm-6">
-                            <?php echo $shipToText;?>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-6">
                         </div>
                         <div id="summaryEditAddress" class="col-sm-6">
-                            <button type="button" class="btn btn-link" onclick="editShippingAddress()">Edit</button>
+                            <button type="button" class="btn btn-link p-0" onclick="editShippingAddress()">Edit</button>
                         </div>
                     </div>
                     <div class="row">
@@ -134,14 +133,13 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                         <h5>Billing Address:</h5>
                         </div>
                         <div class="col-sm-6" id="billToText">
-                        <?php echo $billToText;?>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-6">
                         </div>
                         <div id="summaryEditCard" class="col-sm-6">
-                        <button type="button" class="btn btn-link" onclick="editCard()">Edit</button>
+                            <button type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
                         </div>
                     </div>
                     <div class="row">
@@ -160,6 +158,7 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script src="js/newCard2.js"></script>
+<script src="js/utils.js"></script>
 <script>
 // the capture context that was requested server-side for this transaction
 var captureContext = "<?php echo $captureContext ?>";
@@ -174,6 +173,10 @@ var maskedPan = "<?php echo $defaultPaymentInstrument->_embedded->instrumentIden
 var shippingAddressId = "<?php echo $defaultShippingAddress->id;?>";
 var flexToken="";
 var pan;
+<?php
+  echo "var defaultPaymentInstrumentJson = '" . json_encode($defaultPaymentInstrument) ."';\n";
+  echo "var defaultShippingAddressJson = '" . json_encode($defaultShippingAddress) ."';\n";
+?>
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
     referenceNumber: <?php echo '"' . $_REQUEST['reference_number'] . '"'; ?>,
@@ -220,6 +223,10 @@ var number;
 var payButton;
 document.addEventListener("DOMContentLoaded", function (e) {
     createCardInput("cardInputSection", "progressSpinner2", "payButton", true);
+    let defPI = JSON.parse(defaultPaymentInstrumentJson);
+    document.getElementById('billToText').innerHTML = formatNameAddress(defPI.billTo);
+    let defSA = JSON.parse(defaultShippingAddressJson);
+    document.getElementById('shipToText').innerHTML = formatNameAddress(defSA.shipTo);
 });
 function payNow(){
     document.getElementById("paymentDetailsSection").style.display = "none";
@@ -427,10 +434,10 @@ function editShippingAddress(){
         iframeForm.submit();
     }
 }
-function onShippingAddressUpdated(id, shipToText) {
+function onShippingAddressUpdated(id, shipToText, shipTo) {
     shippingAddressId = id;
     console.log("onShippingAddressUpdated:\n" + id + "\n"+ shipToText);
-    document.getElementById('shipToText').innerHTML = shipToText;
+    document.getElementById('shipToText').innerHTML = formatNameAddress(shipTo);
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
 }
@@ -498,23 +505,6 @@ function stylePaymentInstrument(maskedPan, card, billTo){
                 "</div>\n" +
             "</div>\n";
     return html;
-}
-function formatNameAddress(nameAddress){
-    // return name and address string
-    if(!nameAddress.hasOwnProperty("address2")){
-        nameAddress.address2 = "";
-    }
-    return xtrim(nameAddress.firstName, " ") +
-            xtrim(nameAddress.lastName, "<br>") +
-            xtrim(nameAddress.address1, ",<br>") +
-            xtrim(nameAddress.address2, ",<br>") +
-            xtrim(nameAddress.locality, ",<br>") +
-            xtrim(nameAddress.postalCode, ",<br>") +
-            xtrim(nameAddress.country, ".");
-}
-function xtrim(xin, suffix){
-    xout = xin.trim();
-    return (xout===""? "" : xout + suffix) ;
 }
 function onIframeCancelled(){
     document.getElementById('iframeSection').style.display = "none";

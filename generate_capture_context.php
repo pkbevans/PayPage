@@ -13,7 +13,7 @@ $requestQuery = '{"format":"JWT"}';
 
 $requestBody = json_encode($request);
 
-$result = ProcessRequest("peportfolio", API_FLEX_V1_KEYS . "?format=JWT" , METHOD_POST, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
+$result = ProcessRequest(PORTFOLIO, API_FLEX_V1_KEYS . "?format=JWT" , METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
 //echo(json_encode($result));
 if($result->responseCode == 200){
     $captureContext = $result->response->keyId;

@@ -54,8 +54,8 @@ try {
     ];
     if(empty($incoming->paymentInstrumentId)){
         $billTo = [
-            "firstName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->firstname :$incoming->order->bill_to->firstname), 0, MAXSIZE_NAME),
-            "lastName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->lastname :$incoming->order->bill_to->lastname), 0, MAXSIZE_NAME),
+            "firstName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->firstName :$incoming->order->bill_to->firstName), 0, MAXSIZE_NAME),
+            "lastName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->lastName :$incoming->order->bill_to->lastName), 0, MAXSIZE_NAME),
             "address1" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address1:$incoming->order->bill_to->address1), 0, MAXSIZE_ADDRESS),
             "address2" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address2: $incoming->order->bill_to->address2), 0, MAXSIZE_ADDRESS),
             "locality" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->locality: $incoming->order->bill_to->locality), 0, MAXSIZE_CITY),
@@ -69,8 +69,8 @@ try {
     if($incoming->order->shippingAddressRequired){
         if(empty($incoming->shippingAddressId)){
             $shipTo = [
-                "firstName" => substr($incoming->order->ship_to->firstname, 0, MAXSIZE_NAME),
-                "lastName" => substr($incoming->order->ship_to->lastname, 0, MAXSIZE_NAME),
+                "firstName" => substr($incoming->order->ship_to->firstName, 0, MAXSIZE_NAME),
+                "lastName" => substr($incoming->order->ship_to->lastName, 0, MAXSIZE_NAME),
                 "address1" => substr($incoming->order->ship_to->address1, 0, MAXSIZE_ADDRESS),
                 "address2" => substr($incoming->order->ship_to->address2, 0, MAXSIZE_ADDRESS),
                 "locality" => substr($incoming->order->ship_to->locality, 0, MAXSIZE_CITY),
@@ -154,7 +154,7 @@ try {
         $api = API_PAYMENTS;
     }
 //   ProcessRequest($mid, $resource, $method, $payload, $child = null, $authentication = AUTH_TYPE_SIGNATURE )
-    $result = ProcessRequest("peportfolio", $api , METHOD_POST, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
+    $result = ProcessRequest(PORTFOLIO, $api , METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
 
 } catch (Exception $exception) {

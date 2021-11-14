@@ -12,7 +12,7 @@ if(isset($_REQUEST['customerToken'])){
             // Get Shipping Addresses
             $api = str_replace('{customerId}', $customerToken, API_TMS_V2_CUSTOMER_SHIPPING_ADDRESSES);
 
-            $result = ProcessRequest("peportfolio", $api , METHOD_GET, "", "pemid03", AUTH_TYPE_SIGNATURE );
+            $result = ProcessRequest(PORTFOLIO, $api , METHOD_GET, "", MID, AUTH_TYPE_SIGNATURE );
             if($result->responseCode === 200){
 //                echo("<BR> BODY<BR>" .json_encode($jsonBody). "<BR><BR>");
                 if(isset($result->response->_embedded->shippingAddresses)){

@@ -40,12 +40,12 @@ $payload = [
 $requestBody = json_encode($payload);
 // HTTP POST REQUEST
 echo "Sample 1: POST call - CyberSource Payments API - HTTP POST Payment request";
-$result = ProcessRequest("barclayssitt00", API_PAYMENTS, METHOD_POST, $requestBody,"paulspants18005", AUTH_TYPE_BEARER);
+$result = ProcessRequest("barclayssitt00", API_PAYMENTS, METHOD_POST, $requestBody, MID, AUTH_TYPE_BEARER);
 echo "<PRE>" . json_encode($result, JSON_PRETTY_PRINT) . "</PRE>";
 
 // HTTP GET REQUEST
 $customerId = "C5D2B25A1619A464E053A2598D0AE767";
 $resource = API_TMS_V2_CUSTOMERS ."/" . $customerId;
 //echo "<BR>Sample 2: GET call";
-//$result = ProcessRequest("pemid03", $resource, METHOD_GET, "{}");
+//$result = ProcessRequest(MID, $resource, METHOD_GET, "{}");
 //echo "<PRE>" . json_encode($result, JSON_PRETTY_PRINT) . "</PRE>";

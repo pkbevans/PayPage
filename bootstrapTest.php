@@ -11,6 +11,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
+    <div class="container">
+        <div class="d-flex flex-row">
+            <div class="p-2">
+                <h5>Default Card.</h5>
+            </div>
+            <div class="p-2">
+                <img src="images/Visa.svg" class="img-fluid" alt="Visa logo">
+            </div>
+            <div class="p-2">
+                <ul class="list-unstyled"><li><strong>411111XXXXXX0005</strong></li>
+                    <li><small>Expires:&nbsp;12/2023</small></li>
+                </ul>
+            </div>
+        </div>
+    </div>
     <div class="container d-flex justify-content-center mt-5 mb-5">
         <div class="row g-3">
             <div class="col-md-6"> 

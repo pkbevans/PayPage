@@ -71,14 +71,14 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
-                                        <input id="ship_to_forename" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
-                                        <label for="ship_to_forename" class="form-label">First name*</label>
+                                        <input id="ship_to_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
+                                        <label for="ship_to_firstName" class="form-label">First name*</label>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="form-group form-floating mb-3">
-                                        <input id="ship_to_surname" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
-                                        <label for="ship_to_surname" class="form-label">Surname*</label>
+                                        <input id="ship_to_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
+                                        <label for="ship_to_lastName" class="form-label">Surname*</label>
                                     </div>
                                 </div>
                             </div>
@@ -275,6 +275,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script src="js/newCard2.js"></script>
+<script src="js/utils.js"></script>
 <script>
 <?php
 if (isset($_REQUEST['standAlone'])){echo "var standAlone = true;\n";}else{echo "var standAlone = false;\n";}
@@ -295,8 +296,8 @@ let orderDetails = {
     shippingAddressRequired: true,
     useShippingAsBilling: true,
     ship_to: {
-        firstname: "",
-        lastname: "",
+        firstName: "",
+        lastName: "",
         address1: "",
         address2: "",
         locality: "",
@@ -304,8 +305,8 @@ let orderDetails = {
         country: ""
     },
     bill_to: {
-        firstname: "",
-        lastname: "",
+        firstName: "",
+        lastName: "",
         email: "",
         address1: "",
         address2: "",
@@ -603,8 +604,8 @@ function backButton(form){
     }
 }
 function setShippingDetails(){
-    orderDetails.ship_to.firstname = document.getElementById('ship_to_forename').value;
-    orderDetails.ship_to.lastname = document.getElementById('ship_to_surname').value;
+    orderDetails.ship_to.firstName = document.getElementById('ship_to_firstName').value;
+    orderDetails.ship_to.lastName = document.getElementById('ship_to_lastName').value;
     orderDetails.ship_to.address1 = document.getElementById('ship_to_address_line1').value;
     orderDetails.ship_to.address2 = document.getElementById('ship_to_address_line2').value;
     orderDetails.ship_to.locality = document.getElementById('ship_to_address_city').value;
@@ -613,26 +614,13 @@ function setShippingDetails(){
     document.getElementById("shipToText").innerHTML = formatNameAddress(orderDetails.ship_to);
 }
 function setBillingDetails() {
-    orderDetails.bill_to.firstname = document.getElementById('bill_to_forename').value;
-    orderDetails.bill_to.lastname = document.getElementById('bill_to_surname').value;
+    orderDetails.bill_to.firstName = document.getElementById('bill_to_forename').value;
+    orderDetails.bill_to.lastName = document.getElementById('bill_to_surname').value;
     orderDetails.bill_to.address1 = document.getElementById('bill_to_address_line1').value;
     orderDetails.bill_to.address2 = document.getElementById('bill_to_address_line2').value;
     orderDetails.bill_to.locality = document.getElementById('bill_to_address_city').value;
     orderDetails.bill_to.postalCode = document.getElementById('bill_to_postcode').value;
     orderDetails.bill_to.country = document.getElementById('bill_to_address_country').value;
     document.getElementById("billToText").innerHTML = formatNameAddress(orderDetails.bill_to);
-}
-function formatNameAddress(nameAddress){
-    return xtrim(nameAddress.firstname, " ") +
-            xtrim(nameAddress.lastname, "<br>") +
-            xtrim(nameAddress.address1, ",<br>") +
-            xtrim(nameAddress.address2, ",<br>") +
-            xtrim(nameAddress.locality, ",<br>") +
-            xtrim(nameAddress.postalCode, ",<br>") +
-            xtrim(nameAddress.country, ".");
-}
-function xtrim(xin, suffix){
-    xout = xin.trim();
-    return (xout===""? "" : xout + suffix) ;
 }
 </script>

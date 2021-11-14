@@ -26,7 +26,7 @@ try {
 
     $api = API_TMS_V2_CUSTOMERS . "/" .$incoming->customerId . "/payment-instruments/" . $incoming->paymentInstrumentId;
 
-    $result = ProcessRequest("peportfolio", $api , METHOD_PATCH, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
+    $result = ProcessRequest(PORTFOLIO, $api , METHOD_PATCH, $requestBody, MID, AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
 
 } catch (Exception $exception) {

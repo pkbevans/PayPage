@@ -32,6 +32,18 @@ function stylePaymentInstrument($paymentInstrument){
         "</ul>\n" .
     "</div>\n";
 }
+function stylePaymentInstrument2($paymentInstrument){
+    global $cardTypes;
+    return
+    "<div class=\"p-2\"><img  src=\"images/". $cardTypes[$paymentInstrument->card->type]['image'] . "\" class=\"img-fluid\" alt=\"" . $cardTypes[$paymentInstrument->card->type]['alt'] . "\"></div>\n" .
+    "<div class=\"p-2\">\n" .
+        "<ul class=\"list-unstyled\">" .
+            "<li><strong>" . $paymentInstrument->_embedded->instrumentIdentifier->card->number . "</strong></li>\n" .
+            "<li><small>Expires:&nbsp;" . $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear . "</small></li>\n" .
+        "</ul>\n" .
+    "</div>\n";
+}
+
 ///////////////////////////////////END FUNCTIONS
 ///////////////////////////////////VARIABLES
 $count=0;
@@ -56,11 +68,8 @@ $count=0;
                 <h2 class="accordion-header" id="heading<?php echo $paymentInstrument->id;?>">
                     <button class="accordion-button <?php echo ($paymentInstrument->default?"":"collapsed");?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $paymentInstrument->id;?>" aria-expanded="true" aria-controls="collapse<?php echo $paymentInstrument->id;?>">
                         <div class="container">
-                            <div class="row">
-                                <div class="col-sm-2">
-                                    <h5><?php $count++;echo ($paymentInstrument->default?"Default Card." :"Card #". $count );?></h5>
-                                </div>
-                                <?php echo stylePaymentInstrument($paymentInstrument);?>
+                            <div class="d-flex flex-row">
+                                <?php echo stylePaymentInstrument2($paymentInstrument);?>
                             </div>
                         </div>
                     </button>
@@ -174,14 +183,14 @@ foreach ($countries as $key => $value) {
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group form-floating mb-3">
-                                                <input id="bill_to_firstname" type="text" class="form-control form-control-sm" value="" placeholder="First name" required>
-                                                <label for="bill_to_firstname" class="form-label">First name*</label>
+                                                <input id="bill_to_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" required>
+                                                <label for="bill_to_firstName" class="form-label">First name*</label>
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group form-floating mb-3">
-                                                <input id="bill_to_lastname" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" required>
-                                                <label for="bill_to_lastname" class="form-label">Last name*</label>
+                                                <input id="bill_to_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" required>
+                                                <label for="bill_to_lastName" class="form-label">Last name*</label>
                                             </div>
                                         </div>
                                     </div>
@@ -265,10 +274,10 @@ function saveClicked(){
     }
 }
 function onNewCardReceived(flexDetails){
-    // New card details received from newCard.js
+    // New card details received from newCard2.js
     billTo = {
-        firstName: document.getElementById("bill_to_firstname").value,
-        lastName: document.getElementById("bill_to_lastname").value,
+        firstName: document.getElementById("bill_to_firstName").value,
+        lastName: document.getElementById("bill_to_lastName").value,
         address1: document.getElementById("bill_to_address1").value,
         address2: document.getElementById("bill_to_address2").value,
         locality: document.getElementById("bill_to_locality").value,
@@ -276,7 +285,7 @@ function onNewCardReceived(flexDetails){
         country: document.getElementById("bill_to_country").value
     };
     // New card/billing details but not to be stored
-    parent.onNewCardUsed(flexDetails, billTo);
+//    parent.onNewCardUsed(flexDetails, billTo);
     addPaymentInstrument(flexDetails, billTo);
 }
 function onTokenError(err){
@@ -364,8 +373,8 @@ function addPaymentInstrument(flexDetails, billToDetails){
         shippingAddressRequired: false,
         useShippingAsBilling: false,
         bill_to: {
-            firstname: billToDetails.firstName,
-            lastname: billToDetails.lastName,
+            firstName: billToDetails.firstName,
+            lastName: billToDetails.lastName,
             email: "<?php echo $_REQUEST['email'];?>",
             address1: billToDetails.address1,
             address2: billToDetails.address2,

@@ -1,4 +1,4 @@
-// custom styles that will be applied to each field we create using Microform
+ // custom styles that will be applied to each field we create using Microform
 var myStyles = {
     'input': {
         'font-family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',

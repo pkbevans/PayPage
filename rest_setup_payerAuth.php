@@ -23,7 +23,7 @@ $requestBody = json_encode($request);
 
 try{
     // peportfolio/pemid03
-    $result = ProcessRequest("peportfolio", API_RISK_V1_AUTHENTICATION_SETUPS, METHOD_POST, $requestBody, "pemid03", AUTH_TYPE_SIGNATURE );
+    $result = ProcessRequest(PORTFOLIO, API_RISK_V1_AUTHENTICATION_SETUPS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
 
 } catch (Exception $exception) {

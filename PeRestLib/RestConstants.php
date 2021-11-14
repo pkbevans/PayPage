@@ -1,5 +1,7 @@
 <?php
 include_once '../ppSecure/PeRestLibKeys.php';
+const PORTFOLIO = "barclayssitt00";
+const MID = "paulspants21005";
 const TARGET_ORIGIN =  "https://bondevans.com";  
 // Endpoints
 const REQUEST_HOST =  "apitest.cybersource.com";  // TEST
