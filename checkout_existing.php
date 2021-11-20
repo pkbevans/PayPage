@@ -40,12 +40,22 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
         <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
     </form>
     <div class="container">
+        <!-- Modal -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" role="dialog" aria-hidden="false">
+          <div class="modal-dialog modal-tall">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">3DS</h5>
+              </div>
+              <div class="modal-body">
+                <iframe style="overflow: hidden; display: block; border:none; height:75vh; width:100%" name="stepUpIframe" ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
         <div id="progressSpinner2"  class="spinner-border text-info" style="display: block;"></div>
         <div class="row">
             <div class="col-sm-4">
-                <div id="overlay">
-                    <iframe id="step_up_iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
-                </div>
                 <div id="iframeSection" style="display: none">
                     <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
                 </div>
@@ -221,6 +231,8 @@ var myStyles = {
 };
 var number;
 var payButton;
+var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {keyboard: false});
+
 document.addEventListener("DOMContentLoaded", function (e) {
     createCardInput("cardInputSection", "progressSpinner2", "payButton", true);
     let defPI = JSON.parse(defaultPaymentInstrumentJson);
@@ -410,7 +422,7 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
     });
 }
 function showStepUpScreen(stepUpURL, jwt) {
-    document.getElementById("overlay").style.display = "block";
+    myModal.show();
     // console.log( "Challenge Screen:\n"+stepUpURL);
     document.getElementById('step_up_form').action = stepUpURL;
     document.getElementById('step_up_form_jwt_input').value = jwt;
@@ -420,7 +432,7 @@ function showStepUpScreen(stepUpURL, jwt) {
     }
 }
 function hideStepUpScreen(transactionId) {
-    document.getElementById("overlay").style.display = "none";
+    myModal.hide();
     console.log("Challenge Complete TransactionId:\n" + transactionId);
     authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
 }
