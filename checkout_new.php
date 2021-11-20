@@ -51,7 +51,9 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             </div>
           </div>
         </div>
-        <div id="progressSpinner2"  class="spinner-border text-info" style="display: block;"></div>
+        <div class="d-flex justify-content-center">
+            <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
+        </div>
         <div id="iframeSection" style="display: none">
             <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
         </div>
@@ -232,11 +234,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                     </div>
                 </div>
                 <div class="card card-body" id="resultSection" style="display: none">
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <div id="progressSpinner" class="spinner-border text-info"></div>
-                        </div>
-                    </div>
                     <h5 class="card-title">Result</h5>
                     <p id="result" class="card-text"></p>
                     <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
@@ -328,7 +325,7 @@ let orderDetails = {
 var form;
 var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {keyboard: false});
 document.addEventListener("DOMContentLoaded", function (e) {
-    createCardInput("cardInputSection", "progressSpinner2", "payButton");
+    createCardInput("cardInputSection", "mainSpinner", "payButton");
 });
 function payNow(){
 }
@@ -342,6 +339,7 @@ function onTokenCreated(tokenDetails){
         storeCard = true;
     }
 //    setOrderDetails()
+    document.getElementById("mainSpinner").style.display = "block";
     setUpPayerAuth();
 }
 function onTokenError(err){
@@ -564,7 +562,7 @@ function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, http
     }
     result = document.getElementById("result").innerHTML = text;
     result = document.getElementById("result").style.display = "block";
-    document.getElementById("progressSpinner").style.display = "none";
+    document.getElementById("mainSpinner").style.display = "none";
     if(newCustomer && !paymentInstrumentId !== ""){
         // Write new Customer Token to cookie
         document.cookie = "customerId=" + customerId;

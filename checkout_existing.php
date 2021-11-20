@@ -53,7 +53,9 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
             </div>
           </div>
         </div>
-        <div id="progressSpinner2"  class="spinner-border text-info" style="display: block;"></div>
+        <div class="d-flex justify-content-center">
+            <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
+        </div>
         <div class="row">
             <div class="col-sm-4">
                 <div id="iframeSection" style="display: none">
@@ -100,11 +102,6 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                     </div>
                 </div>
                 <div class="card card-body" id="resultSection" style="display: none">
-                    <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <div id="progressSpinner" class="spinner-border text-info"></div>
-                        </div>
-                    </div>
                     <h5 class="card-title">Result</h5>
                     <p id="result" class="card-text"></p>
                     <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
@@ -234,7 +231,7 @@ var payButton;
 var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {keyboard: false});
 
 document.addEventListener("DOMContentLoaded", function (e) {
-    createCardInput("cardInputSection", "progressSpinner2", "payButton", true);
+    createCardInput("cardInputSection", "mainSpinner", "payButton", true);
     let defPI = JSON.parse(defaultPaymentInstrumentJson);
     document.getElementById('billToText').innerHTML = formatNameAddress(defPI.billTo);
     let defSA = JSON.parse(defaultShippingAddressJson);
@@ -251,6 +248,7 @@ function payNow(){
     }else{
         setUpPayerAuth();
     }
+    document.getElementById("mainSpinner").style.display = "block";
 }
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
@@ -574,7 +572,7 @@ function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, http
     }
     result = document.getElementById("result").innerHTML = text;
     result = document.getElementById("result").style.display = "block";
-    document.getElementById("progressSpinner").style.display = "none";
+    document.getElementById("mainSpinner").style.display = "none";
     if(newCustomer && !paymentInstrumentId !== ""){
         // Write new Customer Token to cookie
         document.cookie = "customerId=" + customerId;
