@@ -164,7 +164,7 @@ function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFla
     cvvOnly = cvvOnlyFlag;
     container = document.getElementById(containerName);
     progress = document.getElementById(progressName);
-    html = "<div class=\"d-flex mt-3 mb-3\">"+
+    html = "<div class=\"d-flex mb-3\">"+
         (!cvvOnly?
         "<div class=\"card\">"+
             "<div class=\"card-body\"> "+
@@ -176,7 +176,7 @@ function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFla
                     "</div>"+
                 "</div>"+
                 "<div class=\"row mt-3 mb-3\">"+
-                    "<div class=\"col-md-12\">"+
+                    "<div class=\"col-12\">"+
                         "<label class=\"form-check-label\" for=\"number-container\">Card Number</label>"+
                         "<div class=\"cardInput\">"+
                             "<i class=\"fa fa-credit-card\"></i>"+
@@ -184,16 +184,16 @@ function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFla
                         "</div>"+
                     "</div>"+
                 "</div>":"")+
-                "<div class=\"row mt-3 mb-3\">"+
+                "<div class=\"row \">"+
                     (!cvvOnly?
-                    "<div class=\"col-md-6\">"+
+                    "<div class=\"col-6\">"+
                         "<label class=\"form-check-label\" for=\"expiryDate\">Expiry Date</label>"+
                         "<div class=\"cardInput\">"+
                             "<i class=\"fa fa-calendar\"></i>"+
                             "<input class=\"form-control\" id=\"expiryDate\" type=\"text\" placeholder=\"MM/YY\" pattern=\"[0-1][0-9]\/[2][1-9]\" inputmode=\"numeric\" autocomplete=\"cc-exp\" autocorrect=\"off\" spellcheck=\"off\" aria-invalid=\"false\" aria-placeholder=\"MM/YY\" required>"+
                         "</div>"+
                     "</div>":"")+
-                    "<div class=\"col-md-6\"> "+
+                    "<div class=\"col-6\"> "+
                         "<label id=\"securityCodeLabel\" class=\"form-check-label\" for=\"securityCode-container\">Security Code</label>"+
                         "<div class=\"cardInput\">"+
                             "<i class=\"fa fa-lock\"></i>"+

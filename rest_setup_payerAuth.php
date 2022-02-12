@@ -5,16 +5,16 @@ $reference_number = $incoming->order->referenceNumber;
 $request = new stdClass();
 $request->clientReferenceInformation = new stdClass();
 $request->clientReferenceInformation->code = $reference_number;
-if(!empty($incoming->paymentInstrumentId)){
+if(!empty($incoming->order->paymentInstrumentId)){
     $paymentInformation = [
             "paymentInstrument" => [
-                "id" => $incoming->paymentInstrumentId
+                "id" => $incoming->order->paymentInstrumentId
             ]
     ];
     $request->paymentInformation = $paymentInformation;
 } else{
     $tokenInformation = [
-        "transientToken" => $incoming->transientToken
+        "transientToken" => $incoming->order->flexToken
     ];
     $request->tokenInformation = $tokenInformation;
 }
@@ -22,7 +22,6 @@ if(!empty($incoming->paymentInstrumentId)){
 $requestBody = json_encode($request);
 
 try{
-    // peportfolio/pemid03
     $result = ProcessRequest(PORTFOLIO, API_RISK_V1_AUTHENTICATION_SETUPS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
     echo(json_encode($result));
 

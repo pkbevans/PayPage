@@ -372,6 +372,14 @@ function addPaymentInstrument(flexDetails, billToDetails){
         currency: "<?php echo $_REQUEST['currency'];?>",
         shippingAddressRequired: false,
         useShippingAsBilling: false,
+        local: false, // TODO
+        storeCard: true,
+        customerId: customerId,
+        paymentInstrumentId: "",
+        shippingAddressId: "",
+        flexToken: flexDetails.flexToken,
+        standAlone: false,
+        capture: false,
         bill_to: {
             firstName: billToDetails.firstName,
             lastName: billToDetails.lastName,
@@ -387,18 +395,10 @@ function addPaymentInstrument(flexDetails, billToDetails){
         type: "POST",
         url: "rest_auth_with_pa.php",
         data: JSON.stringify({
-            "local": false, // TODO
             "order": orderDetails,
-            "storeCard": true,
-            "customerId": customerId,
             "paAction": "NO_PA",
-            "paymentInstrumentId": "",
-            "shippingAddressId": "",
-            "transientToken": flexDetails.flexToken,
             "referenceID": "",
-            "authenticationTransactionID": "",
-            "standAlone": false,
-            "capture": false
+            "authenticationTransactionID": ""
         }),
         success: function (result) {
             // Response is a json string - turn it into a javascript object

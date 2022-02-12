@@ -1,26 +1,25 @@
 <?php require_once 'PeRestLib/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
-$reference_number = $incoming->order->referenceNumber;
 // Key incoming fields:
 //  "storeCard" : If true create a token
 //  "paymentInstrumentId" : if true, use supplied Payment Instrument
 //  "shippingAddressId" : if not blank, use supplied Shipping Address
 //  "customerId" : If not blank and storeCard is true, then add new payment Instrument to existing Customer.
-//  "transientToken" :  Always use - will either contain PAN+CVV for new cards or just CVV for existing payment Instruments
+//  "flexToken" :  Always use - will either contain PAN+CVV for new cards or just CVV for existing payment Instruments
 try {
     $request = new stdClass();
 
-    if(!$incoming->standAlone) {
+    if(!$incoming->order->standAlone) {
         $processingInfo = new stdClass();
         // Dont capture a zero-value auth
-        $processingInfo->capture = $incoming->order->amount>0?$incoming->capture:false;
-        if($incoming->storeCard){
+        $processingInfo->capture = $incoming->order->amount>0?$incoming->order->capture:false;
+        if($incoming->order->storeCard){
             if($incoming->paAction === "NO_PA"){
                 $actionList = ["TOKEN_CREATE"];
             }else{
                 $actionList = [$incoming->paAction, "TOKEN_CREATE"];
             }
-            if(empty($incoming->customerId)){
+            if(empty($incoming->order->customerId)){
                 $buyerInformation = [
                     "merchantCustomerID" => "Your customer identifier",
                     "email" => $incoming->order->bill_to->email
@@ -33,7 +32,7 @@ try {
                 }
             } else{
                 // Add Payment Instrument and/or Shipping Address to existing Customer
-                if($incoming->order->shippingAddressRequired && empty($incoming->shippingAddressId)){
+                if($incoming->order->shippingAddressRequired && empty($incoming->order->shippingAddressId)){
                     $processingInfo->actionTokenTypes = ["paymentInstrument", "shippingAddress"];
                 }else{
                     $processingInfo->actionTokenTypes = ["paymentInstrument"];
@@ -52,7 +51,7 @@ try {
             "currency"=>$incoming->order->currency
         ]
     ];
-    if(empty($incoming->paymentInstrumentId)){
+    if(empty($incoming->order->paymentInstrumentId)){
         $billTo = [
             "firstName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->firstName :$incoming->order->bill_to->firstName), 0, MAXSIZE_NAME),
             "lastName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->lastName :$incoming->order->bill_to->lastName), 0, MAXSIZE_NAME),
@@ -67,7 +66,7 @@ try {
     }
 
     if($incoming->order->shippingAddressRequired){
-        if(empty($incoming->shippingAddressId)){
+        if(empty($incoming->order->shippingAddressId)){
             $shipTo = [
                 "firstName" => substr($incoming->order->ship_to->firstName, 0, MAXSIZE_NAME),
                 "lastName" => substr($incoming->order->ship_to->lastName, 0, MAXSIZE_NAME),
@@ -82,47 +81,47 @@ try {
     }
     $request->orderInformation = $orderInformation;
 
-    if($incoming->standAlone) {
+    if($incoming->order->standAlone) {
         $tokenInformation = [
-            "transientToken" => $incoming->transientToken
+            "transientToken" => $incoming->order->flexToken
         ];
     }else{
-        if(!empty($incoming->paymentInstrumentId) ||
-                !empty($incoming->shippingAddressId) ||
-                ($incoming->storeCard && isset($incoming->customerId))){
+        if(!empty($incoming->order->paymentInstrumentId) ||
+                !empty($incoming->order->shippingAddressId) ||
+                ($incoming->order->storeCard && !empty($incoming->order->customerId))){
             $paymentInformation = [
                 "customer" => [
-                    "id" => $incoming->customerId
+                    "id" => $incoming->order->customerId
                 ]
             ];
             $request->paymentInformation = $paymentInformation;
         }
-        if(!empty($incoming->shippingAddressId)){
-            $request->paymentInformation['shippingAddress']['id'] = $incoming->shippingAddressId;
+        if(!empty($incoming->order->shippingAddressId)){
+            $request->paymentInformation['shippingAddress']['id'] = $incoming->order->shippingAddressId;
         }
 
-        if(!empty($incoming->paymentInstrumentId)){
-            $request->paymentInformation['paymentInstrument']['id'] = $incoming->paymentInstrumentId;
+        if(!empty($incoming->order->paymentInstrumentId)){
+            $request->paymentInformation['paymentInstrument']['id'] = $incoming->order->paymentInstrumentId;
         }
         // Always meed the transient token
         $tokenInformation = [
-            "jti" => $incoming->transientToken
+            "jti" => $incoming->order->flexToken
         ];
     }
     $request->tokenInformation = $tokenInformation;
 
     $request->clientReferenceInformation = new stdClass();
-    $request->clientReferenceInformation->code = $reference_number;
+    $request->clientReferenceInformation->code = $incoming->order->referenceNumber;
 
     if($incoming->paAction == "CONSUMER_AUTHENTICATION"){
         // PA Enrollment check
-        if($incoming->storeCard){
+        if($incoming->order->storeCard){
             // If we are storing the card, then request a challenge
             $challengeCode = "04";
         }else{
             $challengeCode = "01";
         }
-        if($incoming->local){
+        if($incoming->order->local){
             $returnUrl = "http://localhost/payPage/redirect.php";
         }else{
             $returnUrl = "https://bondevans.com/payPage/redirect.php";
@@ -144,7 +143,7 @@ try {
 
     $requestBody = json_encode($request);
 
-    if($incoming->standAlone){
+    if($incoming->order->standAlone){
         if($incoming->paAction == "CONSUMER_AUTHENTICATION"){
             $api = API_RISK_V1_AUTHENTICATIONS;
         }else{

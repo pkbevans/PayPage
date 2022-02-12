@@ -1,7 +1,6 @@
 <?php
 include_once 'card_types.php';
 include_once 'countries.php';
-include 'generate_capture_context.php';
 include 'rest_get_customer.php';
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
@@ -40,7 +39,6 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
         <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
     </form>
     <div class="container">
-        <!-- Modal -->
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" role="dialog" aria-hidden="false">
           <div class="modal-dialog modal-tall">
             <div class="modal-content">
@@ -56,108 +54,106 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
         <div class="d-flex justify-content-center">
             <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
         </div>
-        <div class="row">
-            <div class="col-sm-4">
-                <div id="iframeSection" style="display: none">
-                    <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
+        <div id="iframeSection" style="display: none">
+            <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
+        </div>
+        <div id="summarySection">
+            <div class="row">
+                <h3>Your Order</h3>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <h5>Total:</h5>
                 </div>
-                <div id="paymentDetailsSection">
-                    <input id="bill_to_email" type="hidden" value="<?php echo $defaultEmail;?>">
-                    <div id="storedCardSection">
-                        <h5>Stored Card Details</h5>
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <img id="storedCardImg" src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
-                            </div>
-                            <div class="col-sm-8">
-                                <ul class="list-unstyled">
-                                    <li><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></li>
-                                    <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="cardSection" style="display: block">
-                        <form id="cardForm">
-                            <div id="cardInputSection">
-                            </div>
-                        </form>
-                        <div id="billingAddressSection" style="display: block">
-                            <div id="defaultBillingSection">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <button type="button" class="btn btn-link" onclick="editCard()">Use a different Card</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="payButtonSection" class="row">
-                                <div class="col-sm-12">
-                                    <button type="button" id="payButton" onclick="payNow()" class="btn btn-primary" disabled="true">Pay</button>
-                                    <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
-                                </div>
-                            </div>
-                            <div class="row">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card card-body" id="resultSection" style="display: none">
-                    <h5 class="card-title">Result</h5>
-                    <p id="result" class="card-text"></p>
-                    <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
-                    <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
+                <div class="col-9">
+                    <span><?php echo "£" . $_REQUEST['amount'];?></span>
                 </div>
             </div>
-            <div class="col-sm-4">
-                <div id="summarySection">
-                    <div class="row">
-                        <h3>Your Order</h3>
+            <div class="row">
+                <div class="col-3">
+                    <h5>Email:</h5>
+                </div>
+                <div class="col-9">
+                    <?php echo $defaultEmail;?>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <h5>Delivery:</h5>
+                </div>
+                <div id="shipToText" class="col-7"></div>
+                <div id="summaryEditAddress" class="col-2">
+                    <button type="button" class="btn btn-link p-0" onclick="editShippingAddress()">Edit</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <h5>Card Billing:</h5>
+                </div>
+                <div class="col-7" id="billToText"></div>
+                <div id="summaryEditCard" class="col-2">
+                    <button type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                </div>
+            </div>
+        </div>
+        <div id="paymentDetailsSection">
+            <input id="bill_to_email" type="hidden" value="<?php echo $defaultEmail;?>">
+            <div id="storedCardSection">
+                <h5>Stored Card Details</h5>
+                <div class="row">
+                    <div class="col-3">
+                        <img src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
                     </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h5>Your email:</h5>
-                        </div>
-                        <div class="col-sm-6">
-                            <?php echo $defaultEmail;?>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h5>Delivery Address:</h5>
-                        </div>
-                        <div id="shipToText" class="col-sm-6">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                        </div>
-                        <div id="summaryEditAddress" class="col-sm-6">
-                            <button type="button" class="btn btn-link p-0" onclick="editShippingAddress()">Edit</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                        <h5>Billing Address:</h5>
-                        </div>
-                        <div class="col-sm-6" id="billToText">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                        </div>
-                        <div id="summaryEditCard" class="col-sm-6">
-                            <button type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <span><h5>Total:</h5></span>
-                        </div>
-                        <div class="col-sm-6">
-                            <span><?php echo "£" . $_REQUEST['amount'];?></span>
-                        </div>
+                    <div class="col-9">
+                        <ul class="list-unstyled">
+                            <li><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></li>
+                            <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
+                        </ul>
                     </div>
                 </div>
+            </div>
+            <div id="cardSection" style="display: block">
+                <form id="cardForm">
+                    <div id="cardInputSection">
+                    </div>
+                </form>
+                <div id="billingAddressSection" style="display: block">
+                    <div id="defaultBillingSection">
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-link" onclick="editCard()">Use a different Card</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="payButtonSection" class="row">
+                        <div class="col-12">
+                            <button type="button" id="payButton" onclick="payNow()" class="btn btn-primary" disabled="true">Pay</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="resultSection" style="display: none">
+            <h3>Result</h3>
+            <p id="result"></p>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
+            </div>
+            <div class="col-2">
+                <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
             </div>
         </div>
     </div>
@@ -168,49 +164,48 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
 <script src="js/utils.js"></script>
 <script>
 // the capture context that was requested server-side for this transaction
-var captureContext = "<?php echo $captureContext ?>";
-<?php
-if (isset($_REQUEST['standAlone'])){echo "var standAlone = true;\n";}else{echo "var standAlone = false;\n";}
-if (isset($_REQUEST['local']) && $_REQUEST['local'] === "true") {echo "var local = true;\n";}else{echo "var local = false;\n";}
-echo "var customerId ='".$customerToken."'" . ";\n";
-?>
-var paymentInstrumentId = "<?php echo $defaultPaymentInstrument->id;?>";
 var oldPaymentInstrumentId;
-var maskedPan = "<?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?>";
-var shippingAddressId = "<?php echo $defaultShippingAddress->id;?>";
-var flexToken="";
-var pan;
+//var pan;
 <?php
   echo "var defaultPaymentInstrumentJson = '" . json_encode($defaultPaymentInstrument) ."';\n";
   echo "var defaultShippingAddressJson = '" . json_encode($defaultShippingAddress) ."';\n";
 ?>
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
-    referenceNumber: <?php echo '"' . $_REQUEST['reference_number'] . '"'; ?>,
-    amount: <?php echo '"' . $_REQUEST['amount'] . '"'; ?>,
-    currency: <?php echo '"' . $_REQUEST['currency'] . '"'; ?>,
-    shippingAddressRequired: true,
-    useShippingAsBilling: false,
-    ship_to: {
-        firstname: "",
-        lastname: "",
-        address1: "",
-        address2: "",
-        locality: "",
-        postalCode: "",
-        country: ""
-    },
-    bill_to: {
-        firstname: "",
-        lastname: "",
-        email: "",
-        address1: "",
-        address2: "",
-        locality: "",
-        postalCode: "",
-        country: ""
-    }
-};
+        referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
+        amount: "<?php echo $_REQUEST['amount'];?>",
+        currency: "<?php echo $_REQUEST['currency'];?>",
+        standAlone: <?php echo isset($_REQUEST['standAlone'])?"true":"false";?>,
+        local: <?php echo isset($_REQUEST['local']) && $_REQUEST['local'] === "true"?"true":"false";?>,
+        shippingAddressRequired: true,
+        useShippingAsBilling: true,
+        customerId: "<?php echo $customerToken;?>",
+        paymentInstrumentId: "<?php echo $defaultPaymentInstrument->id;?>",
+        maskedPan: "<?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?>",
+        flexToken: "",
+        shippingAddressId: "<?php echo $defaultShippingAddress->id;?>",
+        storeCard: false,
+        capture: true,           // TODO hardcoded capture
+        ship_to: {
+            firstName: "",
+            lastName: "",
+            address1: "",
+            address2: "",
+            locality: "",
+            postalCode: "",
+            country: ""
+        },
+        bill_to: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            address1: "",
+            address2: "",
+            locality: "",
+            postalCode: "",
+            country: ""
+        }
+    };
 // custom styles that will be applied to each field we create using Microform
 var myStyles = {
     'input': {
@@ -241,27 +236,26 @@ function payNow(){
     document.getElementById("paymentDetailsSection").style.display = "none";
     document.getElementById("summaryEditAddress").style.display = "none";
     document.getElementById("summaryEditCard").style.display = "none";
-    document.getElementById("resultSection").style.display = "block";
 
-    if(flexToken ==""){
+    if(orderDetails.flexToken ==""){
         getToken(onTokenCreated, onTokenError);
     }else{
-        setUpPayerAuth();
+        authorise();
     }
-    document.getElementById("mainSpinner").style.display = "block";
+//    document.getElementById("mainSpinner").style.display = "block";
 }
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
-    flexToken = tokenDetails.flexToken;
-    setUpPayerAuth();
+    orderDetails.flexToken = tokenDetails.flexToken;
+    authorise();
 }
 function onTokenError(err){
     console.log("Token Creation Error:");
     console.log(err);
-    onFinish(status, "", false, false, "n/a", err.reason, err.Message)
+    onFinish(orderDetails, status, "", false, false, "n/a", err.reason, err.Message)
 }
 function cancel() {
-    onFinish("CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
+    onFinish(orderDetails, "CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
     window.location.assign("index.php");
 }
 function useSameAddressChanged() {
@@ -274,7 +268,7 @@ function useSameAddressChanged() {
     }
 }
 function setOrderDetails() {
-    if(shippingAddressId === ""){
+    if(orderDetails.shippingAddressId === ""){
         orderDetails.useShippingAsBilling = shipAsBill();
 
         orderDetails.ship_to.firstname = document.getElementById('ship_to_firstname').value;
@@ -285,7 +279,7 @@ function setOrderDetails() {
         orderDetails.ship_to.postalCode = document.getElementById('ship_to_postalCode').value;
         orderDetails.ship_to.country = document.getElementById('ship_to_country').value;
     }
-    if(paymentInstrumentId === ""){
+    if(orderDetails.paymentInstrumentId === ""){
         if(!orderDetails.useShippingAsBilling){
             orderDetails.bill_to.firstname = document.getElementById('bill_to_forename').value;
             orderDetails.bill_to.lastname = document.getElementById('bill_to_surname').value;
@@ -298,146 +292,21 @@ function setOrderDetails() {
         orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
     }
 }
-function setUpPayerAuth() {
-    $.ajax({
-        type: "POST",
-        url: "rest_setup_payerAuth.php",
-        data: JSON.stringify({
-            "order": orderDetails,
-            "customerId": customerId,
-            "paymentInstrumentId": paymentInstrumentId,
-            "transientToken": flexToken
-        }),
-        success: function (result) {
-            res = JSON.parse(result);
-            console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
-            // If OK, set up device collection
-            let httpCode = res.responseCode;
-            if (httpCode === 201) {
-                // Set up device collection
-                deviceDataCollectionURL = res.response.consumerAuthenticationInformation.deviceDataCollectionUrl;
-                accessToken = res.response.consumerAuthenticationInformation.accessToken;
-                doDeviceCollection(deviceDataCollectionURL, accessToken);
-            } else {
-                // 500 System error or anything else
-                onFinish(status, "", false, false, httpCode, res.response.reason, res.response.message);
-            }
-        }
-    });
-}
-function doDeviceCollection(url, accessTokenJwt) {
-    console.log("\ndoDeviceCollection URL:" + url);
-    document.getElementById('cardinal_collection_form').action = url;
-    document.getElementById('cardinal_collection_form_input').value = accessTokenJwt;
-    document.getElementById('cardinal_collection_form').submit();
-}
-window.addEventListener("message", (event) => {
-    //{MessageType: "profile.completed", SessionId: "0_57f063fd-659a-4779-b45b-9e456fdb7935", Status: true}
-    if (event.origin === "https://centinelapistag.cardinalcommerce.com") {
-        console.log("\nMessage origin:" + event.origin);
-        let data = JSON.parse(event.data);
-        console.log("\nMessage data:" + JSON.stringify(event.data, undefined, 2));
-
-        if (data !== undefined && data.Status) {
-            console.log("\nSessionId:" + data.SessionId);
-            authorizeWithPA(data.SessionId, "", "CONSUMER_AUTHENTICATION");
-        }
+function authorise() {
+//    document.getElementById('paymentDetailsSection').style.display = "none";
+//    document.getElementById('iframeSection').style.display = "block";
+    var iframeForm = document.getElementById('iframe_form');
+    if (iframeForm){
+        sessionStorage.setItem("orderDetails", JSON.stringify(orderDetails));
+        iframeForm.action = "authorise.php";
+        iframeForm.target = "_self";
+        iframeForm.submit();
     }
-}, false);
-/*
- * This function sends a combined enrollment + Authorization request message to Cybersource.
- * the enrollment request is performed first.  If it is successful (i.e ReasonCode=100 - Card is NOT enrolled), then
- * the authorization request is performed.  If the card IS enrolled then the reasonCode = 475 and the the authorization
- * request is NOT performed.  In the latter case the cardholder authentication step is performed and a combined
- * validation + Authorization request is generated.
- */
-function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
-    console.log("\nChecking enrollment...\n");
-    $.ajax({
-        type: "POST",
-        url: "rest_auth_with_pa.php",
-        data: JSON.stringify({
-            "local": local,
-            "order": orderDetails,
-            "storeCard": false,
-            "customerId": customerId,
-            "paAction": paAction,
-            "paymentInstrumentId": paymentInstrumentId,
-            "shippingAddressId": shippingAddressId,
-            "transientToken": flexToken,
-            "referenceID": dfReferenceId,
-            "authenticationTransactionID": authenticationTransactionID,
-            "standAlone": standAlone,
-            "capture": true     // TODO hardcoded capture
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\nEnrollment:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            let status = res.response.status;
-            if (httpCode === 201) {
-                customerCreated = false;
-                paymentInstrumentCreated = false;
-                shippingAddressCreated = false;
-                let requestID = res.response.id;
-                // Successfull response (but could be declined)
-                if (status === "PENDING_AUTHENTICATION") {
-                    // Card is enrolled - Kick off the cardholder authentication
-                    showStepUpScreen(res.response.consumerAuthenticationInformation.stepUpUrl, res.response.consumerAuthenticationInformation.accessToken);
-                } else if (status === "AUTHORIZED") {
-                    if (storeCard) {
-                        paymentInstrumentCreated = true;
-                        paymentInstrumentId = res.response.tokenInformation.paymentInstrument.id;
-                        if(shippingAddressId === ""){
-                            // Not using an existing shippingAddress so must be creating a new one
-                            shippingAddressId = res.response.tokenInformation.shippingAddress.id;
-                        }
-                        if (!customerId) {
-                            // New Customer
-                            customerCreated = true;
-                            customerId = res.response.tokenInformation.customer.id;
-                        }
-                    }
-                    onFinish(status, requestID, customerCreated, paymentInstrumentCreated, httpCode, "", "");
-                } else {
-                    onFinish(status, requestID, false, false, httpCode, res.response.reason, res.response.message);
-                }
-            } else {
-                // 500 System error or anything else
-                switch(httpCode){
-                    case "202":
-                        onFinish(status, "", false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
-                        break;
-                    case "400":
-                        onFinish(status, "", false, false, httpCode, res.response.reason, res.response.details);
-                        break;
-                    default:
-                        onFinish(status, "", false, false, httpCode, res.response.reason, res.response.message);
-                }
-            }
-        }
-    });
-}
-function showStepUpScreen(stepUpURL, jwt) {
-    myModal.show();
-    // console.log( "Challenge Screen:\n"+stepUpURL);
-    document.getElementById('step_up_form').action = stepUpURL;
-    document.getElementById('step_up_form_jwt_input').value = jwt;
-    var stepUpForm = document.getElementById('step_up_form');
-    if (stepUpForm){
-        stepUpForm.submit();
-    }
-}
-function hideStepUpScreen(transactionId) {
-    myModal.hide();
-    console.log("Challenge Complete TransactionId:\n" + transactionId);
-    authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
 }
 function editShippingAddress(){
     document.getElementById('paymentDetailsSection').style.display = "none";
     document.getElementById('iframeSection').style.display = "block";
-    document.getElementById('customerToken').value = customerId;
+    document.getElementById('customerToken').value = orderDetails.customerId;
     var iframeForm = document.getElementById('iframe_form');
     if (iframeForm){
         iframeForm.action = "edit_addresses.php";
@@ -445,7 +314,7 @@ function editShippingAddress(){
     }
 }
 function onShippingAddressUpdated(id, shipToText, shipTo) {
-    shippingAddressId = id;
+    orderDetails.shippingAddressId = id;
     console.log("onShippingAddressUpdated:\n" + id + "\n"+ shipToText);
     document.getElementById('shipToText').innerHTML = formatNameAddress(shipTo);
     document.getElementById('iframeSection').style.display = "none";
@@ -457,11 +326,11 @@ function onNewCardUsed(flexDetails, billToDetails) {
     // Hide/unload Security code
     document.getElementById('cardInputSection').style.display = "none";
     securityCode.unload();
-    maskedPan = flexDetails.cardDetails.number;
-    flexToken = flexDetails.flexToken;
-    paymentInstrumentId = "";
+    orderDetails.maskedPan = flexDetails.cardDetails.number;
+    orderDetails.flexToken = flexDetails.flexToken;
+    orderDetails.paymentInstrumentId = "";
 
-    html = stylePaymentInstrument(maskedPan, flexDetails.cardDetails, billToDetails);
+    html = stylePaymentInstrument(orderDetails.maskedPan, flexDetails.cardDetails, billToDetails);
     document.getElementById('storedCardSection').innerHTML = html;
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
@@ -478,8 +347,8 @@ function onNewCardUsed(flexDetails, billToDetails) {
     document.getElementById('payButton').disabled = false;
 }
 function onPaymentInstrumentUpdated(id, paymentInstrument) {
-    paymentInstrumentId = id;
-    maskedPan = paymentInstrument._embedded.instrumentIdentifier.card.number;
+    orderDetails.paymentInstrumentId = id;
+    orderDetails.maskedPan = paymentInstrument._embedded.instrumentIdentifier.card.number;
     console.log("onPaymentInstrumentUpdated:\n" + id + "\n"+ JSON.stringify(paymentInstrument, undefined, 2));
     html = stylePaymentInstrument(paymentInstrument._embedded.instrumentIdentifier.card.number,
                 paymentInstrument.card, paymentInstrument.billTo);
@@ -502,12 +371,12 @@ function stylePaymentInstrument(maskedPan, card, billTo){
         img = "images/Amex.svg";
         alt = "Amex card logo";
     }
-    html =  "<h5>Your Card Details</h5>" +
+    html =  "<h5>Stored Card Details</h5>" +
             "<div class=\"row\">\n" +
-                "<div class=\"col-sm-2\">\n"+
+                "<div class=\"col-3\">\n"+
                     "<img src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+
                 "</div>\n" +
-                "<div class=\"col-sm-8\">\n" +
+                "<div class=\"col-9\">\n" +
                     "<ul class=\"list-unstyled\">" +
                         "<li><strong>" + maskedPan + "</strong></li>\n" +
                         "<li><small>Expires:&nbsp;" + card.expirationMonth + "/" + card.expirationYear + "</small></li>\n" +
@@ -523,7 +392,7 @@ function onIframeCancelled(){
 function editCard(){
     document.getElementById('paymentDetailsSection').style.display = "none";
     document.getElementById('iframeSection').style.display = "block";
-    document.getElementById('customerToken').value = customerId;
+    document.getElementById('customerToken').value = orderDetails.customerId;
     var iframeForm = document.getElementById('iframe_form');
     if (iframeForm){
         iframeForm.action = "edit_cards.php";
@@ -531,34 +400,35 @@ function editCard(){
     }
 }
 function newCard(){
-    oldPaymentSnstrumentId=paymentInstrumentId;
-    paymentInstrumentId = "";
+    oldPaymentInstrumentId=orderDetails.paymentInstrumentId;
+    orderDetails.paymentInstrumentId = "";
     showPanField(true);
     document.getElementById('billingForm').style.display = "block";
     document.getElementById('defaultBillingSection').style.display = "none";
     document.getElementById('storedCardSection').style.display = "none";
 }
 function cancelNewCard(){
-    paymentInstrumentId = oldPaymentSnstrumentId;
+    orderDetails.paymentInstrumentId = oldPaymentInstrumentId;
     showPanField(false);
     document.getElementById('billingForm').style.display = "none";
     document.getElementById('defaultBillingSection').style.display = "block";
     document.getElementById('storedCardSection').style.display = "block";
 }
-function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
-    document.getElementById('paymentDetailsSection').style.display = "none";
+function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
+    document.getElementById('iframeSection').style.display = "none";
+    document.getElementById("resultSection").style.display = "block";
     finish = "onFinish: " + JSON.stringify({
-        "referenceNumber": orderDetails.referenceNumber,
+        "referenceNumber": orderDetails2.referenceNumber,
         "status": status,
         "httpResponseCode": httpResponseCode,
         "requestId": requestId,
-        "amount": orderDetails.amount,
-        "pan": maskedPan,
+        "amount": orderDetails2.amount,
+        "pan": orderDetails2.maskedPan,
         "newCustomer": newCustomer,
         "newPaymentInstrument": paymentInstrumentCreated,
-        "customerId": customerId,
-        "paymentInstrumentId": paymentInstrumentId,
-        "shippingAddressId": shippingAddressId,
+        "customerId": orderDetails2.customerId,
+        "paymentInstrumentId": orderDetails2.paymentInstrumentId,
+        "shippingAddressId": orderDetails2.shippingAddressId,
         "errorReason": errorReason,
         "errorMessage": errorMessage
     }, undefined, 2);
@@ -571,11 +441,9 @@ function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, http
         document.getElementById("retryButton").style.display = "block";
     }
     result = document.getElementById("result").innerHTML = text;
-    result = document.getElementById("result").style.display = "block";
-    document.getElementById("mainSpinner").style.display = "none";
-    if(newCustomer && !paymentInstrumentId !== ""){
+    if(newCustomer && !orderDetails2.paymentInstrumentId !== ""){
         // Write new Customer Token to cookie
-        document.cookie = "customerId=" + customerId;
+        document.cookie = "customerId=" + orderDetails2.customerId;
     }
 }
 </script>
