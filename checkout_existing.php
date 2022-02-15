@@ -153,7 +153,7 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                 <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
             </div>
             <div class="col-2">
-                <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
+                <button type="button" id="retryButton" class="btn btn-primary" onclick="history.go(-2)" style="display: none">Try again</button>
             </div>
         </div>
     </div>
@@ -226,11 +226,11 @@ var payButton;
 var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {keyboard: false});
 
 document.addEventListener("DOMContentLoaded", function (e) {
-    createCardInput("cardInputSection", "mainSpinner", "payButton", true);
     let defPI = JSON.parse(defaultPaymentInstrumentJson);
     document.getElementById('billToText').innerHTML = formatNameAddress(defPI.billTo);
     let defSA = JSON.parse(defaultShippingAddressJson);
     document.getElementById('shipToText').innerHTML = formatNameAddress(defSA.shipTo);
+    createCardInput("cardInputSection", "mainSpinner", "payButton", true, false, defPI.card.type);
 });
 function payNow(){
     document.getElementById("paymentDetailsSection").style.display = "none";
@@ -361,10 +361,10 @@ function onPaymentInstrumentUpdated(id, paymentInstrument) {
 function stylePaymentInstrument(maskedPan, card, billTo){
     img = "";
     alt = "";
-    if (card.type === "001") {
+    if (card.type === "001" || card.type === "visa") {
         img = "images/Visa.svg";
         alt = "Visa card logo";
-    } else if (card.type === "002") {
+    } else if (card.type === "002" || card.type === "mastercard") {
         img = "images/Mastercard.svg";
         alt = "Mastercard logo";
     } else {
@@ -441,9 +441,6 @@ function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrume
         document.getElementById("retryButton").style.display = "block";
     }
     result = document.getElementById("result").innerHTML = text;
-    if(newCustomer && !orderDetails2.paymentInstrumentId !== ""){
-        // Write new Customer Token to cookie
-        document.cookie = "customerId=" + orderDetails2.customerId;
-    }
+
 }
 </script>

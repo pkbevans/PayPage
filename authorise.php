@@ -36,7 +36,7 @@
                 <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
             </div>
             <div class="col-sm-2">
-                <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
+                <button type="button" id="retryButton" class="btn btn-primary" onclick="history.back()" style="display: none">Try again</button>
             </div>
         </div>
     </div>

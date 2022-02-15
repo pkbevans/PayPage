@@ -71,15 +71,18 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                 <iframe id="shippingAddressIframe" name="shippingAddress_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
             </div>
             <div id="paymentDetailsSection">
-                <div class="row">
-                    <div class="col-3"><h5>Email:</h5></div>
-                    <div id="summary_email" class="col-9" style="display: none"></div>
+                <div id="summary_email" style="display: none">
+                    <div class="row">
+                        <div class="col-3"><h5>Email:</h5></div>
+                        <div id="emailText" class="col-9" style="display: none"></div>
+                    </div>
                 </div>
                     <form id="emailForm" class="needs-validation" novalidate>
                         <div class="row">
                             <div class="col-12">
                                 <div class="form-group form-floating mb-3">
-                                    <input id="bill_to_email" type="email" class="form-control form-control-sm" <?php if(!empty($defaultEmail)) echo "readonly";?> value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                                    <input id="bill_to_email" type="email" class="form-control form-control-sm" value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                                    <label for="bill_to_email" class="form-label">Please give us your email.</label>
                                 </div>
                             </div>
                         </div>
@@ -424,9 +427,10 @@ function nextButton(form){
             form = document.getElementById('emailForm');
             if(validateForm(form)){
                 document.getElementById("emailForm").style.display = "none";
+                document.getElementById("summary_email").style.display = "block";
                 document.getElementById("summary_delivery").style.display = "block";
                 document.getElementById("shippingForm").style.display = "block";
-                showSummaryItem("summary_email", document.getElementById('bill_to_email').value );
+                showSummaryItem("emailText", document.getElementById('bill_to_email').value );
                 orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
             }
             break;
@@ -529,9 +533,5 @@ function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrume
         document.getElementById("retryButton").style.display = "block";
     }
     result = document.getElementById("result").innerHTML = text;
-    if(newCustomer && !orderDetails2.paymentInstrumentId !== ""){
-        // Write new Customer Token to cookie
-        document.cookie = "customerId=" + orderDetails2.customerId;
-    }
 }
 </script>

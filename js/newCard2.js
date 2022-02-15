@@ -15,7 +15,7 @@ var myStyles = {
 };
 var captureContext;
 var maskedPan = "";
-var cardType;
+var cardType = "001";
 var flexToken;
 var pan;
 var storeCard = false;
@@ -32,6 +32,7 @@ var numberContainer;
 var tokenCreatedCallback;
 var tokenErrorCallback;
 var cvvOnly = false;
+var panOnly = false;
 
 function setUpMicroform(cardButtonName){
     flex = new Flex(captureContext);
@@ -39,15 +40,17 @@ function setUpMicroform(cardButtonName){
     if(cvvOnly){
         panValid = true;
     }else{
+        // Set up PAN field
         number = microform.createField('number', {placeholder: 'Card number'});
         numberContainer = document.querySelector('#number-container');
         number.load('#number-container');
         number.on('change', function (data) {
-//        console.log(data);
-            // Set "CVV" text with name based on scheme
-            secCodeLbl.textContent = (data.card && data.card.length > 0) ? data.card[0].securityCode.name : 'CVN';
-            if(data.card && data.card.length > 0){
-                updateSecurityCodeField(data.card[0].cybsCardType);
+            if(!panOnly){
+                // Set "CVV" text with name based on scheme
+                secCodeLbl.textContent = (data.card && data.card.length > 0) ? data.card[0].securityCode.name : 'CVN';
+                if(data.card && data.card.length > 0){
+                    updateSecurityCodeField(data.card[0].cybsCardType);
+                }
             }
             panValid = data.valid;
             fieldsValid(panValid);
@@ -64,20 +67,30 @@ function setUpMicroform(cardButtonName){
             document.getElementById('expiryDate').value = expDate;
         });
     }
-    securityCode = microform.createField('securityCode', {placeholder: "•••", maxLength: 3});
+    if(panOnly){
+        cvnValid = true;
+    }else{
+        if(cardType == "003" || cardType == "american express"){
+            placeholder = "••••";
+            maxLength = 4;
+        }else{
+            placeholder =  "•••";
+            maxLength = 3;
+        }
+        securityCode = microform.createField('securityCode', {placeholder: placeholder, maxLength: maxLength});
+        securityCode.load('#securityCode-container');
+        secCodeLbl = document.querySelector('#securityCodeLabel');
+        securityCode.on('change', function (data) {
+    //        console.log(data);
+            cvnValid = data.valid;
+            fieldsValid(cvnValid);
+        });
+    }
     newCardButton = document.querySelector('#'+cardButtonName);
-
-    securityCode.load('#securityCode-container');
-    secCodeLbl = document.querySelector('#securityCodeLabel');
-    securityCode.on('change', function (data) {
-//        console.log(data);
-        cvnValid = data.valid;
-        fieldsValid(cvnValid);
-    });
 }
 function updateSecurityCodeField(type){
-    // If Amex, CVVis 4 digits, else 3
-    if(type === "003"){
+    // If Amex, CVV is 4 digits, else 3
+    if(type == "003" || type == "amex"){
         securityCode.update({placeholder: "••••", maxLength: 4});
     }else{
         securityCode.update({placeholder: "•••", maxLength: 3});
@@ -160,8 +173,10 @@ function tokenCreated(flexToken, cardDetails){
     };
     tokenCreatedCallback(result);
 }
-function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFlag=false){
+function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFlag=false, panOnlyFlag=false, cvvOnlyCardType){
     cvvOnly = cvvOnlyFlag;
+    panOnly = panOnlyFlag;
+    cardType = cvvOnlyCardType;
     container = document.getElementById(containerName);
     progress = document.getElementById(progressName);
     html = "<div class=\"d-flex mb-3\">"+
@@ -193,13 +208,14 @@ function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFla
                             "<input class=\"form-control\" id=\"expiryDate\" type=\"text\" placeholder=\"MM/YY\" pattern=\"[0-1][0-9]\/[2][1-9]\" inputmode=\"numeric\" autocomplete=\"cc-exp\" autocorrect=\"off\" spellcheck=\"off\" aria-invalid=\"false\" aria-placeholder=\"MM/YY\" required>"+
                         "</div>"+
                     "</div>":"")+
+                    (!panOnly?
                     "<div class=\"col-6\"> "+
                         "<label id=\"securityCodeLabel\" class=\"form-check-label\" for=\"securityCode-container\">Security Code</label>"+
                         "<div class=\"cardInput\">"+
                             "<i class=\"fa fa-lock\"></i>"+
                             "<div id=\"securityCode-container\" class=\"form-control\"></div>"+
                         "</div>"+
-                    "</div>"+
+                    "</div>":"")+
                 "</div>"+
             (!cvvOnly?
             "</div>"+

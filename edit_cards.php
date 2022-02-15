@@ -265,7 +265,7 @@ echo "var paymentInstrument_". $paymentInstrument->id . " = '" . json_encode($pa
 }
 ?>
 document.addEventListener("DOMContentLoaded", function (e) {
-    createCardInput("cardInputSection", "", "newCardButton");
+    createCardInput("cardInputSection", "", "newCardButton", false, true);
 });
 function saveClicked(){
     form = document.getElementById('billingForm');
@@ -407,13 +407,11 @@ function addPaymentInstrument(flexDetails, billToDetails){
             let httpCode = res.responseCode;
             let status = res.response.status;
             if (httpCode === 201) {
-                customerCreated = false;
-                paymentInstrumentCreated = false;
-                shippingAddressCreated = false;
                 let requestID = res.response.id;
                 // Successfull response (but could be declined)
                 if (status === "AUTHORIZED") {
-                    location.reload();
+                    // Get Payment instrument
+                    getPaymentInstrument(res.response.tokenInformation.paymentInstrument.id);
                 } else {
                     // TODO - let user know that it failed
                 }
@@ -429,6 +427,28 @@ function addPaymentInstrument(flexDetails, billToDetails){
                     default:
                         onAuthError(status, httpCode, res.response.reason, res.response.message);
                 }
+            }
+        }
+    });
+}
+function getPaymentInstrument(id){
+    console.log("\nGetting Payment Instrument: "+id);
+    $.ajax({
+        type: "POST",
+        url: "rest_get_payment_instrument.php",
+        data: JSON.stringify({
+            "id": id
+        }),
+        success: function (result) {
+            // Response is a json string - turn it into a javascript object
+            let res = JSON.parse(result);
+            console.log("\nGot:\n" + JSON.stringify(res, undefined, 2));
+            let httpCode = res.responseCode;
+            if (httpCode === 200) {
+                // Successfull response
+                parent.onPaymentInstrumentUpdated(id, res.response);
+            } else {
+                // 500 System error or anything else - TODO
             }
         }
     });
