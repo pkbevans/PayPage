@@ -100,6 +100,9 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                         </div>
                     </div>
                     <form id="shippingForm" class="needs-validation" novalidate style="display: none">
+                        <div class="row">
+                            <div class="col-3"><h5>Delivery:</h5></div>
+                        </div>
                         <div id="shippingDetailsSection" class="form-group">
                             <div class="row">
                                 <div class="col-6">
@@ -337,15 +340,15 @@ document.addEventListener("DOMContentLoaded", function (e) {
 });
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
-    if(!orderDetails.useonTokenCreatedShippingAsBilling) {
+    if(!orderDetails.useShippingAsBilling) {
         setBillingDetails();
     }
-    document.getElementById("cardSection").style.display = "none";
-    document.getElementById("summary_card").style.display = "block";
-    document.getElementById("confirmSection").style.display = "block";
     orderDetails.flexToken = tokenDetails.flexToken;
     orderDetails.maskedPan = tokenDetails.cardDetails.number;
+    document.getElementById("cardSection").style.display = "none";
     document.getElementById("cardNo").innerHTML = orderDetails.maskedPan;
+    document.getElementById("summary_card").style.display = "block";
+    document.getElementById("confirmSection").style.display = "block";
     // IF storeCard checked, we will create a Token
     sc = document.getElementById('storeCard');
     if (sc.checked) {
@@ -425,7 +428,6 @@ function nextButton(form){
             if(validateForm(form)){
                 document.getElementById("emailForm").style.display = "none";
                 document.getElementById("summary_email").style.display = "block";
-                document.getElementById("summary_delivery").style.display = "block";
                 document.getElementById("shippingForm").style.display = "block";
                 showSummaryItem("emailText", document.getElementById('bill_to_email').value );
                 orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
@@ -434,6 +436,7 @@ function nextButton(form){
         case "shipping":
             form = document.getElementById('shippingForm');
             if(validateForm(form)){
+                document.getElementById("summary_delivery").style.display = "block";
                 document.getElementById("shippingForm").style.display = "none";
                 document.getElementById("cardSection").style.display = "block";
                 setShippingDetails();
@@ -442,7 +445,6 @@ function nextButton(form){
         case "card":
             // Pay Button clicked
             getToken(onTokenCreated);
-
             break;
         case "confirm":
             // Confirm Button clicked
@@ -462,13 +464,17 @@ function backButton(form){
     switch(form){
         case "shipping":
             document.getElementById("shippingForm").style.display = "none";
+            document.getElementById("summary_email").style.display = "none";
             document.getElementById("emailForm").style.display = "block";
             break;
         case "card":
+            document.getElementById("summary_delivery").style.display = "none";
+            document.getElementById("summary_card").style.display = "none";
             document.getElementById("cardSection").style.display = "none";
             document.getElementById("shippingForm").style.display = "block";
             break;
         case "confirm":
+            document.getElementById("summary_card").style.display = "none";
             document.getElementById("confirmSection").style.display = "none";
             document.getElementById("cardSection").style.display = "block";
             break;

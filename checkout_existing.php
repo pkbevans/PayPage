@@ -99,10 +99,6 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                     <button type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-3">
-                </div>
-            </div>
         </div>
         <div id="paymentDetailsSection">
             <input id="bill_to_email" type="hidden" value="<?php echo $defaultEmail;?>">
@@ -112,11 +108,14 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                     <div class="col-3">
                         <img src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
                     </div>
-                    <div class="col-9">
+                    <div class="col-7">
                         <ul class="list-unstyled">
                             <li><strong><?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?></strong></li>
                             <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
                         </ul>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-link text-start" onclick="editCard()">Use a different Card</button>
                     </div>
                 </div>
             </div>
@@ -128,9 +127,6 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                 <div id="billingAddressSection" style="display: block">
                     <div id="defaultBillingSection">
                         <div class="row">
-                            <div class="col-12">
-                                <button type="button" class="btn btn-link" onclick="editCard()">Use a different Card</button>
-                            </div>
                         </div>
                     </div>
                     <div id="payButtonSection" class="row">
