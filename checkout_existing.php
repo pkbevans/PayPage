@@ -147,13 +147,11 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
         <div id="resultSection" style="display: none">
             <h3>Result</h3>
             <p id="result"></p>
-        </div>
-        <div class="row">
-            <div class="col-2">
-                <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
-            </div>
-            <div class="col-2">
-                <button type="button" id="retryButton" class="btn btn-primary" onclick="history.go(-2)" style="display: none">Try again</button>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='index.php'">New Payment</button>
+                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="window.location.reload(true)">Try again</button>
+                </div>
             </div>
         </div>
     </div>
@@ -163,9 +161,7 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
 <script src="js/newCard2.js"></script>
 <script src="js/utils.js"></script>
 <script>
-// the capture context that was requested server-side for this transaction
 var oldPaymentInstrumentId;
-//var pan;
 <?php
   echo "var defaultPaymentInstrumentJson = '" . json_encode($defaultPaymentInstrument) ."';\n";
   echo "var defaultShippingAddressJson = '" . json_encode($defaultShippingAddress) ."';\n";
@@ -238,7 +234,7 @@ function payNow(){
     document.getElementById("summaryEditCard").style.display = "none";
 
     if(orderDetails.flexToken ==""){
-        getToken(onTokenCreated, onTokenError);
+        getToken(onTokenCreated);
     }else{
         authorise();
     }
@@ -248,11 +244,6 @@ function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
     orderDetails.flexToken = tokenDetails.flexToken;
     authorise();
-}
-function onTokenError(err){
-    console.log("Token Creation Error:");
-    console.log(err);
-    onFinish(orderDetails, status, "", false, false, "n/a", err.reason, err.Message)
 }
 function cancel() {
     onFinish(orderDetails, "CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
@@ -417,6 +408,7 @@ function cancelNewCard(){
 function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById("resultSection").style.display = "block";
+
     finish = "onFinish: " + JSON.stringify({
         "referenceNumber": orderDetails2.referenceNumber,
         "status": status,
@@ -435,12 +427,10 @@ function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrume
     console.log(finish);
     if (status === "AUTHORIZED") {
         text = "Thank you.  Your payment has completed" + "<BR><PRE>" + finish +"</PRE>";
-        document.getElementById("newPaymentButton").style.display = "block";
+        document.getElementById("retryButton").style.display = "none";
     } else {
         text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
-        document.getElementById("retryButton").style.display = "block";
     }
     result = document.getElementById("result").innerHTML = text;
-
 }
 </script>

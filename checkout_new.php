@@ -264,10 +264,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                         </div>
                     </div>
                 </div>
-                <div id="resultSection" style="display: none">
-                    <h3>Result</h3>
-                    <p id="result"></p>
-                </div>
                 <div id="confirmSection" style="display: none">
                     <p id="result"></p>
                     <div class="row">
@@ -280,12 +276,14 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                 </div>
             </div>
         <!--</div>-->
-        <div class="row">
-            <div class="col-2">
-                <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
-            </div>
-            <div class="col-2">
-                <button type="button" id="retryButton" class="btn btn-primary" onclick="window.location.reload(true)" style="display: none">Try again</button>
+        <div id="resultSection" style="display: none">
+            <h3>Result</h3>
+            <p id="result"></p>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='index.php'">New Payment</button>
+                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="window.location.reload(true)">Try again</button>
+                </div>
             </div>
         </div>
     <!--</div>-->
@@ -339,6 +337,12 @@ document.addEventListener("DOMContentLoaded", function (e) {
 });
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
+    if(!orderDetails.useonTokenCreatedShippingAsBilling) {
+        setBillingDetails();
+    }
+    document.getElementById("cardSection").style.display = "none";
+    document.getElementById("summary_card").style.display = "block";
+    document.getElementById("confirmSection").style.display = "block";
     orderDetails.flexToken = tokenDetails.flexToken;
     orderDetails.maskedPan = tokenDetails.cardDetails.number;
     document.getElementById("cardNo").innerHTML = orderDetails.maskedPan;
@@ -347,13 +351,6 @@ function onTokenCreated(tokenDetails){
     if (sc.checked) {
         orderDetails.storeCard = true;
     }
-//    setOrderDetails()
-//    document.getElementById("mainSpinner").style.display = "block";
-}
-function onTokenError(err){
-    console.log("Token Creation Error:");
-    console.log(err);
-    onFinish(orderDetails, status, "", false, false, "n/a", err.reason, err.Message)
 }
 function cancel() {
     onFinish(orderDetails, "CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
@@ -444,13 +441,7 @@ function nextButton(form){
             break;
         case "card":
             // Pay Button clicked
-            document.getElementById("cardSection").style.display = "none";
-            document.getElementById("summary_card").style.display = "block";
-            document.getElementById("confirmSection").style.display = "block";
-            getToken(onTokenCreated, onTokenError);
-            if(!orderDetails.useShippingAsBilling) {
-                setBillingDetails();
-            }
+            getToken(onTokenCreated);
 
             break;
         case "confirm":
@@ -509,6 +500,7 @@ function setBillingDetails() {
 function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById("resultSection").style.display = "block";
+
     finish = "onFinish: " + JSON.stringify({
         "referenceNumber": orderDetails2.referenceNumber,
         "status": status,
@@ -527,10 +519,9 @@ function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrume
     console.log(finish);
     if (status === "AUTHORIZED") {
         text = "Thank you.  Your payment has completed" + "<BR><PRE>" + finish +"</PRE>";
-        document.getElementById("newPaymentButton").style.display = "block";
+        document.getElementById("retryButton").style.display = "none";
     } else {
         text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
-        document.getElementById("retryButton").style.display = "block";
     }
     result = document.getElementById("result").innerHTML = text;
 }

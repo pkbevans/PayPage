@@ -30,11 +30,12 @@ var cvnValid=false;
 var secCodeLbl;
 var numberContainer;
 var tokenCreatedCallback;
-var tokenErrorCallback;
 var cvvOnly = false;
 var panOnly = false;
+var cardButtonName;
+var errorAlert;
 
-function setUpMicroform(cardButtonName){
+function setUpMicroform(){
     flex = new Flex(captureContext);
     microform = flex.microform({styles: myStyles});
     if(cvvOnly){
@@ -87,6 +88,7 @@ function setUpMicroform(cardButtonName){
         });
     }
     newCardButton = document.querySelector('#'+cardButtonName);
+    errorAlert = document.getElementById("cardError");
 }
 function updateSecurityCodeField(type){
     // If Amex, CVV is 4 digits, else 3
@@ -96,9 +98,9 @@ function updateSecurityCodeField(type){
         securityCode.update({placeholder: "•••", maxLength: 3});
     }
 }
-function getToken(tokenCallback, errorCallback) {
+function getToken(tokenCallback) {
+    errorAlert.style.display = "none";
     tokenCreatedCallback = tokenCallback;
-    tokenErrorCallback = errorCallback;
     var options = {};
     if(!cvvOnly){
         var options = {
@@ -108,9 +110,11 @@ function getToken(tokenCallback, errorCallback) {
     }
     microform.createToken(options, function (err, jwt) {
         if (err) {
-            // handle error
+            // handle error.  Probably a timeout. Start again
             console.log(err);
-            tokenErrorCallback(err);
+            newCardButton.disabled = true;
+            errorAlert.style.display = "block";
+            getCaptureContext(window.location.href.includes("localhost")?true:false);
         } else {
             // Token received.
 //            console.log( "\nGot Token:\n" + jwt);
@@ -145,7 +149,7 @@ function getPayload(jwt) {
 //  console.log(payloadJ);
     return payloadJ;
 }
-function getCaptureContext(local, cardButtonName) {
+function getCaptureContext(local) {
     $.ajax({
         type: "POST",
         url: "rest_generate_capture_context.php",
@@ -158,7 +162,7 @@ function getCaptureContext(local, cardButtonName) {
             let httpCode = res.responseCode;
             if (res.responseCode === 200) {
                 captureContext = res.response.keyId;
-                setUpMicroform(cardButtonName);
+                setUpMicroform();
             } else {
                 // 500 System error or anything else TODO
             }
@@ -173,12 +177,16 @@ function tokenCreated(flexToken, cardDetails){
     };
     tokenCreatedCallback(result);
 }
-function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFlag=false, panOnlyFlag=false, cvvOnlyCardType){
+function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=false, panOnlyFlag=false, cvvOnlyCardType){
     cvvOnly = cvvOnlyFlag;
     panOnly = panOnlyFlag;
     cardType = cvvOnlyCardType;
+    cardButtonName = buttonName;
     container = document.getElementById(containerName);
     progress = document.getElementById(progressName);
+    errorDiv =  "<div id=\"cardError\" class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\" style=\"display:none\">"+
+                    "<strong>Something went wrong. Please try again."+
+                "</div>";
     html = "<div class=\"d-flex mb-3\">"+
         (!cvvOnly?
         "<div class=\"card\">"+
@@ -190,6 +198,7 @@ function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFla
                         "<img src=\"images/Amex.svg\" width=\"30\">"+
                     "</div>"+
                 "</div>"+
+                errorDiv +
                 "<div class=\"row mt-3 mb-3\">"+
                     "<div class=\"col-12\">"+
                         "<label class=\"form-check-label\" for=\"number-container\">Card Number</label>"+
@@ -198,7 +207,7 @@ function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFla
                             "<div id=\"number-container\" class=\"form-control\"></div>"+
                         "</div>"+
                     "</div>"+
-                "</div>":"")+
+                "</div>":errorDiv)+
                 "<div class=\"row \">"+
                     (!cvvOnly?
                     "<div class=\"col-6\">"+
@@ -227,7 +236,7 @@ function createCardInput(containerName, progressName, cardButtonName, cvvOnlyFla
         if(progress){
             progress.style.display = "none";
         }
-        getCaptureContext(window.location.href.includes("localhost")?true:false, cardButtonName);
+        getCaptureContext(window.location.href.includes("localhost")?true:false);
         if(!cvvOnly){
             setUpExpiryDate("expiryDate");
         }

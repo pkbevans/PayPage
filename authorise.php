@@ -30,13 +30,11 @@
         <div id="resultSection" style="display: none">
             <h3>Result</h3>
             <p id="result"></p>
-        </div>
-        <div class="row">
-            <div class="col-sm-2">
-                <button type="button" id="newPaymentButton" class="btn btn-primary" onclick="window.location.href='index.php'" style="display: none">New Payment</button>
-            </div>
-            <div class="col-sm-2">
-                <button type="button" id="retryButton" class="btn btn-primary" onclick="history.back()" style="display: none">Try again</button>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='index.php'">New Payment</button>
+                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="history.go(-1)">Try again</button>
+                </div>
             </div>
         </div>
     </div>
@@ -149,11 +147,11 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
             } else {
                 // 500 System error or anything else
                 switch(httpCode){
-                    case "202":
-                        onFinish(orderDetails, status, "", false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                    case "502":
+                        onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.message);
                         break;
                     case "400":
-                        onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.details);
+                        onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.details.field);
                         break;
                     default:
                         onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.message);
@@ -198,10 +196,9 @@ function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrume
     console.log(finish);
     if (status === "AUTHORIZED") {
         text = "Thank you.  Your payment has completed" + "<BR><PRE>" + finish +"</PRE>";
-        document.getElementById("newPaymentButton").style.display = "block";
+        document.getElementById("retryButton").style.display = "none";
     } else {
         text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
-        document.getElementById("retryButton").style.display = "block";
     }
     result = document.getElementById("result").innerHTML = text;
     if(newCustomer && !orderDetails2.paymentInstrumentId !== ""){
