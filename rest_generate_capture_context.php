@@ -7,12 +7,10 @@ if($incoming->local == true){
 }
 
 $request = [
-        "encryptionType"=> "RsaOaep",
-        "targetOrigin" => $targetOrigin
+        "targetOrigins" => [$targetOrigin]
 ];
-$requestQuery = '{"format":"JWT"}';
 
 $requestBody = json_encode($request);
 
-$result = ProcessRequest(PORTFOLIO, API_FLEX_V1_KEYS . "?format=JWT" , METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
+$result = ProcessRequest(PORTFOLIO, API_MICROFORM_SESSIONS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
 echo(json_encode($result));

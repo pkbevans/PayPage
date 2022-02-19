@@ -160,10 +160,11 @@ function getCaptureContext(local) {
             res = JSON.parse(result);
 //            console.log("\nCapture Context:\n" + JSON.stringify(res, undefined, 2));
             let httpCode = res.responseCode;
-            if (res.responseCode === 200) {
-                captureContext = res.response.keyId;
+            if (httpCode === 201) {
+                captureContext = res.rawResponse;
                 setUpMicroform();
             } else {
+                console.log("Capture Context ERROR");
                 // 500 System error or anything else TODO
             }
         }

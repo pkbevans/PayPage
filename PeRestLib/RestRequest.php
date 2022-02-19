@@ -49,9 +49,15 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
     $http_body = substr($response, $http_header_size);
     $response_info = curl_getinfo($curl);
 
-    $response = json_decode($http_body);
     $result = new stdClass();
     $result->url = $url;
+    if($resource == API_FLEX_V2_SESSIONS || $resource == API_MICROFORM_SESSIONS){
+        $result->rawResponse = $http_body;
+    }else{
+        $response = json_decode($http_body);
+        $result->response = $response;
+    }
+
     $result->method = $method;
     $requestHeaders = [];
     foreach ($headerParams as $key => $val) {
