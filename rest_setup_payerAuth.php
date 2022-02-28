@@ -1,4 +1,7 @@
-<?php require_once 'PeRestLib/RestRequest.php';
+<?php 
+require_once 'PeRestLib/RestRequest.php';
+require_once 'php/utils/logApi.php';
+
 $incoming = json_decode(file_get_contents('php://input'));
 $reference_number = $incoming->order->referenceNumber;
 
@@ -23,7 +26,14 @@ $requestBody = json_encode($request);
 
 try{
     $result = ProcessRequest(PORTFOLIO, API_RISK_V1_AUTHENTICATION_SETUPS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
-    echo(json_encode($result));
+    $json = json_encode($result);
+    logApi($incoming->order->referenceNumber, 
+            "setupPA",                              // API Type
+            $result->response->status,              // Status
+            $incoming->order->amount,               // Amount
+            false,                                  // Token created? 
+            $json);                                 // Complete request + response
+    echo($json);
 
 } catch (Exception $exception) {
     echo "ERROR";

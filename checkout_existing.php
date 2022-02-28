@@ -5,8 +5,9 @@ include 'rest_get_customer.php';
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     $defaultEmail = $_REQUEST['email'];
+}else{
+    $defaultEmail = $defaultPaymentInstrument->billTo->email;
 }
-$defaultEmail = $defaultPaymentInstrument->billTo->email;
 ?>
 <!doctype html>
 <head>
@@ -25,7 +26,7 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
     <form id="iframe_form" method="POST" target="shippingAddress_iframe" action="">
         <input id="customerToken" type="hidden" name="customerToken" value="">
         <input id="currency" type="hidden" name="currency" value="<?php echo $_REQUEST['currency']?>">
-        <input id="email" type="hidden" name="email" value="<?php echo $_REQUEST['email']?>">
+        <input id="email" type="hidden" name="email" value="<?php echo $defaultEmail;?>">
         <input id="reference_number" type="hidden" name="reference_number" value="<?php echo $_REQUEST['reference_number'];?>">
     </form>
     <!--Cardinal device data collection code START-->
@@ -81,8 +82,8 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                 <div class="col-3">
                     <h5>Delivery:</h5>
                 </div>
-                <div id="shipToText" class="col-7"></div>
-                <div id="summaryEditAddress" class="col-2">
+                <div class="col-7" id="shipToText"></div>
+                <div class="col-2" id="summaryEditAddress">
                     <button type="button" class="btn btn-link p-0" onclick="editShippingAddress()">Edit</button>
                 </div>
             </div>
@@ -90,20 +91,8 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                 <div class="col-3">
                 </div>
             </div>
-            <div class="row">
-                <div class="col-3">
-                    <h5>Card Billing:</h5>
-                </div>
-                <div class="col-7" id="billToText"></div>
-                <div id="summaryEditCard" class="col-2">
-                    <button type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
-                </div>
-            </div>
-        </div>
-        <div id="paymentDetailsSection">
-            <input id="bill_to_email" type="hidden" value="<?php echo $defaultEmail;?>">
             <div id="storedCardSection">
-                <h5>Stored Card Details</h5>
+                <h5>Card:</h5>
                 <div class="row">
                     <div class="col-3">
                         <img src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
@@ -115,10 +104,22 @@ $defaultEmail = $defaultPaymentInstrument->billTo->email;
                         </ul>
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-link text-start" onclick="editCard()">Use a different Card</button>
+                        <button type="button" class="btn btn-link p-0 text-start" onclick="editCard()">Use a different Card</button>
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-3">
+                    <h5>Card Billing:</h5>
+                </div>
+                <div class="col-7" id="billToText"></div>
+                <div class="col-2" id="summaryEditCard">
+                    <button type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
+                </div>
+            </div>
+        </div>
+        <div id="paymentDetailsSection">
+            <input id="bill_to_email" type="hidden" value="<?php echo $defaultEmail;?>">
             <div id="cardSection" style="display: block">
                 <form id="cardForm">
                     <div id="cardInputSection">
@@ -280,8 +281,6 @@ function setOrderDetails() {
     }
 }
 function authorise() {
-//    document.getElementById('paymentDetailsSection').style.display = "none";
-//    document.getElementById('iframeSection').style.display = "block";
     var iframeForm = document.getElementById('iframe_form');
     if (iframeForm){
         sessionStorage.setItem("orderDetails", JSON.stringify(orderDetails));
@@ -358,7 +357,7 @@ function stylePaymentInstrument(maskedPan, card, billTo){
         img = "images/Amex.svg";
         alt = "Amex card logo";
     }
-    html =  "<h5>Stored Card Details</h5>" +
+    html =  "<h5>Card:</h5>" +
             "<div class=\"row\">\n" +
                 "<div class=\"col-3\">\n"+
                     "<img src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+

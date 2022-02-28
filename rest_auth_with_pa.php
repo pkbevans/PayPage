@@ -1,4 +1,7 @@
-<?php require_once 'PeRestLib/RestRequest.php';
+<?php 
+require_once 'PeRestLib/RestRequest.php';
+require_once 'php/utils/logApi.php';
+
 $incoming = json_decode(file_get_contents('php://input'));
 // Key incoming fields:
 //  "storeCard" : If true create a token
@@ -124,7 +127,7 @@ try {
         if($incoming->order->local){
             $returnUrl = "http://localhost/payPage/redirect.php";
         }else{
-            $returnUrl = "https://bondevans.com/payPage/redirect.php";
+            $returnUrl = TARGET_ORIGIN . "/payPage/redirect.php";
         }
         $consumerAuthenticationInformation = [
             "challengeCode"=> $challengeCode,
@@ -152,10 +155,15 @@ try {
     }else{
         $api = API_PAYMENTS;
     }
-//   ProcessRequest($mid, $resource, $method, $payload, $child = null, $authentication = AUTH_TYPE_SIGNATURE )
     $result = ProcessRequest(PORTFOLIO, $api , METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
-    echo(json_encode($result));
-
+    $json = json_encode($result);
+    logApi($incoming->order->referenceNumber, 
+            "auth-". $incoming->paAction,           // API Type
+            $result->response->status,              // Status
+            $incoming->order->amount,               // Amount
+            $incoming->order->storeCard,            // Token created? 
+            $json);                                 // Complete request + response
+    echo($json);
 } catch (Exception $exception) {
     echo(json_encode($exception));
 }

@@ -1,4 +1,4 @@
- // custom styles that will be applied to each field we create using Microform
+// custom styles that will be applied to each field we create using Microform
 var myStyles = {
     'input': {
         'font-family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
@@ -63,7 +63,7 @@ function setUpMicroform(){
                 expDate = data.expirationMonth + "/";
             }
             if (data.expirationYear) {
-                expdate += (parseInt(data.expirationYear) - 2000);
+                expDate += (parseInt(data.expirationYear) - 2000);
             }
             document.getElementById('expiryDate').value = expDate;
         });
@@ -191,6 +191,7 @@ function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=fa
     html = "<div class=\"d-flex mb-3\">"+
         (!cvvOnly?
         "<div class=\"card\">"+
+                "5200000000001047 5200000000000007 371449111020228 340000000001007"+
             "<div class=\"card-body\"> "+
                 "<div class=\"d-flex align-items-center justify-content-between\">"+
                     "<div>"+
@@ -264,7 +265,7 @@ function setUpExpiryDate(id){
             // Ignore invalid characters
             if(val === "1/"){
                 // If its a slash following 1 insert the leading zero
-                event.target.value = "01/"
+                event.target.value = "01/";
             }else {
                 //Ignore
                 event.target.value = val.substring(0, val.length - 1);
