@@ -230,12 +230,7 @@ function payNow(){
     document.getElementById("summaryEditAddress").style.display = "none";
     document.getElementById("summaryEditCard").style.display = "none";
 
-    if(orderDetails.flexToken ==""){
-        getToken(onTokenCreated);
-    }else{
-        authorise();
-    }
-//    document.getElementById("mainSpinner").style.display = "block";
+    getToken(onTokenCreated);
 }
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
@@ -305,32 +300,6 @@ function onShippingAddressUpdated(id, shipToText, shipTo) {
     document.getElementById('shipToText').innerHTML = formatNameAddress(shipTo);
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
-}
-function onNewCardUsed(flexDetails, billToDetails) {
-    console.log(flexDetails);
-    console.log(billToDetails);
-    // Hide/unload Security code
-    document.getElementById('cardInputSection').style.display = "none";
-    securityCode.unload();
-    orderDetails.maskedPan = flexDetails.cardDetails.number;
-    orderDetails.flexToken = flexDetails.flexToken;
-    orderDetails.paymentInstrumentId = "";
-
-    html = stylePaymentInstrument(orderDetails.maskedPan, flexDetails.cardDetails, billToDetails);
-    document.getElementById('storedCardSection').innerHTML = html;
-    document.getElementById('iframeSection').style.display = "none";
-    document.getElementById('paymentDetailsSection').style.display = "block";
-    document.getElementById('billToText').innerHTML = formatNameAddress(billToDetails);
-
-    orderDetails.bill_to.firstname = billToDetails.firstName;
-    orderDetails.bill_to.lastname = billToDetails.lastName;
-    orderDetails.bill_to.address1 = billToDetails.address1;
-    orderDetails.bill_to.address2 = billToDetails.address2;
-    orderDetails.bill_to.locality = billToDetails.locality;
-    orderDetails.bill_to.postalCode = billToDetails.postalCode;
-    orderDetails.bill_to.country = billToDetails.country;
-    orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
-    document.getElementById('payButton').disabled = false;
 }
 function onPaymentInstrumentUpdated(id, paymentInstrument) {
     orderDetails.paymentInstrumentId = id;

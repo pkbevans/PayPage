@@ -33,7 +33,7 @@
             <div class="row">
                 <div class="col-12">
                     <button type="button" class="btn btn-primary" onclick="window.location.href='index.php'">New Payment</button>
-                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="history.go(-1)">Try again</button>
+                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="retryAfterDecline()">Try again</button>
                 </div>
             </div>
         </div>
@@ -173,6 +173,10 @@ function hideStepUpScreen(transactionId) {
     console.log("Challenge Complete TransactionId:\n" + transactionId);
     document.getElementById("step_up_iframe").style.display = "none";
     authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
+}
+function retryAfterDecline(){
+    console.log("Retry");
+    window.history.go(-2);
 }
 function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('mainSpinner').style.display = "none";
