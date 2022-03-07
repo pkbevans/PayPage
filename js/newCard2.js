@@ -185,14 +185,16 @@ function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=fa
     cardButtonName = buttonName;
     container = document.getElementById(containerName);
     progress = document.getElementById(progressName);
-    errorDiv =  "<div id=\"cardError\" class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\" style=\"display:none\">"+
-                    "<strong>Something went wrong. Please try again."+
+    errorDiv = "<div class=\"row\">"+ 
+                    "<div id=\"cardError\" class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\" style=\"display:none\">"+
+                    "<strong>Something went wrong. Please try again.</strong></div>"+
                 "</div>";
     html = "<div class=\"d-flex mb-3\">"+
-        (!cvvOnly?
+        
         "<div class=\"card\">"+
-                "5200000000001047 5200000000000007 371449111020228 340000000001007"+
             "<div class=\"card-body\"> "+
+                errorDiv +
+                (!cvvOnly?
                 "<div class=\"d-flex align-items-center justify-content-between\">"+
                     "<div>"+
                         "<img src=\"images/Visa.svg\" width=\"30\">"+
@@ -200,7 +202,6 @@ function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=fa
                         "<img src=\"images/Amex.svg\" width=\"30\">"+
                     "</div>"+
                 "</div>"+
-                errorDiv +
                 "<div class=\"row mt-3 mb-3\">"+
                     "<div class=\"col-12\">"+
                         "<label class=\"form-check-label\" for=\"number-container\">Card Number</label>"+
@@ -209,8 +210,8 @@ function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=fa
                             "<div id=\"number-container\" class=\"form-control\"></div>"+
                         "</div>"+
                     "</div>"+
-                "</div>":errorDiv)+
-                "<div class=\"row \">"+
+                "</div>":"")+
+                "<div class=\"row\">"+
                     (!cvvOnly?
                     "<div class=\"col-6\">"+
                         "<label class=\"form-check-label\" for=\"expiryDate\">Expiry Date</label>"+
@@ -228,9 +229,8 @@ function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=fa
                         "</div>"+
                     "</div>":"")+
                 "</div>"+
-            (!cvvOnly?
             "</div>"+
-        "</div>":"")+
+        "</div>"+
     "</div>";
     if(container){
         container.innerHTML = html;

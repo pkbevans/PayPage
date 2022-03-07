@@ -42,6 +42,8 @@
 </body>
 <script>
 var orderDetails;
+var failedApi = "";
+const SETUP_PA = "SETUPPA"
 document.addEventListener("DOMContentLoaded", function (e) {
     orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
     setUpPayerAuth();
@@ -65,7 +67,7 @@ function setUpPayerAuth(){
                 doDeviceCollection(deviceDataCollectionURL, accessToken);
             } else {
                 // 500 System error or anything else
-                onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                onFinish(SETUP_PA, status, "", false, false, httpCode, res.response.reason, res.response.message);
             }
         }
     });
@@ -121,7 +123,6 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                 customerCreated = false;
                 paymentInstrumentCreated = false;
                 shippingAddressCreated = false;
-                let requestID = res.response.id;
                 // Successfull response (but could be declined)
                 if (status === "PENDING_AUTHENTICATION") {
                     // Card is enrolled - Kick off the cardholder authentication
@@ -140,21 +141,25 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                             orderDetails.customerId = res.response.tokenInformation.customer.id;
                         }
                     }
-                    onFinish(orderDetails, status, requestID, customerCreated, paymentInstrumentCreated, httpCode, "", "");
+                    onFinish("AUTH+"+paAction, status, res.response.id, customerCreated, paymentInstrumentCreated, httpCode, "", "");
                 } else {
-                    onFinish(orderDetails, status, requestID, false, false, httpCode, res.response.reason, res.response.message);
+                    // Decline
+                    onFinish("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
                 }
             } else {
                 // 500 System error or anything else
                 switch(httpCode){
-                    case "502":
-                        onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                    case 202:
+                        onFinish("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
                         break;
-                    case "400":
-                        onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.details.field);
+                    case 502:
+                        onFinish("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                        break;
+                    case 400:
+                        onFinish("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.details.field);
                         break;
                     default:
-                        onFinish(orderDetails, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                        onFinish("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
                 }
             }
         }
@@ -175,25 +180,31 @@ function hideStepUpScreen(transactionId) {
     authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
 }
 function retryAfterDecline(){
-    console.log("Retry");
-    window.history.go(-2);
+    console.log("Retry:"+failedApi);
+    if(failedApi === SETUP_PA){
+        console.log(failedApi);
+        window.history.go(-1);
+    }else{
+        window.history.go(-2);
+    }
 }
-function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
+function onFinish(apiCalled, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('mainSpinner').style.display = "none";
     document.getElementById('step_up_iframe').style.display = "none";
     document.getElementById("resultSection").style.display = "block";
     finish = "onFinish: " + JSON.stringify({
-        "referenceNumber": orderDetails2.referenceNumber,
-        "status": status,
+        "referenceNumber": orderDetails.referenceNumber,
+        "amount": orderDetails.amount,
+        "apiCalled": apiCalled,
         "httpResponseCode": httpResponseCode,
+        "status": status,
         "requestId": requestId,
-        "amount": orderDetails2.amount,
-        "pan": orderDetails2.maskedPan,
+        "pan": orderDetails.maskedPan,
         "newCustomer": newCustomer,
         "newPaymentInstrument": paymentInstrumentCreated,
-        "customerId": orderDetails2.customerId,
-        "paymentInstrumentId": orderDetails2.paymentInstrumentId,
-        "shippingAddressId": orderDetails2.shippingAddressId,
+        "customerId": orderDetails.customerId,
+        "paymentInstrumentId": orderDetails.paymentInstrumentId,
+        "shippingAddressId": orderDetails.shippingAddressId,
         "errorReason": errorReason,
         "errorMessage": errorMessage
     }, undefined, 2);
@@ -203,11 +214,12 @@ function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrume
         document.getElementById("retryButton").style.display = "none";
     } else {
         text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
+        failedApi=apiCalled;
     }
     result = document.getElementById("result").innerHTML = text;
-    if(newCustomer && !orderDetails2.paymentInstrumentId !== ""){
+    if(newCustomer && !orderDetails.paymentInstrumentId !== ""){
         // Write new Customer Token to cookie
-        document.cookie = "customerId=" + orderDetails2.customerId;
+        document.cookie = "customerId=" + orderDetails.customerId;
     }
 }
 </script>

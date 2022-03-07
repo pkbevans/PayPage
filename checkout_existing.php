@@ -120,24 +120,22 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
         </div>
         <div id="paymentDetailsSection">
             <input id="bill_to_email" type="hidden" value="<?php echo $defaultEmail;?>">
-            <div id="cardSection" style="display: block">
-                <form id="cardForm">
-                    <div id="cardInputSection">
-                    </div>
-                </form>
-                <div id="billingAddressSection" style="display: block">
-                    <div id="defaultBillingSection">
-                        <div class="row">
-                        </div>
-                    </div>
-                    <div id="payButtonSection" class="row">
-                        <div class="col-12">
-                            <button type="button" id="payButton" onclick="payNow()" class="btn btn-primary" disabled="true">Pay</button>
-                            <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
-                        </div>
-                    </div>
+            <form id="cardForm">
+                <div id="cardInputSection">
+                </div>
+            </form>
+            <div id="billingAddressSection" style="display: block">
+                <div id="defaultBillingSection">
                     <div class="row">
                     </div>
+                </div>
+                <div id="payButtonSection" class="row">
+                    <div class="col-12">
+                        <button type="button" id="payButton" onclick="payNow()" class="btn btn-primary" disabled="true">Pay</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+                    </div>
+                </div>
+                <div class="row">
                 </div>
             </div>
         </div>
@@ -226,19 +224,18 @@ document.addEventListener("DOMContentLoaded", function (e) {
     createCardInput("cardInputSection", "mainSpinner", "payButton", true, false, defPI.card.type);
 });
 function payNow(){
-    document.getElementById("paymentDetailsSection").style.display = "none";
-    document.getElementById("summaryEditAddress").style.display = "none";
-    document.getElementById("summaryEditCard").style.display = "none";
-
     getToken(onTokenCreated);
 }
 function onTokenCreated(tokenDetails){
+    document.getElementById("paymentDetailsSection").style.display = "none";
+    document.getElementById("summaryEditAddress").style.display = "none";
+    document.getElementById("summaryEditCard").style.display = "none";
     console.log(tokenDetails);
     orderDetails.flexToken = tokenDetails.flexToken;
     authorise();
 }
 function cancel() {
-    onFinish(orderDetails, "CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
+    onFinish("CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
     window.location.assign("index.php");
 }
 function useSameAddressChanged() {
@@ -369,22 +366,22 @@ function cancelNewCard(){
     document.getElementById('defaultBillingSection').style.display = "block";
     document.getElementById('storedCardSection').style.display = "block";
 }
-function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
+function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById("resultSection").style.display = "block";
 
     finish = "onFinish: " + JSON.stringify({
-        "referenceNumber": orderDetails2.referenceNumber,
+        "referenceNumber": orderDetails.referenceNumber,
         "status": status,
         "httpResponseCode": httpResponseCode,
         "requestId": requestId,
-        "amount": orderDetails2.amount,
-        "pan": orderDetails2.maskedPan,
+        "amount": orderDetails.amount,
+        "pan": orderDetails.maskedPan,
         "newCustomer": newCustomer,
         "newPaymentInstrument": paymentInstrumentCreated,
-        "customerId": orderDetails2.customerId,
-        "paymentInstrumentId": orderDetails2.paymentInstrumentId,
-        "shippingAddressId": orderDetails2.shippingAddressId,
+        "customerId": orderDetails.customerId,
+        "paymentInstrumentId": orderDetails.paymentInstrumentId,
+        "shippingAddressId": orderDetails.shippingAddressId,
         "errorReason": errorReason,
         "errorMessage": errorMessage
     }, undefined, 2);

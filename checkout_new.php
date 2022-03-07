@@ -145,7 +145,7 @@ foreach ($countries as $key => $value) {
                     </div>
                 </div>
             </form>
-            <div id="cardSection" style="display: none">
+            <div id="cardForm" style="display: none">
                 <div class="col-12"><h1 class="display-5">Payment card details</h1></div>
                 <div id="cardInputSection">
                 </div>
@@ -351,7 +351,7 @@ function onTokenCreated(tokenDetails){
     }
     orderDetails.flexToken = tokenDetails.flexToken;
     orderDetails.maskedPan = tokenDetails.cardDetails.number;
-    document.getElementById("cardSection").style.display = "none";
+    document.getElementById("cardForm").style.display = "none";
     document.getElementById("cardNumber").innerHTML = orderDetails.maskedPan;
     document.getElementById("summaryExpDate").innerHTML = tokenDetails.cardDetails.expirationMonth+"/"+tokenDetails.cardDetails.expirationYear;
     if(tokenDetails.cardDetails.type === "001"){
@@ -375,7 +375,7 @@ function onTokenCreated(tokenDetails){
     }
 }
 function cancel() {
-    onFinish(orderDetails, "CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
+    onFinish("CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
     window.location.assign("index.php");
 }
 function shipAsBill(){
@@ -435,7 +435,7 @@ function nextButton(form){
             if(validateForm(form)){
                 document.getElementById("summary_delivery").style.display = "block";
                 document.getElementById("shippingForm").style.display = "none";
-                document.getElementById("cardSection").style.display = "block";
+                document.getElementById("cardForm").style.display = "block";
                 setShippingDetails();
             }
             break;
@@ -467,13 +467,13 @@ function backButton(form){
         case "card":
             document.getElementById("summary_delivery").style.display = "none";
             document.getElementById("summary_card").style.display = "none";
-            document.getElementById("cardSection").style.display = "none";
+            document.getElementById("cardForm").style.display = "none";
             document.getElementById("shippingForm").style.display = "block";
             break;
         case "confirm":
             document.getElementById("summary_card").style.display = "none";
             document.getElementById("confirmSection").style.display = "none";
-            document.getElementById("cardSection").style.display = "block";
+            document.getElementById("cardForm").style.display = "block";
             break;
     }
 }
@@ -500,22 +500,22 @@ function setBillingDetails() {
     orderDetails.bill_to.country = document.getElementById('bill_to_address_country').value;
     document.getElementById("billToText").innerHTML = formatNameAddress(orderDetails.bill_to);
 }
-function onFinish(orderDetails2, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
+function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById("resultSection").style.display = "block";
 
     finish = "onFinish: " + JSON.stringify({
-        "referenceNumber": orderDetails2.referenceNumber,
+        "referenceNumber": orderDetails.referenceNumber,
         "status": status,
         "httpResponseCode": httpResponseCode,
         "requestId": requestId,
-        "amount": orderDetails2.amount,
-        "pan": orderDetails2.maskedPan,
+        "amount": orderDetails.amount,
+        "pan": orderDetails.maskedPan,
         "newCustomer": newCustomer,
         "newPaymentInstrument": paymentInstrumentCreated,
-        "customerId": orderDetails2.customerId,
-        "paymentInstrumentId": orderDetails2.paymentInstrumentId,
-        "shippingAddressId": orderDetails2.shippingAddressId,
+        "customerId": orderDetails.customerId,
+        "paymentInstrumentId": orderDetails.paymentInstrumentId,
+        "shippingAddressId": orderDetails.shippingAddressId,
         "errorReason": errorReason,
         "errorMessage": errorMessage
     }, undefined, 2);
