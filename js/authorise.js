@@ -1,54 +1,5 @@
-<!doctype html>
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    ​
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
-    <title>Payment Page</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
-<body>
-    <!--Cardinal device data collection code START-->
-    <iframe id="cardinal_collection_iframe" name="collectionIframe" height="1" width="1" style="display: none;"></iframe>
-    <form id="cardinal_collection_form" method="POST" target="collectionIframe" action="">
-        <input id="cardinal_collection_form_input" type="hidden" name="JWT" value=""/>
-    </form>
-    </<!--Cardinal device data collection code END-->
-    <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
-        <input id="step_up_form_jwt_input" type="hidden" name="JWT" value=""/>
-        <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
-    </form>
-    <div class="container">
-        <div class="d-flex justify-content-center">
-            <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
-        </div>
-        <iframe id="step_up_iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
-        <div id="resultSection" style="display: none">
-            <h3>Result</h3>
-            <p id="result"></p>
-            <div class="row">
-                <div class="col-12">
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='index.php'">New Payment</button>
-                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="retryAfterDecline()">Try again</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-</body>
-<script>
-var orderDetails;
-var failedApi = "";
-const SETUP_PA = "SETUPPA"
-document.addEventListener("DOMContentLoaded", function (e) {
-    orderDetails = JSON.parse(sessionStorage.getItem("orderDetails"));
-    setUpPayerAuth();
-});
 function setUpPayerAuth(){
+    document.getElementById('authSpinner').style.display = "block";
     $.ajax({
         type: "POST",
         url: "rest_setup_payerAuth.php",
@@ -67,7 +18,7 @@ function setUpPayerAuth(){
                 doDeviceCollection(deviceDataCollectionURL, accessToken);
             } else {
                 // 500 System error or anything else
-                onFinish(SETUP_PA, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                onFinish2("SETUPPA", status, "", false, false, httpCode, res.response.reason, res.response.message);
             }
         }
     });
@@ -141,25 +92,25 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                             orderDetails.customerId = res.response.tokenInformation.customer.id;
                         }
                     }
-                    onFinish("AUTH+"+paAction, status, res.response.id, customerCreated, paymentInstrumentCreated, httpCode, "", "");
+                    onFinish2("AUTH+"+paAction, status, res.response.id, customerCreated, paymentInstrumentCreated, httpCode, "", "");
                 } else {
                     // Decline
-                    onFinish("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                    onFinish2("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
                 }
             } else {
                 // 500 System error or anything else
                 switch(httpCode){
                     case 202:
-                        onFinish("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                        onFinish2("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
                         break;
                     case 502:
-                        onFinish("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
                         break;
                     case 400:
-                        onFinish("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.details.field);
+                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.details.field);
                         break;
                     default:
-                        onFinish("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
                 }
             }
         }
@@ -179,20 +130,12 @@ function hideStepUpScreen(transactionId) {
     document.getElementById("step_up_iframe").style.display = "none";
     authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
 }
-function retryAfterDecline(){
-    console.log("Retry:"+failedApi);
-    if(failedApi === SETUP_PA){
-        console.log(failedApi);
-        window.history.go(-1);
-    }else{
-        window.history.go(-2);
-    }
-}
-function onFinish(apiCalled, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
-    document.getElementById('mainSpinner').style.display = "none";
-    document.getElementById('step_up_iframe').style.display = "none";
-    document.getElementById("resultSection").style.display = "block";
-    finish = "onFinish: " + JSON.stringify({
+function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
+    document.getElementById('authSection').style.display = "none";
+    document.getElementById('summarySection').style.display = "none";
+    document.getElementById('confirmSection').style.display = "none";
+    document.getElementById('iframeSection').style.display = "none";
+    finish = "onFinish2: " + JSON.stringify({
         "referenceNumber": orderDetails.referenceNumber,
         "amount": orderDetails.amount,
         "apiCalled": apiCalled,
@@ -214,12 +157,11 @@ function onFinish(apiCalled, status, requestId, newCustomer, paymentInstrumentCr
         document.getElementById("retryButton").style.display = "none";
     } else {
         text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
-        failedApi=apiCalled;
     }
-    result = document.getElementById("result").innerHTML = text;
+    document.getElementById("resultText").innerHTML = text;
+    document.getElementById("resultSection").style.display = "block";
     if(newCustomer && !orderDetails.paymentInstrumentId !== ""){
         // Write new Customer Token to cookie
         document.cookie = "customerId=" + orderDetails.customerId;
     }
 }
-</script>

@@ -34,19 +34,12 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
         <input id="cardinal_collection_form_input" type="hidden" name="JWT" value=""/>
     </form>
     </<!--Cardinal device data collection code END-->
-    <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
-        <input id="step_up_form_jwt_input" type="hidden" name="JWT" value=""/>
-        <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
-    </form>
     <div class="container">
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" role="dialog" aria-hidden="false">
           <div class="modal-dialog modal-tall">
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title" id="staticBackdropLabel">3DS</h5>
-              </div>
-              <div class="modal-body">
-                <iframe style="overflow: hidden; display: block; border:none; height:75vh; width:100%" name="stepUpIframe" ></iframe>
               </div>
             </div>
           </div>
@@ -276,7 +269,6 @@ foreach ($countries as $key => $value) {
             </div>
         </div>
         <div id="confirmSection" style="display: none">
-            <p id="result"></p>
             <div class="row">
                 <div class="col-12">
                     <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
@@ -285,13 +277,23 @@ foreach ($countries as $key => $value) {
                 </div>
             </div>
         </div>
+        <div id="authSection" style="display: none;">
+            <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
+                <input id="step_up_form_jwt_input" type="hidden" name="JWT" value=""/>
+                <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
+            </form>
+            <div class="d-flex justify-content-center">
+                <div id="authSpinner" class="spinner-border" ></div>
+            </div>
+            <iframe id="step_up_iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
+        </div>
         <div id="resultSection" style="display: none">
             <h3>Result</h3>
-            <p id="result"></p>
+            <div id="resultText"></div>
             <div class="row">
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='index.php'">New Payment</button>
-                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="window.location.reload(true)">Try again</button>
+                    <button type="button" class="btn btn-primary" onclick="window.open('index.php', '_parent')">Home</button>
+                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="retryAfterDecline()">Try again</button>
                 </div>
             </div>
         </div>
@@ -301,6 +303,7 @@ foreach ($countries as $key => $value) {
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script src="js/newCard2.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/authorise.js"></script>
 <script>
 var oldPaymentInstrumentId;
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
@@ -375,8 +378,7 @@ function onTokenCreated(tokenDetails){
     }
 }
 function cancel() {
-    onFinish("CANCELLED", 0, false, false, "n/a", "User Cancelled", "");
-    window.location.assign("index.php");
+    window.open('index.php', '_parent');
 }
 function shipAsBill(){
     usb = document.querySelector('#useShipAsBill');
@@ -406,13 +408,8 @@ function useSameAddressChanged() {
     }
 }
 function authorise() {
-    var iframeForm = document.getElementById('iframe_form');
-    if (iframeForm){
-        sessionStorage.setItem("orderDetails", JSON.stringify(orderDetails));
-        iframeForm.action = "authorise.php";
-        iframeForm.target = "_self";
-        iframeForm.submit();
-    }
+    document.getElementById('authSection').style.display = "block";
+    setUpPayerAuth();
 }
 function onIframeCancelled(){
     document.getElementById('iframeSection').style.display = "none";
@@ -500,32 +497,10 @@ function setBillingDetails() {
     orderDetails.bill_to.country = document.getElementById('bill_to_address_country').value;
     document.getElementById("billToText").innerHTML = formatNameAddress(orderDetails.bill_to);
 }
-function onFinish(status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
-    document.getElementById('iframeSection').style.display = "none";
-    document.getElementById("resultSection").style.display = "block";
-
-    finish = "onFinish: " + JSON.stringify({
-        "referenceNumber": orderDetails.referenceNumber,
-        "status": status,
-        "httpResponseCode": httpResponseCode,
-        "requestId": requestId,
-        "amount": orderDetails.amount,
-        "pan": orderDetails.maskedPan,
-        "newCustomer": newCustomer,
-        "newPaymentInstrument": paymentInstrumentCreated,
-        "customerId": orderDetails.customerId,
-        "paymentInstrumentId": orderDetails.paymentInstrumentId,
-        "shippingAddressId": orderDetails.shippingAddressId,
-        "errorReason": errorReason,
-        "errorMessage": errorMessage
-    }, undefined, 2);
-    console.log(finish);
-    if (status === "AUTHORIZED") {
-        text = "Thank you.  Your payment has completed" + "<BR><PRE>" + finish +"</PRE>";
-        document.getElementById("retryButton").style.display = "none";
-    } else {
-        text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
-    }
-    result = document.getElementById("result").innerHTML = text;
+function retryAfterDecline(){
+    console.log("Retry");
+    document.getElementById('summarySection').style.display = "block";
+    document.getElementById("resultSection").style.display = "none";
+    backButton("confirm");
 }
 </script>
