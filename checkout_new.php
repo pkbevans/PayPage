@@ -311,7 +311,6 @@ let orderDetails = {
         referenceNumber: <?php echo '"' . $_REQUEST['reference_number'] . '"'; ?>,
         amount: <?php echo '"' . $_REQUEST['amount'] . '"'; ?>,
         currency: <?php echo '"' . $_REQUEST['currency'] . '"'; ?>,
-        standAlone: <?php echo isset($_REQUEST['standAlone'])?"true":"false";?>,
         local: <?php echo isset($_REQUEST['local']) && $_REQUEST['local'] === "true"?"true":"false";?>,
         shippingAddressRequired: true,
         useShippingAsBilling: true,

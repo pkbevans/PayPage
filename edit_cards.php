@@ -378,7 +378,6 @@ function addPaymentInstrument(flexDetails, billToDetails){
         paymentInstrumentId: "",
         shippingAddressId: "",
         flexToken: flexDetails.flexToken,
-        standAlone: false,
         capture: false,
         bill_to: {
             firstName: billToDetails.firstName,

@@ -96,7 +96,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                             <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
                         </ul>
                     </div>
-                    <div class="col-2">
+                    <div class="col-2" id="summaryDifferentCard">
                         <button type="button" class="btn btn-link p-0 text-start" onclick="editCard()">Use a different Card</button>
                     </div>
                 </div>
@@ -124,7 +124,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                 </div>
                 <div id="payButtonSection" class="row">
                     <div class="col-12">
-                        <button type="button" id="payButton" onclick="payNow()" class="btn btn-primary" disabled="true">Pay</button>
+                        <button type="button" id="payButton" onclick="nextButton('cvv')" class="btn btn-primary" disabled="true">Pay</button>
                         <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
                     </div>
                 </div>
@@ -133,7 +133,13 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             </div>
         </div>
         <div id="confirmSection" style="display: none">
-            <!-- TODO -->
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
+                    <button type="button" class="btn btn-secondary" onclick="backButton('confirm')">Back</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
+                </div>
+            </div>
         </div>
         <div id="authSection" style="display: none;">
             <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
@@ -173,7 +179,6 @@ let orderDetails = {
         referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
         amount: "<?php echo $_REQUEST['amount'];?>",
         currency: "<?php echo $_REQUEST['currency'];?>",
-        standAlone: <?php echo isset($_REQUEST['standAlone'])?"true":"false";?>,
         local: <?php echo isset($_REQUEST['local']) && $_REQUEST['local'] === "true"?"true":"false";?>,
         shippingAddressRequired: true,
         useShippingAsBilling: true,
@@ -230,17 +235,6 @@ document.addEventListener("DOMContentLoaded", function (e) {
     document.getElementById('shipToText').innerHTML = formatNameAddress(defSA.shipTo);
     createCardInput("cardInputSection", "mainSpinner", "payButton", true, false, defPI.card.type);
 });
-function payNow(){
-    getToken(onTokenCreated);
-}
-function onTokenCreated(tokenDetails){
-    document.getElementById("paymentDetailsSection").style.display = "none";
-    document.getElementById("summaryEditAddress").style.display = "none";
-    document.getElementById("summaryEditCard").style.display = "none";
-    console.log(tokenDetails);
-    orderDetails.flexToken = tokenDetails.flexToken;
-    authorise();
-}
 function cancel() {
     window.open('index.php', '_parent');
 }
@@ -277,6 +271,47 @@ function setOrderDetails() {
         }
         orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
     }
+}
+function nextButton(form){
+    switch(form){
+        case "email":
+        case "shipping":
+            break;
+        case "cvv":
+            // Pay Button clicked
+            getToken(onTokenCreated);
+            break;
+        case "confirm":
+            // Confirm Button clicked
+            document.getElementById("confirmSection").style.display = "none";
+            authorise();
+            break;
+    }
+}
+function backButton(form){
+    switch(form){
+        case "shipping":
+        case "card":
+            break;
+        case "confirm":
+            document.getElementById("paymentDetailsSection").style.display = "block";
+            document.getElementById("summaryEditAddress").style.display = "block";
+            document.getElementById("summaryEditCard").style.display = "block";
+            document.getElementById("summaryDifferentCard").style.display = "block";
+            document.getElementById("confirmSection").style.display = "none";
+            break;
+    }
+}
+function onTokenCreated(tokenDetails){
+    // Hide CVV input, show Confirmation section
+    document.getElementById("paymentDetailsSection").style.display = "none";
+    document.getElementById("summaryEditAddress").style.display = "none";
+    document.getElementById("summaryEditCard").style.display = "none";
+    document.getElementById("summaryDifferentCard").style.display = "none";
+    document.getElementById("confirmSection").style.display = "block";
+    console.log(tokenDetails);
+    orderDetails.flexToken = tokenDetails.flexToken;
+//    authorise();
 }
 function authorise() {
     document.getElementById('authSection').style.display = "block";

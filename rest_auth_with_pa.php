@@ -12,41 +12,39 @@ $incoming = json_decode(file_get_contents('php://input'));
 try {
     $request = new stdClass();
 
-    if(!$incoming->order->standAlone) {
-        $processingInfo = new stdClass();
-        // Dont capture a zero-value auth
-        $processingInfo->capture = $incoming->order->amount>0?$incoming->order->capture:false;
-        if($incoming->order->storeCard){
-            if($incoming->paAction === "NO_PA"){
-                $actionList = ["TOKEN_CREATE"];
-            }else{
-                $actionList = [$incoming->paAction, "TOKEN_CREATE"];
-            }
-            if(empty($incoming->order->customerId)){
-                $buyerInformation = [
-                    "merchantCustomerID" => "Your customer identifier",
-                    "email" => $incoming->order->bill_to->email
-                ];
-                $request->buyerInformation = $buyerInformation;
-                if($incoming->order->shippingAddressRequired){
-                    $processingInfo->actionTokenTypes = ["customer", "paymentInstrument", "shippingAddress"];
-                }else{
-                    $processingInfo->actionTokenTypes = ["customer", "paymentInstrument"];
-                }
-            } else{
-                // Add Payment Instrument and/or Shipping Address to existing Customer
-                if($incoming->order->shippingAddressRequired && empty($incoming->order->shippingAddressId)){
-                    $processingInfo->actionTokenTypes = ["paymentInstrument", "shippingAddress"];
-                }else{
-                    $processingInfo->actionTokenTypes = ["paymentInstrument"];
-                }
-            }
-        } else {
-            $actionList = [$incoming->paAction];
+    $processingInfo = new stdClass();
+    // Dont capture a zero-value auth
+    $processingInfo->capture = $incoming->order->amount>0?$incoming->order->capture:false;
+    if($incoming->order->storeCard){
+        if($incoming->paAction === "NO_PA"){
+            $actionList = ["TOKEN_CREATE"];
+        }else{
+            $actionList = [$incoming->paAction, "TOKEN_CREATE"];
         }
-        $processingInfo->actionList = $actionList;
-        $request->processingInformation = $processingInfo;
+        if(empty($incoming->order->customerId)){
+            $buyerInformation = [
+                "merchantCustomerID" => "Your customer identifier",
+                "email" => $incoming->order->bill_to->email
+            ];
+            $request->buyerInformation = $buyerInformation;
+            if($incoming->order->shippingAddressRequired){
+                $processingInfo->actionTokenTypes = ["customer", "paymentInstrument", "shippingAddress"];
+            }else{
+                $processingInfo->actionTokenTypes = ["customer", "paymentInstrument"];
+            }
+        } else{
+            // Add Payment Instrument and/or Shipping Address to existing Customer
+            if($incoming->order->shippingAddressRequired && empty($incoming->order->shippingAddressId)){
+                $processingInfo->actionTokenTypes = ["paymentInstrument", "shippingAddress"];
+            }else{
+                $processingInfo->actionTokenTypes = ["paymentInstrument"];
+            }
+        }
+    } else {
+        $actionList = [$incoming->paAction];
     }
+    $processingInfo->actionList = $actionList;
+    $request->processingInformation = $processingInfo;
 
     $orderInformation = [
         "amountDetails"=>[
@@ -84,33 +82,28 @@ try {
     }
     $request->orderInformation = $orderInformation;
 
-    if($incoming->order->standAlone) {
-        $tokenInformation = [
-            "transientToken" => $incoming->order->flexToken
+    if(!empty($incoming->order->paymentInstrumentId) ||
+            !empty($incoming->order->shippingAddressId) ||
+            ($incoming->order->storeCard && !empty($incoming->order->customerId))){
+        $paymentInformation = [
+            "customer" => [
+                "id" => $incoming->order->customerId
+            ]
         ];
-    }else{
-        if(!empty($incoming->order->paymentInstrumentId) ||
-                !empty($incoming->order->shippingAddressId) ||
-                ($incoming->order->storeCard && !empty($incoming->order->customerId))){
-            $paymentInformation = [
-                "customer" => [
-                    "id" => $incoming->order->customerId
-                ]
-            ];
-            $request->paymentInformation = $paymentInformation;
-        }
-        if(!empty($incoming->order->shippingAddressId)){
-            $request->paymentInformation['shippingAddress']['id'] = $incoming->order->shippingAddressId;
-        }
-
-        if(!empty($incoming->order->paymentInstrumentId)){
-            $request->paymentInformation['paymentInstrument']['id'] = $incoming->order->paymentInstrumentId;
-        }
-        // Always meed the transient token
-        $tokenInformation = [
-            "jti" => $incoming->order->flexToken
-        ];
+        $request->paymentInformation = $paymentInformation;
     }
+    if(!empty($incoming->order->shippingAddressId)){
+        $request->paymentInformation['shippingAddress']['id'] = $incoming->order->shippingAddressId;
+    }
+
+    if(!empty($incoming->order->paymentInstrumentId)){
+        $request->paymentInformation['paymentInstrument']['id'] = $incoming->order->paymentInstrumentId;
+    }
+    // Always meed the transient token
+    $tokenInformation = [
+        "jti" => $incoming->order->flexToken
+    ];
+
     $request->tokenInformation = $tokenInformation;
 
     $request->clientReferenceInformation = new stdClass();
@@ -146,16 +139,7 @@ try {
 
     $requestBody = json_encode($request);
 
-    if($incoming->order->standAlone){
-        if($incoming->paAction == "CONSUMER_AUTHENTICATION"){
-            $api = API_RISK_V1_AUTHENTICATIONS;
-        }else{
-            $api = API_RISK_V1_AUTHENTICATION_RESULTS;
-        }
-    }else{
-        $api = API_PAYMENTS;
-    }
-    $result = ProcessRequest(PORTFOLIO, $api , METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
+    $result = ProcessRequest(PORTFOLIO, API_PAYMENTS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
     $json = json_encode($result);
     logApi($incoming->order->referenceNumber, 
             "auth-". $incoming->paAction,           // API Type
