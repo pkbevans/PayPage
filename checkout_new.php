@@ -309,6 +309,7 @@ var oldPaymentInstrumentId;
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
         referenceNumber: <?php echo '"' . $_REQUEST['reference_number'] . '"'; ?>,
+        orderId: "<?php echo $_REQUEST['orderId'];?>",
         amount: <?php echo '"' . $_REQUEST['amount'] . '"'; ?>,
         currency: <?php echo '"' . $_REQUEST['currency'] . '"'; ?>,
         local: <?php echo isset($_REQUEST['local']) && $_REQUEST['local'] === "true"?"true":"false";?>,
@@ -320,7 +321,7 @@ let orderDetails = {
         flexToken: "",
         shippingAddressId: "",
         storeCard: false,
-        capture: true,           // TODO hardcoded capture
+        capture: <?php echo isset($_REQUEST['autoCapture']) && $_REQUEST['autoCapture'] === "true"?"true":"false";?>,
         ship_to: {
             firstName: "",
             lastName: "",

@@ -68,16 +68,35 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                     <h5>Email:</h5>
                 </div>
                 <div class="col-9">
-                    <?php echo $defaultEmail;?>
+                    <div id="emailSection">
+                        <div id="emailText"><?php echo $defaultEmail;?></div>
+                        <button id="summaryEmail" type="button" class="btn btn-link p-0" onclick="editEmail()">Edit</button>
+                    </div>
+                    <form id="emailForm" class="needs-validation" novalidate style="display:none">
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="form-group mb-3">
+                                    <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary" onclick="updateEmail(true)">Update</button>
+                                <button type="button" class="btn btn-secondary" onclick="updateEmail(false)">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+
                 </div>
             </div>
             <div class="row">
                 <div class="col-3">
                     <h5>Delivery:</h5>
                 </div>
-                <div class="col-7" id="shipToText"></div>
-                <div class="col-2" id="summaryEditAddress">
-                    <button type="button" class="btn btn-link p-0" onclick="editShippingAddress()">Edit</button>
+                <div class="col-9">
+                    <div id="shipToText"></div>
+                    <button id="summaryEditAddress" type="button" class="btn btn-link p-0" onclick="editShippingAddress()">Edit</button>
                 </div>
             </div>
             <div class="row">
@@ -85,9 +104,11 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                 </div>
             </div>
             <div id="storedCardSection">
-                <h5>Card:</h5>
                 <div class="row">
                     <div class="col-3">
+                        <h5>Card:</h5>
+                    </div>
+                    <div class="col-2">
                         <img src="images/<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['image'];?>" class="img-fluid" alt="<?php echo $cardTypes[$defaultPaymentInstrument->card->type]['alt'];?>">
                     </div>
                     <div class="col-7">
@@ -96,39 +117,33 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                             <li><small>Expires:&nbsp;<?php echo $defaultPaymentInstrument->card->expirationMonth . "/" . $defaultPaymentInstrument->card->expirationYear;?></small></li>
                         </ul>
                     </div>
-                    <div class="col-2" id="summaryDifferentCard">
-                        <button type="button" class="btn btn-link p-0 text-start" onclick="editCard()">Use a different Card</button>
-                    </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-3">
-                    <h5>Card Billing:</h5>
                 </div>
-                <div class="col-7" id="billToText"></div>
-                <div class="col-2" id="summaryEditCard">
-                    <button type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
+                <div class="col-9">
+                    <div id="billToText"></div>
+                    <button id="summaryEditCard" type="button" class="btn btn-link p-0" onclick="editCard()">Edit</button>
                 </div>
             </div>
-        </div>
-        <div id="paymentDetailsSection">
-            <input id="bill_to_email" type="hidden" value="<?php echo $defaultEmail;?>">
-            <form id="cardForm">
-                <div id="cardInputSection">
-                </div>
-            </form>
-            <div id="billingAddressSection" style="display: block">
-                <div id="defaultBillingSection">
-                    <div class="row">
+            <div id="paymentDetailsSection">
+                <div class="row">
+                    <div class="col-3"></div>
+                    <div class="col-9">
+                        <form id="cardForm">
+                            <div id="cardInputSection">
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div id="payButtonSection" class="row">
-                    <div class="col-12">
+                    <div class="col-3">
+                    </div>
+                    <div class="col-9">
                         <button type="button" id="payButton" onclick="nextButton('cvv')" class="btn btn-primary" disabled="true">Pay</button>
                         <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
                     </div>
-                </div>
-                <div class="row">
                 </div>
             </div>
         </div>
@@ -170,13 +185,12 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <script src="js/authorise.js"></script>
 <script>
 var oldPaymentInstrumentId;
-<?php
-  echo "var defaultPaymentInstrumentJson = '" . json_encode($defaultPaymentInstrument) ."';\n";
-  echo "var defaultShippingAddressJson = '" . json_encode($defaultShippingAddress) ."';\n";
-?>
+var defaultPaymentInstrumentJson = '<?php echo json_encode($defaultPaymentInstrument);?>';
+var defaultShippingAddressJson = '<?php echo json_encode($defaultShippingAddress);?>';
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
         referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
+        orderId: "<?php echo $_REQUEST['orderId'];?>",
         amount: "<?php echo $_REQUEST['amount'];?>",
         currency: "<?php echo $_REQUEST['currency'];?>",
         local: <?php echo isset($_REQUEST['local']) && $_REQUEST['local'] === "true"?"true":"false";?>,
@@ -188,7 +202,7 @@ let orderDetails = {
         flexToken: "",
         shippingAddressId: "<?php echo $defaultShippingAddress->id;?>",
         storeCard: false,
-        capture: true,           // TODO hardcoded capture
+        capture: <?php echo isset($_REQUEST['autoCapture']) && $_REQUEST['autoCapture'] === "true"?"true":"false";?>,
         ship_to: {
             firstName: "",
             lastName: "",
@@ -201,7 +215,7 @@ let orderDetails = {
         bill_to: {
             firstName: "",
             lastName: "",
-            email: "",
+            email: '<?php echo $defaultEmail;?>',
             address1: "",
             address2: "",
             locality: "",
@@ -247,30 +261,17 @@ function useSameAddressChanged() {
         document.getElementById('billingForm').style.display = "block";
     }
 }
-function setOrderDetails() {
-    if(orderDetails.shippingAddressId === ""){
-        orderDetails.useShippingAsBilling = shipAsBill();
-
-        orderDetails.ship_to.firstname = document.getElementById('ship_to_firstname').value;
-        orderDetails.ship_to.lastname = document.getElementById('ship_to_lastname').value;
-        orderDetails.ship_to.address1 = document.getElementById('ship_to_address1').value;
-        orderDetails.ship_to.address2 = document.getElementById('ship_to_address2').value;
-        orderDetails.ship_to.locality = document.getElementById('ship_to_city').value;
-        orderDetails.ship_to.postalCode = document.getElementById('ship_to_postalCode').value;
-        orderDetails.ship_to.country = document.getElementById('ship_to_country').value;
-    }
-    if(orderDetails.paymentInstrumentId === ""){
-        if(!orderDetails.useShippingAsBilling){
-            orderDetails.bill_to.firstname = document.getElementById('bill_to_forename').value;
-            orderDetails.bill_to.lastname = document.getElementById('bill_to_surname').value;
-            orderDetails.bill_to.address1 = document.getElementById('bill_to_address_line1').value;
-            orderDetails.bill_to.address2 = document.getElementById('bill_to_address_line2').value;
-            orderDetails.bill_to.locality = document.getElementById('bill_to_address_city').value;
-            orderDetails.bill_to.postalCode = document.getElementById('bill_to_postcode').value;
-            orderDetails.bill_to.country = document.getElementById('bill_to_address_country').value;
-        }
+function editEmail(){
+    document.getElementById('emailForm').style.display = "block";
+    document.getElementById('emailSection').style.display = "none";
+}
+function updateEmail(update){
+    if(update){
         orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
+        document.getElementById('emailText').innerHTML = orderDetails.bill_to.email;
     }
+    document.getElementById('emailForm').style.display = "none";
+    document.getElementById('emailSection').style.display = "block";
 }
 function nextButton(form){
     switch(form){
@@ -297,7 +298,6 @@ function backButton(form){
             document.getElementById("paymentDetailsSection").style.display = "block";
             document.getElementById("summaryEditAddress").style.display = "block";
             document.getElementById("summaryEditCard").style.display = "block";
-            document.getElementById("summaryDifferentCard").style.display = "block";
             document.getElementById("confirmSection").style.display = "none";
             break;
     }
@@ -307,7 +307,6 @@ function onTokenCreated(tokenDetails){
     document.getElementById("paymentDetailsSection").style.display = "none";
     document.getElementById("summaryEditAddress").style.display = "none";
     document.getElementById("summaryEditCard").style.display = "none";
-    document.getElementById("summaryDifferentCard").style.display = "none";
     document.getElementById("confirmSection").style.display = "block";
     console.log(tokenDetails);
     orderDetails.flexToken = tokenDetails.flexToken;
@@ -341,7 +340,10 @@ function onPaymentInstrumentUpdated(id, paymentInstrument) {
     html = stylePaymentInstrument(paymentInstrument._embedded.instrumentIdentifier.card.number,
                 paymentInstrument.card, paymentInstrument.billTo);
     document.getElementById('storedCardSection').innerHTML  = html;
-    document.getElementById('billToText').innerHTML = formatNameAddress(paymentInstrument.billTo);
+    btt = document.getElementById('billToText');
+    if(btt){
+        btt.innerHTML = formatNameAddress(paymentInstrument.billTo);
+    }
     document.getElementById('iframeSection').style.display = "none";
     document.getElementById('paymentDetailsSection').style.display = "block";
     updateSecurityCodeField(paymentInstrument.card.type);
@@ -364,7 +366,7 @@ function stylePaymentInstrument(maskedPan, card, billTo){
                 "<div class=\"col-3\">\n"+
                     "<img src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+
                 "</div>\n" +
-                "<div class=\"col-9\">\n" +
+                "<div class=\"col-7 \">\n" +
                     "<ul class=\"list-unstyled\">" +
                         "<li><strong>" + maskedPan + "</strong></li>\n" +
                         "<li><small>Expires:&nbsp;" + card.expirationMonth + "/" + card.expirationYear + "</small></li>\n" +
@@ -392,14 +394,12 @@ function newCard(){
     orderDetails.paymentInstrumentId = "";
     showPanField(true);
     document.getElementById('billingForm').style.display = "block";
-    document.getElementById('defaultBillingSection').style.display = "none";
     document.getElementById('storedCardSection').style.display = "none";
 }
 function cancelNewCard(){
     orderDetails.paymentInstrumentId = oldPaymentInstrumentId;
     showPanField(false);
     document.getElementById('billingForm').style.display = "none";
-    document.getElementById('defaultBillingSection').style.display = "block";
     document.getElementById('storedCardSection').style.display = "block";
 }
 </script>

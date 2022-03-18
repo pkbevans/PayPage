@@ -1,6 +1,8 @@
 <?php 
 require_once 'PeRestLib/RestRequest.php';
 require_once 'php/utils/logApi.php';
+include_once 'db/db_insert_payment.php';
+
 
 $incoming = json_decode(file_get_contents('php://input'));
 // Key incoming fields:
@@ -63,8 +65,12 @@ try {
             "country" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->country: $incoming->order->bill_to->country), 0, MAXSIZE_COUNTRY),
             "email" => $incoming->order->bill_to->email
         ];
-        $orderInformation['billTo'] = $billTo;
+    }else{
+        $billTo = [
+            "email" => $incoming->order->bill_to->email     // Email may have been updated/changed
+        ];
     }
+    $orderInformation['billTo'] = $billTo;
 
     if($incoming->order->shippingAddressRequired){
         if(empty($incoming->order->shippingAddressId)){
@@ -140,7 +146,17 @@ try {
     $requestBody = json_encode($request);
 
     $result = ProcessRequest(PORTFOLIO, API_PAYMENTS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
+    // Update DB
+    $dbResult=insertPayment($incoming->order->orderId, 
+            $incoming->order->customerId, 
+            $incoming->order->bill_to->email, 
+            $incoming->order->maskedPan, 
+            $result->response->paymentInformation->card->type, 
+            $result->response->status);
+    $result->payment = $dbResult;
+
     $json = json_encode($result);
+    
     logApi($incoming->order->referenceNumber, 
             "auth-". $incoming->paAction,           // API Type
             $result->response->status,              // Status

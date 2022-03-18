@@ -17,11 +17,12 @@ function getCookie($name){
 <!DOCTYPE html>
 <html lang="en-GB">
     <head>
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self' cdn.jsdelivr.net https://testflex.cybersource.com/ bondevans.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' cdn.jsdelivr.net/ bondevans.com 'unsafe-eval' 'unsafe-inline' ; frame-src 'self' https://testflex.cybersource.com/ bondevans.com; child-src https://testflex.cybersource.com/; "> 
+        <!--<meta http-equiv="Content-Security-Policy" content="script-src 'self' cdn.jsdelivr.net https://testflex.cybersource.com/ bondevans.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' cdn.jsdelivr.net/ bondevans.com 'unsafe-eval' 'unsafe-inline' ; frame-src 'self' https://testflex.cybersource.com/ bondevans.com; child-src https://testflex.cybersource.com/; ">--> 
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <title>View Basket</title>
     </head>
     <body>
@@ -40,8 +41,14 @@ function getCookie($name){
                 <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value="<?php echo getCookie("customerId")?>"/>
                 <!--<label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>-->
                 <input id="currency" type="hidden" name="currency" value="GBP"/>
+                <input id="orderId" type="hidden" name="orderId" value=""/>
                 <label for="local" class="form-label">Local</label><input id="local" class="form-control" type="text" name="local" value="<?php echo $local; ?>"/>
-                <BR><button type="submit" class="btn btn-primary" >Checkout</button>
+                <label for="autoCapture" class="form-label">Auto Capture</label>
+                <select id="autoCapture" class="form-select" name="autoCapture">
+                    <option value="true" selected>Yes</option>
+                    <option value="false" selected>No</option>
+                </select>
+                <BR><button type="submit" class="btn btn-primary">Checkout</button>
             </form>
             </div>
             <iframe id="checkoutIframe" name="checkout_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
@@ -60,7 +67,7 @@ function getCookie($name){
             }else{
                 checkout_form.action = "checkout_existing.php"
             }
-            checkout_form.submit();
+            writeOrder();
         }
     }
 
@@ -86,6 +93,28 @@ function getCookie($name){
           }, false);
         });
     })();
+    function writeOrder(){
+        $.ajax({
+            type: "POST",
+            url: "write_order.php",
+            data: JSON.stringify({
+                "mrn": document.getElementById('reference_number').value,
+                "customerId": document.getElementById('customerToken').value,
+                "amount": document.getElementById('amount').value,
+                "currency": document.getElementById('currency').value,
+                "email": document.getElementById('email').value
+            }),
+            success: function (result) {
+                console.log("\nOrder written:\n" + result);
+                res = JSON.parse(result);
+
+                if(res.status==="OK"){
+                    document.getElementById('orderId').value = res.id;
+                    checkout_form.submit();
+                }
+            }
+        });
+    }
     </script>
     </body>
 </html>

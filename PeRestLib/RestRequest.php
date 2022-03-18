@@ -51,6 +51,9 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
 
     $result = new stdClass();
     $result->url = $url;
+    $result->method = $method;
+    $result->request = json_decode($payload);
+    $result->responseCode = $response_info['http_code'];
     if($resource == API_FLEX_V2_SESSIONS || $resource == API_MICROFORM_SESSIONS){
         $result->rawResponse = $http_body;
     }else{
@@ -58,17 +61,14 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
         $result->response = $response;
     }
 
-    $result->method = $method;
     $requestHeaders = [];
     foreach ($headerParams as $key => $val) {
         $requestHeaders[$key] = $val;
     }
 //    $result->requestHeaders = $requestHeaders;
-    $result->request = json_decode($payload);
-    $result->responseCode = $response_info['http_code'];
 //    $result->responseInfo = $response_info;
 //    $result->responseHeaders=$http_headers;
-    $result->response = $response;
+//    $result->response = $response;
 
     return $result;
 }
