@@ -1,5 +1,5 @@
 <?php
-include_once '../../ppSecure/Credentials.php';
+include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">
@@ -15,7 +15,7 @@ include_once '../../ppSecure/Credentials.php';
             <h3>Orders</h3>
 <?php
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=paypage", $username, $password);
+    $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
     $stmtOrders = $conn->query("select id, merchantReference, amount, currency, customerId, customerEmail, status from orders order by id desc;"); 
     $orders = $stmtOrders->fetchAll(PDO::FETCH_ASSOC);
     // iterate over rows
@@ -43,7 +43,7 @@ try {
                 "<div class=\"col-1\">" .
                 "</div>" .
                 "<div class=\"col-11\">";
-        $stmtPayments = $conn->query("select id, orderId, cardNumber, cardType, status, dateTime from payments where orderId = ".$order['id']); 
+        $stmtPayments = $conn->query("select id, orderId, amount, cardNumber, cardType, status, dateTime from payments where orderId = ".$order['id']); 
         $payments = $stmtPayments->fetchAll(PDO::FETCH_ASSOC);
         // iterate over rows
         $firstPayment=true;
@@ -53,6 +53,7 @@ try {
                 echo "<h5>Payments</h5><table class=\"table\"><thead><tr>" .
                         "<th>Order Id</th>" .
                         "<th>Id</th>" .
+                        "<th>Amount</th>" .
                         "<th>Card Number</th>" .
                         "<th>Card Type</th>" .
                         "<th>Status</th>" .
@@ -62,6 +63,7 @@ try {
             echo "<tbody><tr>" . 
                     "<td>" . $payment['orderId'] . "</td>" . 
                     "<td>" . $payment['id'] . "</td>" . 
+                    "<td>" . $payment['amount'] . "</td>" . 
                     "<td>" . $payment['cardNumber'] . "</td>" . 
                     "<td>" . $payment['cardType'] . "</td>" . 
                     "<td>" . $payment['status'] . "</td>" .

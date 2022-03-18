@@ -149,6 +149,7 @@ try {
     // Update DB
     $dbResult=insertPayment($incoming->order->orderId, 
             $incoming->order->customerId, 
+            $incoming->order->amount, 
             $incoming->order->bill_to->email, 
             $incoming->order->maskedPan, 
             $result->response->paymentInformation->card->type, 

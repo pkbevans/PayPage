@@ -24,7 +24,8 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 </head>
 <body>
     <form id="iframe_form" method="POST" target="shippingAddress_iframe" action="">
-        <input id="customerToken" type="hidden" name="customerToken" value="">
+        <input id="orderId" type="hidden" name="orderId" value="<?php echo $_REQUEST['orderId'];?>">
+        <input id="customerToken" type="hidden" name="customerToken" value="<?php echo $customerToken;?>">
         <input id="currency" type="hidden" name="currency" value="<?php echo $_REQUEST['currency']?>">
         <input id="email" type="hidden" name="email" value="<?php echo $defaultEmail;?>">
         <input id="reference_number" type="hidden" name="reference_number" value="<?php echo $_REQUEST['reference_number'];?>">
@@ -198,9 +199,9 @@ let orderDetails = {
         useShippingAsBilling: true,
         customerId: "<?php echo $customerToken;?>",
         paymentInstrumentId: "<?php echo $defaultPaymentInstrument->id;?>",
-        maskedPan: "<?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?>",
-        flexToken: "",
         shippingAddressId: "<?php echo $defaultShippingAddress->id;?>",
+        flexToken: "",
+        maskedPan: "<?php echo $defaultPaymentInstrument->_embedded->instrumentIdentifier->card->number;?>",
         storeCard: false,
         capture: <?php echo isset($_REQUEST['autoCapture']) && $_REQUEST['autoCapture'] === "true"?"true":"false";?>,
         ship_to: {
@@ -319,7 +320,7 @@ function authorise() {
 function editShippingAddress(){
     document.getElementById('paymentDetailsSection').style.display = "none";
     document.getElementById('iframeSection').style.display = "block";
-    document.getElementById('customerToken').value = orderDetails.customerId;
+//    document.getElementById('customerToken').value = orderDetails.customerId;
     var iframeForm = document.getElementById('iframe_form');
     if (iframeForm){
         iframeForm.action = "edit_addresses.php";
@@ -382,7 +383,7 @@ function onIframeCancelled(){
 function editCard(){
     document.getElementById('paymentDetailsSection').style.display = "none";
     document.getElementById('iframeSection').style.display = "block";
-    document.getElementById('customerToken').value = orderDetails.customerId;
+//    document.getElementById('customerToken').value = orderDetails.customerId;
     var iframeForm = document.getElementById('iframe_form');
     if (iframeForm){
         iframeForm.action = "edit_cards.php";

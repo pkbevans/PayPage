@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function (e) {
 function saveClicked(){
     form = document.getElementById('billingForm');
     if(validateForm(form)){
-        getToken(onNewCardReceived, onTokenError);
+        getToken(onNewCardReceived);
     }
 }
 function onNewCardReceived(flexDetails){
@@ -287,9 +287,6 @@ function onNewCardReceived(flexDetails){
     // New card/billing details but not to be stored
 //    parent.onNewCardUsed(flexDetails, billTo);
     addPaymentInstrument(flexDetails, billTo);
-}
-function onTokenError(err){
-    console.log(err);
 }
 function validateForm(form){
     if (!form.checkValidity()) {
@@ -368,16 +365,18 @@ function addPaymentInstrument(flexDetails, billToDetails){
 //    card = JSON.parse(cardDetails);
     let orderDetails = {
         referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
+        orderId: "<?php echo $_REQUEST['orderId'];?>",
         amount: "0.00",
         currency: "<?php echo $_REQUEST['currency'];?>",
+        local: false, // TODO
         shippingAddressRequired: false,
         useShippingAsBilling: false,
-        local: false, // TODO
-        storeCard: true,
         customerId: customerId,
         paymentInstrumentId: "",
         shippingAddressId: "",
         flexToken: flexDetails.flexToken,
+        maskedPan: flexDetails.cardDetails.number,
+        storeCard: true,
         capture: false,
         bill_to: {
             firstName: billToDetails.firstName,
@@ -400,6 +399,7 @@ function addPaymentInstrument(flexDetails, billToDetails){
             "authenticationTransactionID": ""
         }),
         success: function (result) {
+            console.log("\Auth:\n" + result);
             // Response is a json string - turn it into a javascript object
             let res = JSON.parse(result);
             console.log("\Auth:\n" + JSON.stringify(res, undefined, 2));

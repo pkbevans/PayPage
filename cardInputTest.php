@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">-->
     <link rel="stylesheet" type="text/css" href="css/styles.css"/>
     <title>Bootstrap Test</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -17,7 +17,7 @@
         </div>
         <div class="row mt-3 mb-3">
             <div class="col-sm-6">
-            <button type="button" class="btn btn-primary" onclick="getToken()" id="payButton" disabled="true">Pay</button>
+            <button type="button" class="btn btn-primary" onclick="getToken(tokenCallback)" id="payButton" disabled="true">Pay</button>
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
 <script src="js/newCard2.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function (e) {
-        createCardInput("cardInput", "progressSpinner", tokenCallback, "payButton" );
+        createCardInput("cardInput", "progressSpinner", "payButton" );
     });
     function tokenCallback(result){
         console.log(result);

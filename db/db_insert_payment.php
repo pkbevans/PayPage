@@ -1,13 +1,11 @@
 <?php
-$path = $_SERVER['DOCUMENT_ROOT'];
-$path .= "../ppSecure/Credentials.php";
-include_once($path);
+include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
 
-function insertPayment($orderId, $customerId, $email, $cardNumber, $cardType, $status){
-    global $servername,$username,$password;
+function insertPayment($orderId, $customerId, $amount, $email, $cardNumber, $cardType, $status){
+    global $servername,$username,$password,$dbName;
     
-    $paymentSql = "INSERT INTO payments (orderId, cardNumber, cardType, status)" .
-            " VALUES (" . $orderId . ",'" . $cardNumber . "','" . $cardType . "','" . $status ."')";
+    $paymentSql = "INSERT INTO payments (orderId, amount, cardNumber, cardType, status)" .
+            " VALUES (" . $orderId . "," . $amount . ",'" . $cardNumber . "','" . $cardType . "','" . $status ."')";
     
     $orderSql = "UPDATE orders set " .
             "customerId = '" . $customerId . "'," .
@@ -19,7 +17,7 @@ function insertPayment($orderId, $customerId, $email, $cardNumber, $cardType, $s
     $result->paymentSql=$paymentSql;
     $result->orderSql=$orderSql;
     try{
-        $conn = new PDO("mysql:host=$servername;dbname=paypage", $username, $password);
+        $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
         $conn->exec($paymentSql);
         $result->id=$conn->lastInsertId();
         $conn->exec($orderSql);
