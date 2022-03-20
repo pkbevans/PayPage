@@ -16,7 +16,7 @@ include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
 <?php
 try {
     $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
-    $stmtOrders = $conn->query("select id, merchantReference, amount, currency, customerId, customerEmail, status from orders order by id desc;"); 
+    $stmtOrders = $conn->query("select id, merchantReference, amount, currency, customerId, customerEmail, status, dateTime from orders order by id desc;"); 
     $orders = $stmtOrders->fetchAll(PDO::FETCH_ASSOC);
     // iterate over rows
     foreach($orders as $order) {
@@ -28,6 +28,7 @@ try {
                 "<th>Customer</th>" .
                 "<th>Email</th>" .
                 "<th>Status</th>" .
+                "<th>Timestamp</th>" .
                 "</tr></thead>";
         echo "<tbody><tr>" . 
                 "<td>" . $order['id'] . "</td>" . 
@@ -37,6 +38,7 @@ try {
                 "<td>" . $order['customerId'] . "</td>" . 
                 "<td>" . $order['customerEmail'] . "</td>" .
                 "<td>" . $order['status'] . "</td>" . 
+                "<td>" . $order['dateTime'] . "</td>" . 
                 "</tr></tbody></table>";
         //
         echo "<div class=\"row\">" .
