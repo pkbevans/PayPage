@@ -24,8 +24,8 @@ function xtrim($in, $suffix){
 function stylePaymentInstrument($paymentInstrument){
     global $cardTypes;
     return
-    "<div class=\"col-sm-2\"><img  src=\"images/". $cardTypes[$paymentInstrument->card->type]['image'] . "\" class=\"img-fluid\" alt=\"" . $cardTypes[$paymentInstrument->card->type]['alt'] . "\"></div>\n" .
-    "<div class=\"col-sm-1\">\n" .
+    "<div class=\"col-2 col-sm-2\"><img  src=\"images/". $cardTypes[$paymentInstrument->card->type]['image'] . "\" class=\"img-fluid\" alt=\"" . $cardTypes[$paymentInstrument->card->type]['alt'] . "\"></div>\n" .
+    "<div class=\"col-10\">\n" .
         "<ul class=\"list-unstyled\">" .
             "<li><strong>" . $paymentInstrument->_embedded->instrumentIdentifier->card->number . "</strong></li>\n" .
             "<li><small>Expires:&nbsp;" . $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear . "</small></li>\n" .
@@ -69,7 +69,9 @@ $count=0;
                     <button class="accordion-button <?php echo ($paymentInstrument->default?"":"collapsed");?>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?php echo $paymentInstrument->id;?>" aria-expanded="true" aria-controls="collapse<?php echo $paymentInstrument->id;?>">
                         <div class="container">
                             <div class="d-flex flex-row">
-                                <?php echo stylePaymentInstrument2($paymentInstrument);?>
+                                <?php echo stylePaymentInstrument($paymentInstrument);?>
+                            <button type="button" class="btn btn-link" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')">Use this card</button>
+                                <button type="button" class="btn btn-link" onclick="editPaymentInstrument('<?php echo $paymentInstrument->id;?>')">Edit Billing Address</button>
                             </div>
                         </div>
                     </button>
@@ -79,8 +81,6 @@ $count=0;
                     <div class="row">
                         <div id="<?php echo $paymentInstrument->id;?>_buttons">
                             <div class="col-sm-6">
-                                <button type="button" class="btn btn-link" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')">Use this card</button>
-                                <button type="button" class="btn btn-link" onclick="editPaymentInstrument('<?php echo $paymentInstrument->id;?>')">Edit Billing Address</button>
 <?php if(!$paymentInstrument->default):?>
                             <button type="button" class="btn btn-link" onclick="updatePaymentInstrument('<?php echo $paymentInstrument->id;?>',true)">Set as default</button>
                             <button type="button" class="btn btn-link" onclick="deletePaymentInstrument('<?php echo $paymentInstrument->id;?>')">Remove</button>

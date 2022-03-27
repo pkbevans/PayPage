@@ -137,11 +137,11 @@ foreach ($countries as $key => $value) {
                         <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
                     </div>
                 </div>
+                <a href="checkout_existing.php"></a>
             </form>
             <div id="cardForm" style="display: none">
                 <div class="col-12"><h1 class="display-5">Payment card details</h1></div>
-                <div id="cardInputSection">
-                </div>
+                <div id="cardInputSection"></div>
                 <div id="billingAddressSection" style="display: block">
                     <div class="row">
                         <div class="col-12">

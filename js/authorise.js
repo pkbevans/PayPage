@@ -135,7 +135,7 @@ function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentC
     document.getElementById('authSection').style.display = "none";
     document.getElementById('summarySection').style.display = "none";
     document.getElementById('confirmSection').style.display = "none";
-    document.getElementById('iframeSection').style.display = "none";
+//    document.getElementById('iframeSection').style.display = "none";
     finish = "onFinish2: " + JSON.stringify({
         "referenceNumber": orderDetails.referenceNumber,
         "amount": orderDetails.amount,

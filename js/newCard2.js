@@ -34,6 +34,7 @@ var cvvOnly = false;
 var panOnly = false;
 var cardButtonName;
 var errorAlert;
+var container;
 
 function setUpMicroform(){
     flex = new Flex(captureContext);
@@ -42,8 +43,37 @@ function setUpMicroform(){
         panValid = true;
     }else{
         // Set up PAN field
+        setUpPanField();
+    }
+    if(panOnly){
+        cvnValid = true;
+    }else{
+        if(cardType == "003" || cardType == "american express"){
+            placeholder = "••••";
+            maxLength = 4;
+        }else{
+            placeholder =  "•••";
+            maxLength = 3;
+        }
+        securityCode = microform.createField('securityCode', {placeholder: placeholder, maxLength: maxLength});
+        securityCode.load('#securityCode-container');
+        secCodeLbl = document.querySelector('#securityCodeLabel');
+        securityCode.on('change', function (data) {
+    //        console.log(data);
+            cvnValid = data.valid;
+            fieldsValid(cvnValid);
+        });
+    }
+    newCardButton = document.querySelector('#'+cardButtonName);
+    errorAlert = document.getElementById("cardError");
+}
+function setUpPanField(){
+    // Set up PAN field
+    if(number === undefined){
         number = microform.createField('number', {placeholder: 'Card number'});
         numberContainer = document.querySelector('#number-container');
+    }
+    if(!number._loaded){
         number.load('#number-container');
         number.on('change', function (data) {
             if(!panOnly){
@@ -68,27 +98,6 @@ function setUpMicroform(){
             document.getElementById('expiryDate').value = expDate;
         });
     }
-    if(panOnly){
-        cvnValid = true;
-    }else{
-        if(cardType == "003" || cardType == "american express"){
-            placeholder = "••••";
-            maxLength = 4;
-        }else{
-            placeholder =  "•••";
-            maxLength = 3;
-        }
-        securityCode = microform.createField('securityCode', {placeholder: placeholder, maxLength: maxLength});
-        securityCode.load('#securityCode-container');
-        secCodeLbl = document.querySelector('#securityCodeLabel');
-        securityCode.on('change', function (data) {
-    //        console.log(data);
-            cvnValid = data.valid;
-            fieldsValid(cvnValid);
-        });
-    }
-    newCardButton = document.querySelector('#'+cardButtonName);
-    errorAlert = document.getElementById("cardError");
 }
 function updateSecurityCodeField(type){
     // If Amex, CVV is 4 digits, else 3
@@ -97,6 +106,23 @@ function updateSecurityCodeField(type){
     }else{
         securityCode.update({placeholder: "•••", maxLength: 3});
     }
+}
+function flipCvvOnly(cvvOnlyFlag, type){
+    cvvOnly = cvvOnlyFlag;
+    // Hide PAN and Expiry date sections
+    document.getElementById("cardNumber").style.display = (cvvOnly?"none":"block");
+    document.getElementById("cardDate").style.display = (cvvOnly?"none":"block");
+    if(cvvOnly){
+        // Remove PAN field
+        if(number !== undefined && number._loaded){
+            number.unload();
+        }
+        updateSecurityCodeField(type);
+        panValid = true;
+    }else{
+        // Add PAN field
+        setUpPanField();
+    }    
 }
 function getToken(tokenCallback) {
     errorAlert.style.display = "none";
@@ -185,35 +211,51 @@ function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=fa
     cardButtonName = buttonName;
     container = document.getElementById(containerName);
     progress = document.getElementById(progressName);
+
+    if(container){
+        createCardInputHTML(container, cvvOnly, panOnly);
+    }
+        
+    if(progress){
+        progress.style.display = "none";
+    }
+    getCaptureContext(window.location.href.includes("localhost")?true:false);
+    if(!cvvOnly){
+        setUpExpiryDate("expiryDate");
+    }
+}
+function createCardInputHTML(container, cvvOnly, panOnly){
     errorDiv = "<div class=\"row\">"+ 
                     "<div id=\"cardError\" class=\"alert alert-danger alert-dismissible fade show\" role=\"alert\" style=\"display:none\">"+
                     "<strong>Something went wrong. Please try again.</strong></div>"+
                 "</div>";
     html = "<div class=\"d-flex mb-3\">"+
-        
+
         "<div class=\"card\">"+
             "<div class=\"card-body\"> "+
                 errorDiv +
                 (!cvvOnly?
-                "<div class=\"d-flex align-items-center justify-content-between\">"+
-                    "<div>"+
-                        "<img src=\"images/Visa.svg\" width=\"30\">"+
-                        "<img src=\"images/Mastercard.svg\" width=\"30\">"+
-                        "<img src=\"images/Amex.svg\" width=\"30\">"+
-                    "</div>"+
-                "</div>"+
-                "<div class=\"row mt-3 mb-3\">"+
-                    "<div class=\"col-12\">"+
-                        "<label class=\"form-check-label\" for=\"number-container\">Card Number</label>"+
-                        "<div class=\"cardInput\">"+
-                            "<i class=\"fa fa-credit-card\"></i>"+
-                            "<div id=\"number-container\" class=\"form-control\"></div>"+
+                "<div id=\"cardNumber\">"+
+                    "<div class=\"d-flex align-items-center justify-content-between\">"+
+                        "<div>"+
+                            "<img src=\"images/Visa.svg\" width=\"30\">"+
+                            "<img src=\"images/Mastercard.svg\" width=\"30\">"+
+                            "<img src=\"images/Amex.svg\" width=\"30\">"+
                         "</div>"+
                     "</div>"+
-                "</div>":"")+
+                    "<div class=\"row mt-3 mb-3\">"+
+                        "<div class=\"col-12\">"+
+                            "<label class=\"form-check-label\" for=\"number-container\">Card Number</label>"+
+                            "<div class=\"cardInput\">"+
+                                "<i class=\"fa fa-credit-card\"></i>"+
+                                "<div id=\"number-container\" class=\"form-control\"></div>"+
+                            "</div>"+
+                        "</div>"+
+                    "</div>":"")+
+                "</div>"+
                 "<div class=\"row\">"+
                     (!cvvOnly?
-                    "<div class=\"col-6\">"+
+                    "<div class=\"col-6\" id=\"cardDate\">"+
                         "<label class=\"form-check-label\" for=\"expiryDate\">Expiry Date</label>"+
                         "<div class=\"cardInput\">"+
                             "<i class=\"fa fa-calendar\"></i>"+
@@ -232,17 +274,7 @@ function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=fa
             "</div>"+
         "</div>"+
     "</div>";
-    if(container){
-        container.innerHTML = html;
-        
-        if(progress){
-            progress.style.display = "none";
-        }
-        getCaptureContext(window.location.href.includes("localhost")?true:false);
-        if(!cvvOnly){
-            setUpExpiryDate("expiryDate");
-        }
-    }
+    container.innerHTML = html;
 }
 function expiryDateValid() {
     d = new Date();

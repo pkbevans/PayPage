@@ -61,12 +61,7 @@ function getCookie($name){
         document.getElementById('checkoutIframe').style.display="block";
         var checkout_form = document.getElementById('checkout_form');
         if(checkout_form){
-            customer = document.getElementById('customerToken').value;
-            if(customer === ""){
-                checkout_form.action = "checkout_new.php"
-            }else{
-                checkout_form.action = "checkout_existing.php"
-            }
+            checkout_form.action = "checkout.php"
             writeOrder();
         }
     }

@@ -147,13 +147,7 @@ try {
 
     $result = ProcessRequest(PORTFOLIO, API_PAYMENTS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
     // Update DB
-    $dbResult=insertPayment($incoming->order->orderId, 
-            $incoming->order->customerId, 
-            $incoming->order->amount, 
-            $incoming->order->bill_to->email, 
-            $incoming->order->maskedPan, 
-            $result->response->paymentInformation->card->type, 
-            $result->response->status);
+    $dbResult=insertPayment($incoming->order, $result);
     $result->payment = $dbResult;
 
     $json = json_encode($result);

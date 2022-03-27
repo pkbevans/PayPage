@@ -1,17 +1,41 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
 
-function insertPayment($orderId, $customerId, $amount, $email, $cardNumber, $cardType, $status){
+function insertPayment($orderDetails, $request){
     global $servername,$username,$password,$dbName;
     
-    $paymentSql = "INSERT INTO payments (orderId, amount, cardNumber, cardType, status)" .
-            " VALUES (" . $orderId . "," . $amount . ",'" . $cardNumber . "','" . $cardType . "','" . $status ."')";
+    $authCode="";
+    $requestId="";
+    $cardType="";
+    if($request->response->status === "AUTHORIZED"){
+        $authCode = $request->response->processorInformation->approvalCode;
+    }
+    if($request->responseCode === 201){
+        $requestId = $request->response->id;
+        $cardType = $request->response->paymentInformation->card->type;
+    }
+    $paymentSql = "INSERT INTO payments ("
+                . "orderId, "
+                . "amount, "
+                . "cardNumber, "
+                . "cardType, "
+                . "authCode, "
+                . "gatewayRequestId, "
+                . "status) " .
+            "VALUES (" . 
+                $orderDetails->orderId . "," . 
+                $orderDetails->amount . ",'" . 
+                $orderDetails->maskedPan . "','" . 
+                $cardType . "','" . 
+                $authCode . "','" . 
+                $requestId . "','" . 
+                $request->response->status . "')";
     
     $orderSql = "UPDATE orders set " .
-            "customerId = '" . $customerId . "'," .
-            "customerEmail = '" . $email . "'," .
-            "status = '" . $status . "' " .
-            "WHERE id = " . $orderId .";";
+            "customerId = '" . $orderDetails->customerId . "'," .
+            "customerEmail = '" . $orderDetails->bill_to->email . "'," .
+            "status = '" . $request->response->status . "' " .
+            "WHERE id = " . $orderDetails->orderId .";";
     
     $result= new stdClass();
     $result->paymentSql=$paymentSql;

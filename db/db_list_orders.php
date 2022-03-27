@@ -45,7 +45,7 @@ try {
                 "<div class=\"col-1\">" .
                 "</div>" .
                 "<div class=\"col-11\">";
-        $stmtPayments = $conn->query("select id, orderId, amount, cardNumber, cardType, status, dateTime from payments where orderId = ".$order['id']); 
+        $stmtPayments = $conn->query("select id, orderId, amount, cardNumber, cardType, status, authCode, gatewayRequestId, dateTime from payments where orderId = ".$order['id']); 
         $payments = $stmtPayments->fetchAll(PDO::FETCH_ASSOC);
         // iterate over rows
         $firstPayment=true;
@@ -59,6 +59,8 @@ try {
                         "<th>Card Number</th>" .
                         "<th>Card Type</th>" .
                         "<th>Status</th>" .
+                        "<th>Auth Code</th>" .
+                        "<th>Request ID</th>" .
                         "<th>Timestamp</th>" .
                         "</tr></thead>";
             }
@@ -69,6 +71,8 @@ try {
                     "<td>" . $payment['cardNumber'] . "</td>" . 
                     "<td>" . $payment['cardType'] . "</td>" . 
                     "<td>" . $payment['status'] . "</td>" .
+                    "<td>" . $payment['authCode'] . "</td>" .
+                    "<td>" . $payment['gatewayRequestId'] . "</td>" .
                     "<td>" . $payment['dateTime'] . "</td>" .
                     "</tr></tbody>";
         }
