@@ -46,22 +46,25 @@ try {
     echo(json_encode($exception));
 }?>
 <?php if ($count>0): ?>
+<div class="d-grid gap-2">
 <?php foreach ($shippingAddresses as $shippingAddress): ?>
-<div class="row">
-    <input type="hidden" id="<?php echo "sa_" . $shippingAddress->id ;?>" value='<?php echo json_encode($shippingAddress);?>'>
-    <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')"> 
-        <div class="row">
-            <div class="col-10">
-                <ul class="list-unstyled">
-                    <li><small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small></li>
-                </ul>
+    <div class="row">
+        <input type="hidden" id="<?php echo "sa_" . $shippingAddress->id ;?>" value='<?php echo json_encode($shippingAddress);?>'>
+        <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')"> 
+            <div class="row">
+                <div class="col-10">
+                    <ul class="list-unstyled">
+                        <li><small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small></li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </button>
+        </button>
+    </div>
 <?php endforeach; ?>
     <div class="row">
         <button type="button" class="btn btn-primary" onclick="showNewAddress()">Use a different address</button>
     </div>
+</div>
 <?php endif?>
     <div id="shippingSection" style="display: <?php echo ($count>0?'none':'block')?>">
     <form id="shippingForm" class="needs-validation" novalidate>

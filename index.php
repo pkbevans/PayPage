@@ -26,10 +26,7 @@ function getCookie($name){
         <title>View Basket</title>
     </head>
     <body>
-        <span>5200000000001047</span><BR>
-        <span>5200000000000007</span><br>
-        <span>371449111020228</span><br>
-        <span>340000000001007</span><br>
+        <span>5200000000001047,5200000000000007,371449111020228,340000000001007</span><br>
         <div class="container-fluid justify-content-center">
         <div class="row">
             <div id="formSection">

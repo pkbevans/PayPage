@@ -47,24 +47,38 @@ try {
 }?>
 <div id="cardSelectionSection">
 <?php if ($count>0): ?>
-<?php foreach ($paymentInstruments as $paymentInstrument): ?>
-<div class="row">
-    <input type="hidden" id="<?php echo "pi_" . $paymentInstrument->id ;?>" value='<?php echo json_encode($paymentInstrument);?>'>
-    <button type="button" class="btn btn-primary" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')"> 
-        <div class="col-10">
-            <ul class="list-unstyled">
-                <li>Pay with: <img src="images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>"><strong><?php echo $paymentInstrument->_embedded->instrumentIdentifier->card->number; ?></strong></li>
-                <li><small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small></li>
-            </ul>
+    <div class="d-grid gap-2">
+    <?php foreach ($paymentInstruments as $paymentInstrument): ?>
+            <input type="hidden" id="<?php echo "pi_" . $paymentInstrument->id ;?>" value='<?php echo json_encode($paymentInstrument);?>'>
+            <button type="button" class="btn btn-primary" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')"> 
+                <div class="row">
+                    <div class="col-3">
+                        Pay with:&nbsp; 
+                    </div>
+                    <div class="col-3">
+                        <img src="images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>">
+                    </div>
+                    <div class="col-6">
+                        <strong><?php echo $paymentInstrument->_embedded->instrumentIdentifier->card->number; ?></strong>
+                    </div>
+                    <div class="row">
+                        <div class="col-6"></div>
+                        <div class="col-6">
+                            <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
+                        </div>
+                    </div>
+                </div>
+            </button>
+    <?php endforeach; ?>
+        <button type="button" class="btn btn-primary" onclick="usePaymentInstrument('NEW')">Pay with a new card</button>
+    </div>
+    <div id="payButtonSection" class="row">
+        <div class="col-12">
+            <button type="button" class="btn btn-secondary" onclick="backButton('cardSelection')">Back</button>
         </div>
-    </button>
-</div>
-<?php endforeach; ?>
-<div class="row">
-    <button type="button" class="btn btn-primary" onclick="usePaymentInstrument('NEW')">Pay with a new card</button>
+    </div>
 </div>
 <?php endif?>
-</div>
 <div id="paymentDetailsSection" style="display: <?php echo ($count>0?"none":"block");?>">
     <div class="col-9">
         <div id="cardInputSection">
@@ -115,7 +129,7 @@ try {
         </div>
     </div>
     <div id="billingAddressSection">
-        <div  id="storeCardCheck" style="display:none">
+        <div  id="storeCardCheck" style="display: <?php echo ($count>0?"none":"block");?>">
             <div class="row">
                 <div class="col-12">
                     <input type="checkbox" class="form-check-input" onchange="useSameAddressChanged()" id="useShipAsBill" name="useShipAsBill" value="1" checked="checked">

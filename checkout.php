@@ -85,7 +85,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                     <div class="col-3"><h5>Delivery:</h5></div>
                 </div>
                 <div class="row">
-                    <div class="col-9" id="shipToText"></div>
+                    <div class="col-12" id="shipToText"></div>
                 </div>
             </div>
             <div id="summary_billTo" style="display:none">
@@ -93,7 +93,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                     <div class="col-3"><h5>Card:</h5></div>
                 </div>
                 <div class="row">
-                    <div class="col-9" id="billToText"></div>
+                    <div class="col-12" id="billToText"></div>
                 </div>
             </div>
             <div id="addressSelectionSection">
@@ -276,17 +276,15 @@ function nextButton(form){
 }
 function backButton(form){
     switch(form){
-        case "addressSelection":
-            break;
         case "cardSelection":
             document.getElementById("paymentSection").style.display = "none";
             document.getElementById("summary_delivery").style.display = "none";
             document.getElementById("addressSelectionSection").style.display = "block";
             break;
         case "pay":
-            document.getElementById("paymentDetailsSection").style.display = "none";
+            document.getElementById("cardSelectionSection").style.display = "block";
             document.getElementById("summary_billTo").style.display = "none";
-            document.getElementById("paymentSection").style.display = "block";
+            document.getElementById("paymentDetailsSection").style.display = "none";
             break;
         case "confirm":
             document.getElementById("paymentDetailsSection").style.display = "block";
@@ -348,6 +346,7 @@ function usePaymentInstrument(id){
         orderDetails.paymentInstrumentId = id;
         document.getElementById("storeCardCheck").style.display = "none";
         pi=JSON.parse(document.getElementById("pi_"+id).value);
+        orderDetails.maskedPan = pi._embedded.instrumentIdentifier.card.number;
         document.getElementById('billToText').innerHTML = stylePaymentInstrument(pi.card,pi._embedded.instrumentIdentifier.card.number,pi.billTo);
         cardType = pi.card.type;
         flipCvvOnly(true, cardType);
@@ -432,9 +431,7 @@ function stylePaymentInstrument(card, number, billTo){
                 "</div>\n" +
             "</div>" +
             "<div class=\"row\">\n" +
-                "<div class=\"col-3\">\n"+
-                "</div>\n" +
-                "<div class=\"col-7 \">\n" +
+                "<div class=\"col-12 \">\n" +
                     formatNameAddress(billTo)+
                 "</div>\n" +
             "</div>\n";
