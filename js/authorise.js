@@ -133,10 +133,9 @@ function hideStepUpScreen(transactionId) {
 }
 function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('authSection').style.display = "none";
-    document.getElementById('summarySection').style.display = "none";
+    document.getElementById('inputSection').style.display = "none";
     document.getElementById('confirmSection').style.display = "none";
-//    document.getElementById('iframeSection').style.display = "none";
-    finish = "onFinish2: " + JSON.stringify({
+    let finish = {
         "referenceNumber": orderDetails.referenceNumber,
         "amount": orderDetails.amount,
         "apiCalled": apiCalled,
@@ -153,13 +152,13 @@ function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentC
         "shippingAddressId": orderDetails.shippingAddressId,
         "errorReason": errorReason,
         "errorMessage": errorMessage
-    }, undefined, 2);
-    console.log(finish);
+    };
+    console.log(JSON.stringify(finish, undefined, 2));
     if (status === "AUTHORIZED") {
-        text = "Thank you.  Your payment has completed" + "<BR><PRE>" + finish +"</PRE>";
+        text = successHTML(finish);
         document.getElementById("retryButton").style.display = "none";
     } else {
-        text = "Oh dear. Your payment was not successful.  You can try again or try a different payment method" + "<BR>" + finish;
+        text = failHTML(finish);
     }
     document.getElementById("resultText").innerHTML = text;
     document.getElementById("resultSection").style.display = "block";
@@ -167,4 +166,24 @@ function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentC
         // Write new Customer Token to cookie
         document.cookie = "customerId=" + orderDetails.customerId;
     }
+}
+function successHTML(finish){
+    template = 
+        "<h3>Thank you for your order.  Your payment was successful</h3><br>"+
+        "<div class='row'><div class='col-4'>Order Reference</div><div class='col-8'>?mr?</div></div>"+
+        "<div class='row'><div class='col-4'>Request ID</div><div class='col-8'>?requestId?</div></div><br>"
+        ;
+    html = template.replace("?mr?", finish.referenceNumber);
+    html = html.replace("?requestId?", finish.requestId);
+    return html;
+}
+function failHTML(finish){
+    template = 
+        "<h3>Oh dear. Something is not working. Please check your internet connection and try again.</h3><br>"+
+        "<div class='row'><div class='col-4'>Order Reference</div><div class='col-8'>?mr?</div></div>"+
+        "<div class='row'><div class='col-4'>Request ID</div><div class='col-8'>?requestId?</div></div><br>"
+        ;
+    html = template.replace("?mr?", finish.referenceNumber);
+    html = html.replace("?requestId?", finish.requestId);
+    return html;
 }

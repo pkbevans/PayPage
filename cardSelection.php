@@ -72,7 +72,7 @@ try {
     <?php endforeach; ?>
         <button type="button" class="btn btn-primary" onclick="usePaymentInstrument('NEW')">Pay with a new card</button>
     </div>
-    <div id="payButtonSection" class="row">
+    <div class="row mt-2">
         <div class="col-12">
             <button type="button" class="btn btn-secondary" onclick="backButton('cardSelection')">Back</button>
         </div>
@@ -146,7 +146,7 @@ try {
         <form id="billingForm" class="needs-validation" novalidate style="display: none">
             <div id="billingSection">
                 <div class="row">
-                    <div class="col-3">
+                    <div class="12">
                         <h5>Card Billing:</h5>
                     </div>
                 </div>
@@ -209,10 +209,10 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
             </div>
         </form>
     </div>
-    <div id="payButtonSection" class="row">
+    <div class="row">
         <div class="col-12">
             <button type="button" id="payButton" onclick="nextButton('pay')" class="btn btn-primary" disabled="true">Pay</button>
-            <button type="button" class="btn btn-secondary" onclick="backButton('pay')">Back</button>
+            <button type="button" class="btn btn-secondary" onclick="backButton('<?php echo ($count>0?"pay":"pay_new");?>')">Back</button>
         </div>
     </div>
 </div>

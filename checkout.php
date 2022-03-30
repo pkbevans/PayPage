@@ -42,7 +42,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
         <div class="d-flex justify-content-center">
             <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
         </div>
-        <div id="summarySection">
+        <div id="inputSection">
             <div class="row">
                 <h3>Your Order</h3>
             </div>
@@ -82,7 +82,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             </div>
             <div id="summary_delivery" style="display:none">
                 <div class="row">
-                    <div class="col-3"><h5>Delivery:</h5></div>
+                    <div class="col-12"><h5>Delivery:</h5></div>
                 </div>
                 <div class="row">
                     <div class="col-12" id="shipToText"></div>
@@ -90,15 +90,15 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             </div>
             <div id="summary_billTo" style="display:none">
                 <div class="row">
-                    <div class="col-3"><h5>Card:</h5></div>
+                    <div class="col-12"><h5>Card:</h5></div>
                 </div>
                 <div class="row">
                     <div class="col-12" id="billToText"></div>
                 </div>
             </div>
-            <div id="addressSelectionSection">
+            <div id="addressSection">
                 <div class="row">
-                    <div class="col-3"><h5>Delivery:</h5></div>
+                    <div class="col-12"><h5>Delivery:</h5></div>
                 </div>
                 <div class="row">
                     <div id="addressSelection"></div>
@@ -112,7 +112,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                 <div class="col-12">
                     <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
                     <button type="button" class="btn btn-secondary" onclick="backButton('confirm')">Back</button>
-                    <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -127,13 +126,17 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <iframe id="step_up_iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
         </div>
         <div id="resultSection" style="display: none">
-            <h3>Result</h3>
             <div id="resultText"></div>
             <div class="row">
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary" onclick="window.open('index.php', '_parent')">Home</button>
+                    <button type="button" class="btn btn-primary" onclick="window.open('index.php', '_parent')">Continue shopping</button>
                     <button type="button" id="retryButton" class="btn btn-secondary" onclick="window.location.reload(true)">Try again</button>
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
             </div>
         </div>
     </div>
@@ -143,7 +146,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <script src="js/newCard2.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/authorise.js"></script>
-<script src="js/cardInput.js"></script>
 <script>
 var oldPaymentInstrumentId;
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
@@ -277,34 +279,46 @@ function nextButton(form){
 function backButton(form){
     switch(form){
         case "cardSelection":
+            // Back to Address Selection or entry
             document.getElementById("paymentSection").style.display = "none";
+            document.getElementById("addressSection").style.display = "block";
             document.getElementById("summary_delivery").style.display = "none";
-            document.getElementById("addressSelectionSection").style.display = "block";
+            document.getElementById("summary_billTo").style.display = "none";
             break;
         case "pay":
+            // Existing Customer who has payment Instruments => back to Card selection 
+            document.getElementById("paymentDetailsSection").style.display = "none";
             document.getElementById("cardSelectionSection").style.display = "block";
             document.getElementById("summary_billTo").style.display = "none";
-            document.getElementById("paymentDetailsSection").style.display = "none";
+            break;
+        case "pay_new":
+            // New customer with No Payment Instruments => Back to PAN entry
+            document.getElementById("paymentSection").style.display = "none";
+            document.getElementById("addressSection").style.display = "block";
+            document.getElementById("summary_delivery").style.display = "none";
+            document.getElementById("summary_billTo").style.display = "none";
             break;
         case "confirm":
             document.getElementById("paymentDetailsSection").style.display = "block";
+            document.getElementById("summaryEmailButton").style.display = "block";
             document.getElementById("confirmSection").style.display = "none";
             break;
     }
 }
 function showNewAddress(){
-    document.getElementById("shippingSection").style.display = "block";
+    document.getElementById("newAddressSection").style.display = "block";
 }
 function useShippingAddress(id){
     console.log("Shipping Address: "+ id);
     if(id === "NEW"){
         orderDetails.shippingAddressId = "";
-        form = document.getElementById('shippingForm');
+        form = document.getElementById('newAddressForm');
         if(validateForm(form)){
             setNewShippingDetails();
             document.getElementById("summary_delivery").style.display = "block";
             document.getElementById("paymentSection").style.display = "block";
-            document.getElementById("addressSelectionSection").style.display = "none";
+            document.getElementById("addressSection").style.display = "none";
+            document.getElementById("cardSelectionSection").style.display = "block";
             document.getElementById('shipToText').innerHTML = formatNameAddress(orderDetails.ship_to);
         }
     }else{
@@ -312,10 +326,20 @@ function useShippingAddress(id){
         setShippingDetails(address);
         orderDetails.shippingAddressId = id;
         document.getElementById("summary_delivery").style.display = "block";
+        document.getElementById("cardSelectionSection").style.display = "block";
         document.getElementById("paymentSection").style.display = "block";
-        document.getElementById("addressSelectionSection").style.display = "none";
+        document.getElementById("addressSection").style.display = "none";
         document.getElementById('shipToText').innerHTML = formatNameAddress(address.shipTo);
     }
+}
+function validateForm(form){
+    if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        return false;
+    }
+    return true;
 }
 function setShippingDetails(address){
     orderDetails.ship_to.firstName = address.shipTo.firstName;
@@ -358,6 +382,7 @@ function usePaymentInstrument(id){
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
     // Hide card input, show Confirmation section
+    document.getElementById("summaryEmailButton").style.display = "none";
     document.getElementById("paymentDetailsSection").style.display = "none";
     document.getElementById("confirmSection").style.display = "block";
 
@@ -426,7 +451,7 @@ function stylePaymentInstrument(card, number, billTo){
                 "</div>\n" +
             "</div>\n" +
             "<div class=\"row\">\n" +
-                "<div class=\"col-3\">\n"+
+                "<div class=\"col-12\">\n"+
                     "<h5>Billing Address:</h5>" +
                 "</div>\n" +
             "</div>" +

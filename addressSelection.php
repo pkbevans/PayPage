@@ -66,12 +66,12 @@ try {
     </div>
 </div>
 <?php endif?>
-    <div id="shippingSection" style="display: <?php echo ($count>0?'none':'block')?>">
-    <form id="shippingForm" class="needs-validation" novalidate>
+    <div id="newAddressSection" style="display: <?php echo ($count>0?'none':'block')?>">
+    <form id="newAddressForm" class="needs-validation" novalidate>
         <div class="row">
             <div class="col-12"><h5>Please enter the delivery address</h5></div>
         </div>
-        <div id="shippingDetailsSection" class="form-group">
+        <div class="form-group">
             <div class="row">
                 <div class="col-6">
                     <div class="form-group form-floating mb-3">
@@ -131,10 +131,8 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
         </div>
     </form>
     <div class="row">
-        <div class="col-3"></div>
         <div class="col-9">
             <button type="button" class="btn btn-primary" onclick="useShippingAddress('NEW')">Next</button>
-            <button type="button" class="btn btn-secondary" onclick="cancel()">Cancel</button>
         </div>
     </div>
 </div>
