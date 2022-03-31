@@ -80,50 +80,55 @@ try {
 </div>
 <?php endif?>
 <div id="paymentDetailsSection" style="display: <?php echo ($count>0?"none":"block");?>">
-    <div class="col-9">
+    <div class="col-12">
         <div id="cardInputSection">
             <div class="d-flex mb-3">
-                <div class="card">
-                    <div class="card-body"> 
-                        <div class="row"> 
-                        <div id="cardError" class="alert alert-danger alert-dismissible fade show" role="alert" style="display:none">
-                            <strong>Something went wrong. Please try again.</strong></div>
-                        </div>
-                       <div id="cardNumber">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <img src="images/Visa.svg" width="30">
-                                    <img src="images/Mastercard.svg" width="30">
-                                    <img src="images/Amex.svg" width="30">
+                <div id="cardInput">
+                    <form onsubmit="return false;">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div id="cardError" class="alert alert-danger alert-dismissible fade show" role="alert" style="display:none">
+                                        <strong>Something went wrong. Please try again.</strong>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row mt-3 mb-3">
-                                <div class="col-12">
-                                    <label class="form-check-label" for="number-container">Card Number</label>
-                                    <div class="cardInput">
-                                        <i class="fa fa-credit-card"></i>
-                                        <div id="number-container" class="form-control"></div>
+                                <div id="cardNumber">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <img src="/payPage/images/Visa.svg" width="30">
+                                            <img src="/payPage/images/Mastercard.svg" width="30">
+                                            <img src="/payPage/images/Amex.svg" width="30">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3 mb-3">
+                                        <div class="col-12">
+                                            <label class="form-check-label" for="number-container">Card Number</label>
+                                            <div class="cardInput">
+                                                <i class="fa fa-credit-card"></i>
+                                                <div id="number-container" class="form-control flex-microform"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6" id="cardDate">
+                                        <label class="form-check-label" for="expiryDate">Expiry Date</label>
+                                        <div class="cardInput">
+                                            <i class="fa fa-calendar"></i>
+                                            <input class="form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]/[2][1-9]" inputmode="numeric" autocomplete="cc-exp" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
+                                        <div class="cardInput">
+                                            <i class="fa fa-lock"></i>
+                                            <div id="securityCode-container" class="form-control flex-microform"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-6" id="cardDate">
-                                <label class="form-check-label" for="expiryDate">Expiry Date</label>
-                                <div class="cardInput">
-                                    <i class="fa fa-calendar"></i>
-                                    <input class="form-control" id="expiryDate" type="text" placeholder="MM/YY" pattern="[0-1][0-9]\/[2][1-9]" inputmode="numeric" autocomplete="cc-exp" autocorrect="off" spellcheck="off" aria-invalid="false" aria-placeholder="MM/YY" required>
-                                </div>
-                            </div>
-                            <div class="col-6"> 
-                                <label id="securityCodeLabel" class="form-check-label" for="securityCode-container">Security Code</label>
-                                <div class="cardInput">
-                                    <i class="fa fa-lock"></i>
-                                    <div id="securityCode-container" class="form-control"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -151,13 +156,13 @@ try {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="" tabindex="1" placeholder="First name" maxlength="60" required>
                             <label for="bill_to_forename" class="form-label">First name*</label>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="" tabindex="2" placeholder="Last Name" maxlength="60" required>
                             <label for="bill_to_surname" class="form-label">Last name*</label>
@@ -165,13 +170,13 @@ try {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="" tabindex="3" placeholder="1st line of address" maxlength="60" required>
                             <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="" tabindex="4" placeholder="2nd line of address" maxlength="60">
                             <label for="bill_to_address_line2" class="form-label">Address line 2</label>
@@ -179,21 +184,21 @@ try {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="form-group form-floating mb-3">
-                            <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="" tabindex="6" placeholder="City/County" required maxlength="50">
+                            <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="" tabindex="5" placeholder="City/County" required maxlength="50">
                             <label for="bill_to_address_city" class="form-label">City/County*</label>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-6">
                         <div class="form-group form-floating mb-3">
-                            <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="" tabindex="5" placeholder="Postcode" required maxlength="10">
+                            <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="" tabindex="6" placeholder="Postcode" required maxlength="10">
                             <label for="bill_to_postcode" class="form-label">PostCode*</label>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-9">
+                    <div class="col-6">
                         <div class="form-group form-floating mb-3">
                             <select id="bill_to_address_country" class="form-control form-control-sm" tabindex="7" >
 <?php

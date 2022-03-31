@@ -143,7 +143,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
-<script src="js/newCard2.js"></script>
+<script src="js/cardInput.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/authorise.js"></script>
 <script>
@@ -216,7 +216,7 @@ function showCardSelection(){
         }),
         success: function (result) {
             document.getElementById('paymentSection').innerHTML = result;
-            createCardInput("", "mainSpinner", "payButton");
+            createCardInput("mainSpinner","payButton", false, false,"");
         }
     });
 }
@@ -267,7 +267,14 @@ function nextButton(form){
     switch(form){
         case "pay":
             // Pay Button clicked
-            getToken(onTokenCreated);
+            if(orderDetails.useShippingAsBilling){
+                getToken(onTokenCreated);
+            }else{
+                form = document.getElementById('billingForm');
+                if(validateForm(form)){
+                    getToken(onTokenCreated);
+                }
+            }
             break;
         case "confirm":
             // Confirm Button clicked

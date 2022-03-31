@@ -125,8 +125,8 @@ function flipCvvOnly(cvvOnlyFlag, type){
     }    
 }
 function getToken(tokenCallback) {
-    errorAlert.style.display = "none";
     tokenCreatedCallback = tokenCallback;
+    errorAlert.style.display = "none";
     var options = {};
     if(!cvvOnly){
         var options = {
@@ -138,12 +138,12 @@ function getToken(tokenCallback) {
         if (err) {
             // handle error.  Probably a timeout. Start again
             console.log(err);
+
             newCardButton.disabled = true;
             errorAlert.style.display = "block";
             getCaptureContext(window.location.href.includes("localhost")?true:false);
         } else {
             // Token received.
-//            console.log( "\nGot Token:\n" + jwt);
             cardDetails = getCardDetails(jwt);
             flexToken = getJTI(jwt);
             return tokenCreated(flexToken, cardDetails);
