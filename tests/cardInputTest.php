@@ -15,7 +15,7 @@
         <div id="progressSpinner"  class="spinner-border text-info" style="display: block;"></div>
         <div class="row">
             <div class="col-12">
-                <input type="checkbox" class="form-check-input" onchange="cvvOnlyChanged()" id="cvvOnly" name="cvvOnly" value="1">
+                <input type="checkbox" class="form-check-input" onchange="cvvOnlyChanged()" id="cvvOnly" name="cvvOnly" value="1" checked="checked">
                 <label for="cvvOnly" class="form-check-label">CVV Only</label>
             </div>
         </div>                            
@@ -69,12 +69,6 @@
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function (e) {
-        createCardInput("", "progressSpinner", "payButton" );
-    });
-    function tokenCallback(result){
-        console.log(result);
-    }
     // custom styles that will be applied to each field we create using Microform
 var myStyles = {
     'input': {
@@ -91,29 +85,73 @@ var myStyles = {
     'invalid': {'color': 'red'}
 };
 var captureContext;
-var maskedPan = "";
-var cardType = "001";
+var cardType;
 var flexToken;
-var pan;
-var storeCard = false;
 var expDate;
 var flex;
 var microform;
 var number;
 var securityCode;
-var newCardButton;
-var panValid=false;
-var cvnValid=false;
-var expDateValid=false;
+var getTokenButtonId;
+var getTokenButton;
+var panValid;
+var cvnValid;
+var expDateValid;
 var secCodeLbl;
 var numberContainer;
-var cvvOnly = false;
-var panOnly = false;
-var cardButtonName;
+var cvvOnly;
+var panOnly;
 var errorAlert;
 var container;
 
+document.addEventListener("DOMContentLoaded", function (e) {
+    createCardInput("", "progressSpinner", "payButton", true, false,"" );
+});
+function flipCvvOnly(cvvOnlyFlag, type){
+    createCardInput("", "progressSpinner", "payButton", cvvOnlyFlag, false, type );
+    return;
+}
+function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=false, panOnlyFlag=false, cvvOnlyCardType){
+    cvvOnly = cvvOnlyFlag;
+    panOnly = panOnlyFlag;
+    cardType = cvvOnlyCardType;
+    getTokenButtonId = buttonName;
+    container = document.getElementById(containerName);
+    progress = document.getElementById(progressName);
+
+    document.getElementById("cardNumber").style.display = (cvvOnly?"none":"block");
+    document.getElementById("cardDate").style.display = (cvvOnly?"none":"block");
+
+    if(progress){
+        progress.style.display = "none";
+    }
+    getCaptureContext(window.location.href.includes("localhost")?true:false);
+}
+function getCaptureContext(local) {
+    $.ajax({
+        type: "POST",
+        url: "../rest_generate_capture_context.php",
+        data: JSON.stringify({
+            "local": local
+        }),
+        success: function (result) {
+            res = JSON.parse(result);
+//            console.log("\nCapture Context:\n" + JSON.stringify(res, undefined, 2));
+            let httpCode = res.responseCode;
+            if (httpCode === 201) {
+                captureContext = res.rawResponse;
+                setUpMicroform();
+            } else {
+                // 500 System error or anything else TODO
+                console.log("Capture Context ERROR");
+            }
+        }
+    });
+}
 function setUpMicroform(){
+    panValid=false;
+    cvnValid=false;
+    expDateValid=false;
     flex = new Flex(captureContext);
     microform = flex.microform({styles: myStyles});
     if(cvvOnly){
@@ -146,44 +184,47 @@ function setUpMicroform(){
         });
 
     }
-    newCardButton = document.querySelector('#'+cardButtonName);
+    setUpExpiryDate("expiryDate");
+    getTokenButton = document.querySelector('#'+getTokenButtonId);
     errorAlert = document.getElementById("cardError");
 }
 function setUpPanField(){
     // Set up PAN field
-    if(number === undefined){
-        number = microform.createField('number', {placeholder: 'Card number'});
-        numberContainer = document.querySelector('#number-container');
-    }
-    if(!number._loaded){
-        number.load('#number-container');
-        number.on('change', function (data) {
-//            console.log(data);
-            if(!panOnly){
-                // Set "CVV" text with name based on scheme
-                secCodeLbl.textContent = (data.card && data.card.length > 0) ? data.card[0].securityCode.name : 'CVN';
-                if(data.card && data.card.length > 0){
-                    updateSecurityCodeField(data.card[0].cybsCardType);
-                }
+    number = microform.createField('number', {placeholder: 'Card number'});
+    numberContainer = document.querySelector('#number-container');
+    number.load('#number-container');
+    number.on('change', function (data) {
+        console.log(data);
+        if(!panOnly){
+            // Set "CVV" text with name based on scheme
+            secCodeLbl.textContent = (data.card && data.card.length > 0) ? data.card[0].securityCode.name : 'CVN';
+            if(data.card && data.card.length > 0){
+                updateSecurityCodeField(data.card[0].cybsCardType);
             }
-            panValid = data.valid;
-            fieldsValid();
-        });
-        number.on('autocomplete', function (data) {
-    //        console.log(data);
-            let xDate = "";
-            if (data.expirationMonth) {
-                xDate = data.expirationMonth + "/";
+        }
+        panValid = data.valid;
+        fieldsValid();
+    });
+    number.on('autocomplete', function (data) {
+        console.log(data);
+        let xDate = "";
+        if (data.expirationMonth) {
+            xDate = data.expirationMonth + "/";
+        }
+        if (data.expirationYear) {
+            d=parseInt(data.expirationYear);
+            if(d>2000){
+                d-=2000;
             }
-            if (data.expirationYear) {
-                xDate += (parseInt(data.expirationYear) - 2000);
-            }
-            expDate.value = xDate;
-        });
-        number.on('inputSubmitRequest', function() {
-            expDate.focus();
-        });
-    }
+            xDate += d;
+        }
+        expDate.value = xDate;
+        expDateValid = expiryDateValid();
+        fieldsValid();
+    });
+    number.on('inputSubmitRequest', function() {
+        expDate.focus();
+    });
 }
 function updateSecurityCodeField(type){
     // If Amex, CVV is 4 digits, else 3
@@ -193,113 +234,11 @@ function updateSecurityCodeField(type){
         securityCode.update({placeholder: "•••", maxLength: 3});
     }
 }
-function flipCvvOnly(cvvOnlyFlag, type){
-    cvvOnly = cvvOnlyFlag;
-    // Hide PAN and Expiry date sections
-    document.getElementById("cardNumber").style.display = (cvvOnly?"none":"block");
-    document.getElementById("cardDate").style.display = (cvvOnly?"none":"block");
-    if(cvvOnly){
-        // Remove PAN field
-        if(number !== undefined && number._loaded){
-            number.unload();
-        }
-        // Clear CVV Field
-        securityCode.clear();
-        updateSecurityCodeField(type);
-        panValid = true;
-        expDateValid = true;
-    }else{
-        // Add PAN field
-        setUpPanField();
-        // Clear CVV Field
-        securityCode.clear();
-    }    
-}
-function getToken() {
-    errorAlert.style.display = "none";
-    var options = {};
-    if(!cvvOnly){
-        var options = {
-            expirationMonth: expDate.value.substring(0,2),
-            expirationYear: 20 + expDate.value.substring(3,5)
-        };
-    }
-    microform.createToken(options, function (err, jwt) {
-        if (err) {
-            // handle error.  Probably a timeout. Start again
-            console.log(err);
-            console.log("Status: "+err.status+". Reason: "+err.reason);
-            newCardButton.disabled = true;
-            errorAlert.style.display = "block";
-            getCaptureContext(window.location.href.includes("localhost")?true:false);
-        } else {
-            // Token received.
-            console.log( "\nGot Token:\n" + jwt);
-            cardDetails = getCardDetails(jwt);
-            flexToken = getJTI(jwt);
-            window.alert("HELLO GOT TOKEN");
-        }
-    });
-}
-function fieldsValid() {
-    // Check PAN and CVN both Populated and valid
-    newCardButton.disabled = (panValid && cvnValid && expDateValid)?false:true;
-    if(!newCardButton.disabled){
-        newCardButton.focus();
-    }
-}
-function getJTI(jwt) {
-    jti = getPayload(jwt).jti;
-//  console.log("JTI:" + jti);
-    return (jti);
-}
-function getCardDetails(jwt) {
-    return getPayload(jwt).data;
-}
-function getPayload(jwt) {
-    jwtArray = jwt.split(".");
-    payloadB64 = jwtArray[1];
-    payload = window.atob(payloadB64);
-    payloadJ = JSON.parse(payload);
-    console.log(payloadJ);
-    return payloadJ;
-}
-function getCaptureContext(local) {
-    $.ajax({
-        type: "POST",
-        url: "../rest_generate_capture_context.php",
-        data: JSON.stringify({
-            "local": local
-        }),
-        success: function (result) {
-            res = JSON.parse(result);
-//            console.log("\nCapture Context:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            if (httpCode === 201) {
-                captureContext = res.rawResponse;
-                setUpMicroform();
-            } else {
-                // 500 System error or anything else TODO
-                console.log("Capture Context ERROR");
-            }
-        }
-    });
-}
-function createCardInput(containerName, progressName, buttonName, cvvOnlyFlag=false, panOnlyFlag=false, cvvOnlyCardType){
-    cvvOnly = cvvOnlyFlag;
-    panOnly = panOnlyFlag;
-    cardType = cvvOnlyCardType;
-    cardButtonName = buttonName;
-    container = document.getElementById(containerName);
-    progress = document.getElementById(progressName);
-
-    if(progress){
-        progress.style.display = "none";
-    }
-    getCaptureContext(window.location.href.includes("localhost")?true:false);
-    if(!cvvOnly){
-        setUpExpiryDate("expiryDate");
-    }
+function setUpExpiryDate(id){
+    expDate = document.getElementById(id);
+    expDate.value="";
+    expDate.addEventListener('input',dateInput);
+    expDate.addEventListener('keydown',dateKeyDown);
 }
 function expiryDateValid() {
     if(expDate.value.length<5){
@@ -315,9 +254,8 @@ function expiryDateValid() {
     }
     return true;
 }
-function setUpExpiryDate(id){
-    expDate = document.getElementById(id);
-    expDate.addEventListener('input',(event)=>{
+function dateInput(event){
+        console.log(event.target.value);
         const val = event.target.value.toString();
         // If last char is invalid - ignore it
         myChar = val.charAt(val.length-1);
@@ -333,8 +271,13 @@ function setUpExpiryDate(id){
             return;
         }
         if(val.length>5){
-            //Ignore
-            event.target.value = val.substring(0, val.length - 1);
+            if(val.length===7){
+                // Could be a auutocomplete in MM/YYYY format
+                event.target.value = val.substring(0,2)+"/"+val.substring(5,7);
+            }else{
+                //Ignore
+                event.target.value = val.substring(0, val.length - 1);
+            }
         }
         switch (val.length) {
             case 0:
@@ -362,21 +305,73 @@ function setUpExpiryDate(id){
         }
         expDateValid = expiryDateValid();
         fieldsValid();
-    });
-    expDate.addEventListener('keydown',(event)=> {
-        const val = event.target.value.toString();
-        if(event.key === "Backspace"){
-            if (event.target.selectionStart === 3 ){
-                event.target.value = val.substring(0, 2);
-            }else if(event.target.selectionStart === 4){
-                event.target.value = val.substring(0, 3);
+}
+function dateKeyDown(event){
+    const val = event.target.value.toString();
+    if(event.key === "Backspace"){
+        if (event.target.selectionStart === 3 ){
+            event.target.value = val.substring(0, 2);
+        }else if(event.target.selectionStart === 4){
+            event.target.value = val.substring(0, 3);
+        }
+    }else if(event.key === "Enter"){
+        event.preventDefault();
+        event.stopPropagation();
+        securityCode.focus();
+    }  
+}
+function getToken() {
+    errorAlert.style.display = "none";
+    var options = {};
+    if(!cvvOnly){
+        var options = {
+            expirationMonth: expDate.value.substring(0,2),
+            expirationYear: 20 + expDate.value.substring(3,5)
+        };
+    }
+    microform.createToken(options, function (err, jwt) {
+        if (err) {
+            // handle error.  Probably a timeout. Start again
+            console.log(err);
+            console.log("Status: "+err.status+". Reason: "+err.reason);
+            getTokenButton.disabled = true;
+            errorAlert.style.display = "block";
+            getCaptureContext(window.location.href.includes("localhost")?true:false);
+        } else {
+            // Token received.
+            console.log( "\nGot Token:\n" + jwt);
+            if(cvvOnly){
+                console.log( "\nGot Token (CVV)\n");
+            }else{
+                cardDetails = getCardDetails(jwt);
+                console.log( "\nGot Token:\n" + cardDetails.number +"\nExp Date: "+cardDetails.expirationMonth+"/"+cardDetails.expirationYear);
             }
-        }else if(event.key === "Enter"){
-            event.preventDefault();
-            event.stopPropagation();
-            securityCode.focus();
+            flexToken = getJTI(jwt);
         }
     });
+}
+function fieldsValid() {
+    // Check PAN and CVN both Populated and valid
+    getTokenButton.disabled = (panValid && cvnValid && expDateValid)?false:true;
+    if(!getTokenButton.disabled){
+        getTokenButton.focus();
+    }
+}
+function getJTI(jwt) {
+    jti = getPayload(jwt).jti;
+//  console.log("JTI:" + jti);
+    return (jti);
+}
+function getCardDetails(jwt) {
+    return getPayload(jwt).data;
+}
+function getPayload(jwt) {
+    jwtArray = jwt.split(".");
+    payloadB64 = jwtArray[1];
+    payloadJ = window.atob(payloadB64);
+    payload = JSON.parse(payloadJ);
+//    console.log(payload);
+    return payload;
 }
 function cvvOnlyChanged(){
     xxx = document.querySelector('#cvvOnly');
