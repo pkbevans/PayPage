@@ -107,11 +107,27 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <div id="paymentSection" style="display:none">
             </div>
         </div>
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasLabel">My Donuts</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <div id="manageAddressSection">
+                <iframe id="manageIframe" name="manageIframe" src="" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
+            </div>
+          </div>
+        </div>
         <div id="confirmSection" style="display: none">
             <div class="row">
                 <div class="col-12">
                     <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
-                    <button type="button" class="btn btn-secondary" onclick="backButton('confirm')">Back</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" class="btn btn-link" onclick="backButton('confirm')">Back</button>
+                    <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -132,11 +148,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                     <button type="button" class="btn btn-primary" onclick="window.open('index.php', '_parent')">Continue shopping</button>
                     <button type="button" id="retryButton" class="btn btn-secondary" onclick="window.location.reload(true)">Try again</button>
                 </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
             </div>
         </div>
     </div>
@@ -219,6 +230,23 @@ function showCardSelection(){
             createCardInput("mainSpinner","payButton", false, false,"");
         }
     });
+}
+var myOffcanvas = document.getElementById('offcanvasExample');
+myOffcanvas.addEventListener('hidden.bs.offcanvas', function () {
+   // Refresh list of addresses, as they may have changed
+   // TODO - only refresh if something changed
+   showAddresses();
+});
+function showManageAddresses(){
+    document.getElementById("offcanvasLabel").innerHTML = "My Addresses";
+    var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
+    var iframe = document.getElementById('manageIframe');
+    iframe.src = "/payPage/manageStoredAddresses.php?customerId=" + orderDetails.customerId
+            +"&reference_number="+orderDetails.referenceNumber+
+            "&orderId="+orderDetails.orderId+
+            "&email="+orderDetails.email+
+            "&currency="+ orderDetails.currency;
+    bsOffcanvas.show()
 }
 function showAddresses(){
     $.ajax({

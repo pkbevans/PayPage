@@ -74,7 +74,8 @@ try {
     </div>
     <div class="row mt-2">
         <div class="col-12">
-            <button type="button" class="btn btn-secondary" onclick="backButton('cardSelection')">Back</button>
+            <button type="button" class="btn btn-link" onclick="backButton('cardSelection')">Back</button>
+            <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
         </div>
     </div>
 </div>
@@ -217,7 +218,12 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
     <div class="row">
         <div class="col-12">
             <button type="button" id="payButton" onclick="nextButton('pay')" class="btn btn-primary" disabled="true">Pay</button>
-            <button type="button" class="btn btn-secondary" onclick="backButton('<?php echo ($count>0?"pay":"pay_new");?>')">Back</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button type="button" class="btn btn-link" onclick="backButton('<?php echo ($count>0?"pay":"pay_new");?>')">Back</button>
+            <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
         </div>
     </div>
 </div>

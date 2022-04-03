@@ -136,4 +136,12 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-9">
+        <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+<?php if ($count>0): ?>
+        <button type="button" class="btn btn-link" onclick="showManageAddresses()">Manage my addresses</button>
+<?php endif ?>
+    </div>
+</div>
     

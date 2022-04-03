@@ -108,7 +108,7 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                         onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
                         break;
                     case 400:
-                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.details.field);
+                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
                         break;
                     default:
                         onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
