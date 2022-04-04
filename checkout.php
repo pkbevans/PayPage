@@ -1,7 +1,6 @@
 <?php
-include_once 'card_types.php';
-include_once 'countries.php';
-//include 'rest_get_customer.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/card_types.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     $defaultEmail = $_REQUEST['email'];

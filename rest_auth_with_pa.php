@@ -124,9 +124,9 @@ try {
             $challengeCode = "01";
         }
         if($incoming->order->local){
-            $returnUrl = "http://localhost/payPage/redirect.php";
+            $returnUrl = "http://localhost/payPage/php/utils/redirect.php";
         }else{
-            $returnUrl = TARGET_ORIGIN . "/payPage/redirect.php";
+            $returnUrl = TARGET_ORIGIN . "/payPage/php/utils/redirect.php";
         }
         $consumerAuthenticationInformation = [
             "challengeCode"=> $challengeCode,

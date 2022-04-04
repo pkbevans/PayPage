@@ -1,6 +1,6 @@
-<?php 
-require_once 'PeRestLib/RestRequest.php';
-require_once 'php/utils/logApi.php';
+<?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/logApi.php';
 
 $incoming = json_decode(file_get_contents('php://input'));
 $reference_number = $incoming->order->referenceNumber;

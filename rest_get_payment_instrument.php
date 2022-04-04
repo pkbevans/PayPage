@@ -1,4 +1,5 @@
-<?php require_once 'PeRestLib/RestRequest.php';
+<?php
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
 ///////////////////////////FUNCTIONS
 /////////////////////////END FUNCTIONS

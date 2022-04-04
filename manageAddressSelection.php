@@ -1,7 +1,7 @@
 <?php
-require_once 'PeRestLib/RestRequest.php';
-include_once 'countries.php';
-include_once 'card_types.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/card_types.php';
 ////////////////////////////////////FUNCTIONS
 function concatinateNameAddress($nameAddress){
     // return name and address string
