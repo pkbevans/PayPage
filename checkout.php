@@ -120,7 +120,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
         </div>
         <div id="confirmSection" style="display: none">
             <div class="row">
-                <div class="col-12">
+                <div class="d-grid gap-2">
                     <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
                 </div>
             </div>
@@ -216,9 +216,9 @@ var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {ke
 
 document.addEventListener("DOMContentLoaded", function (e) {
     showAddresses();
-    showCardSelection();
+    showCards();
 });
-function showCardSelection(){
+function showCards(){
     $.ajax({
         type: "POST",
         url: "cardSelection.php",
@@ -232,21 +232,29 @@ function showCardSelection(){
     });
 }
 var myOffcanvas = document.getElementById('offcanvasExample');
-myOffcanvas.addEventListener('hidden.bs.offcanvas', function () {
-   // Refresh list of addresses, as they may have changed
-   // TODO - only refresh if something changed
-   showAddresses();
-});
-function showManageAddresses(){
-    document.getElementById("offcanvasLabel").innerHTML = "My Addresses";
+function showManageIframe(type){
+    document.getElementById("offcanvasLabel").innerHTML = (type==="ADDRESS"?"My Addresses":"My Cards");
     var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
     var iframe = document.getElementById('manageIframe');
-    iframe.src = "/payPage/manageStoredAddresses.php?customerId=" + orderDetails.customerId
+    if(type === "ADDRESS"){
+        src = "/payPage/manageStoredAddresses.php?customerId=" + orderDetails.customerId;
+    }else{
+        src = "/payPage/manageStoredCards.php?customerId=" + orderDetails.customerId
             +"&reference_number="+orderDetails.referenceNumber+
             "&orderId="+orderDetails.orderId+
-            "&email="+orderDetails.email+
+            "&email="+orderDetails.bill_to.email+
             "&currency="+ orderDetails.currency;
+    }
+    iframe.src = src;
     bsOffcanvas.show()
+}
+function onStoredDataUpdated(type, action){
+    console.log("Stored data updated: "+type+" : "+action);
+    if(type === "ADDRESS"){
+        showAddresses();
+    }else{
+        showCards();
+    }
 }
 function showAddresses(){
     $.ajax({

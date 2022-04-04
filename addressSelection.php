@@ -62,7 +62,7 @@ try {
     </div>
 <?php endforeach; ?>
     <div class="row">
-        <button type="button" class="btn btn-primary" onclick="showNewAddress()">Use a different address</button>
+        <button type="button" class="btn btn-secondary" onclick="showNewAddress()">Use a different address</button>
     </div>
 </div>
 <?php endif?>
@@ -140,7 +140,7 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
     <div class="col-9">
         <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
 <?php if ($count>0): ?>
-        <button type="button" class="btn btn-link" onclick="showManageAddresses()">Manage my addresses</button>
+        <button type="button" class="btn btn-link" onclick="showManageIframe('ADDRESS')">Manage my addresses</button>
 <?php endif ?>
     </div>
 </div>

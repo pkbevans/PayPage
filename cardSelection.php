@@ -70,12 +70,15 @@ try {
                 </div>
             </button>
     <?php endforeach; ?>
-        <button type="button" class="btn btn-primary" onclick="usePaymentInstrument('NEW')">Pay with a new card</button>
+        <button type="button" class="btn btn-secondary" onclick="usePaymentInstrument('NEW')">Pay with a new card</button>
     </div>
     <div class="row mt-2">
         <div class="col-12">
             <button type="button" class="btn btn-link" onclick="backButton('cardSelection')">Back</button>
             <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+<?php if ($count>0): ?>
+            <button type="button" class="btn btn-link" onclick="showManageIframe('CARDS')">Manage my cards</button>
+<?php endif ?>
         </div>
     </div>
 </div>
@@ -215,11 +218,13 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
             </div>
         </form>
     </div>
-    <div class="row">
+    <!--<div class="row">-->
         <div class="col-12">
-            <button type="button" id="payButton" onclick="nextButton('pay')" class="btn btn-primary" disabled="true">Pay</button>
+            <div class="d-grid gap-2">
+                <button type="button" id="payButton" onclick="nextButton('pay')" class="btn btn-primary" disabled="true">Pay</button>
+            </div>
         </div>
-    </div>
+    <!--</div>-->
     <div class="row">
         <div class="col-12">
             <button type="button" class="btn btn-link" onclick="backButton('<?php echo ($count>0?"pay":"pay_new");?>')">Back</button>

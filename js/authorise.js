@@ -65,7 +65,6 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
             "authenticationTransactionID": authenticationTransactionID
         }),
         success: function (result) {
-            console.log("\nResult:\n" + result);
             // Response is a json string - turn it into a javascript object
             let res = JSON.parse(result);
             console.log("\nResults:\n" + JSON.stringify(res, undefined, 2));

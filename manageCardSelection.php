@@ -2,26 +2,7 @@
 require_once 'PeRestLib/RestRequest.php';
 include_once 'countries.php';
 include_once 'card_types.php';
-////////////////////////////////////FUNCTIONS
-function concatinateNameAddress($nameAddress){
-    // return name and address string
-    if(!isset($nameAddress->address2)){
-        $nameAddress->address2 = "";
-    }
-    return xtrim($nameAddress->firstName, " ") .
-            xtrim($nameAddress->lastName, "<BR>") .
-            xtrim($nameAddress->address1, ", ") .
-            xtrim($nameAddress->address2, ", ") .
-            xtrim($nameAddress->locality, ", ") .
-            xtrim($nameAddress->postalCode, ", ") .
-            xtrim($nameAddress->country, ".");
-}
-
-function xtrim($in, $suffix){
-    $out = trim($in);
-    return (empty($out)? "" : $out . $suffix );
-}
-///////////////////////////////////END FUNCTIONS
+include_once '/php/utils/addresses.php';
 ///////////////////////////////////VARIABLES
 $count=0;
 $incoming = json_decode(file_get_contents('php://input'));
