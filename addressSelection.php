@@ -48,9 +48,6 @@ try {
 <?php endif?>
     <div id="newAddressSection" style="display: <?php echo ($count>0?'none':'block')?>">
     <form id="newAddressForm" class="needs-validation" novalidate>
-        <div class="row">
-            <div class="col-12"><h5>Please enter the delivery address</h5></div>
-        </div>
         <div class="form-group">
             <div class="row">
                 <div class="col-6">

@@ -1,5 +1,6 @@
 <?php
-include_once '../ppSecure/PeRestLibKeys.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/ppSecure/PeRestLibKeys.php';
+
 //const PORTFOLIO = "barclayssitt00";
 //const MID = "paulspants21005";
 const PORTFOLIO = "pemid03";

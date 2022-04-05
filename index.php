@@ -88,7 +88,7 @@ function getCookie($name){
     function writeOrder(){
         $.ajax({
             type: "POST",
-            url: "write_order.php",
+            url: "/payPage/tests/write_order.php",
             data: JSON.stringify({
                 "mrn": document.getElementById('reference_number').value,
                 "customerId": document.getElementById('customerToken').value,

@@ -80,24 +80,28 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                 </div>
             </div>
             <div id="summary_delivery" style="display:none">
-                <div class="row">
-                    <div class="col-12"><h5>Delivery:</h5></div>
-                </div>
-                <div class="row">
-                    <div class="col-12" id="shipToText"></div>
+                <div class="d-flex justify-content-center">
+                    <div class="card" style="width: 24rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">Delivery Address</h5>
+                            <p id="shipToText" class="card-text"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="summary_billTo" style="display:none">
-                <div class="row">
-                    <div class="col-12"><h5>Card:</h5></div>
-                </div>
-                <div class="row">
-                    <div class="col-12" id="billToText"></div>
+                <div class="d-flex justify-content-center">
+                    <div class="card" style="width: 24rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">Payment Card</h5>
+                            <p id="billToText" class="card-text"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="addressSection">
                 <div class="row">
-                    <div class="col-12"><h5>Delivery:</h5></div>
+                    <div class="col-12"><h5>Tell us where to deliver your stuff:</h5></div>
                 </div>
                 <div class="row">
                     <div id="addressSelection"></div>
@@ -324,6 +328,7 @@ function backButton(form){
             // Back to Address Selection or entry
             document.getElementById("paymentSection").style.display = "none";
             document.getElementById("addressSection").style.display = "block";
+            document.getElementById("summaryEmailButton").style.display = "block";
             document.getElementById("summary_delivery").style.display = "none";
             document.getElementById("summary_billTo").style.display = "none";
             break;
@@ -337,12 +342,12 @@ function backButton(form){
             // New customer with No Payment Instruments => Back to PAN entry
             document.getElementById("paymentSection").style.display = "none";
             document.getElementById("addressSection").style.display = "block";
+            document.getElementById("summaryEmailButton").style.display = "block";
             document.getElementById("summary_delivery").style.display = "none";
             document.getElementById("summary_billTo").style.display = "none";
             break;
         case "confirm":
             document.getElementById("paymentDetailsSection").style.display = "block";
-            document.getElementById("summaryEmailButton").style.display = "block";
             document.getElementById("confirmSection").style.display = "none";
             break;
     }
@@ -360,6 +365,7 @@ function useShippingAddress(id){
             document.getElementById("summary_delivery").style.display = "block";
             document.getElementById("paymentSection").style.display = "block";
             document.getElementById("addressSection").style.display = "none";
+            document.getElementById("summaryEmailButton").style.display = "none";
             document.getElementById("cardSelectionSection").style.display = "block";
             document.getElementById('shipToText').innerHTML = formatNameAddress(orderDetails.ship_to);
         }
@@ -371,6 +377,7 @@ function useShippingAddress(id){
         document.getElementById("cardSelectionSection").style.display = "block";
         document.getElementById("paymentSection").style.display = "block";
         document.getElementById("addressSection").style.display = "none";
+        document.getElementById("summaryEmailButton").style.display = "none";
         document.getElementById('shipToText').innerHTML = formatNameAddress(address.shipTo);
     }
 }
@@ -424,7 +431,6 @@ function usePaymentInstrument(id){
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
     // Hide card input, show Confirmation section
-    document.getElementById("summaryEmailButton").style.display = "none";
     document.getElementById("paymentDetailsSection").style.display = "none";
     document.getElementById("confirmSection").style.display = "block";
 

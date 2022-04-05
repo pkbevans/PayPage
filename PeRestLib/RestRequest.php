@@ -1,5 +1,5 @@
 <?php
-include_once "RestConstants.php";
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestConstants.php';
 
 // HTTP POST request
 function ProcessRequest($mid, $resource, $method, $payload, $child = null, $authentication = AUTH_TYPE_SIGNATURE )
