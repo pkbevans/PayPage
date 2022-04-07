@@ -81,23 +81,25 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             </div>
             <div id="summary_delivery" style="display:none">
                 <div class="d-flex justify-content-center">
-                    <div class="card" style="width: 24rem;">
-                        <div class="card-body">
+                    <div class="card">
+                        <div class="card-body" style="width: 90vw">
                             <h5 class="card-title">Delivery Address</h5>
                             <p id="shipToText" class="card-text"></p>
                         </div>
                     </div>
                 </div>
+                <BR>
             </div>
             <div id="summary_billTo" style="display:none">
                 <div class="d-flex justify-content-center">
-                    <div class="card" style="width: 24rem;">
-                        <div class="card-body">
+                    <div class="card">
+                        <div class="card-body" style="width: 90vw">
                             <h5 class="card-title">Payment Card</h5>
                             <p id="billToText" class="card-text"></p>
                         </div>
                     </div>
                 </div>
+                <BR>
             </div>
             <div id="addressSection">
                 <div class="row">
@@ -354,6 +356,11 @@ function backButton(form){
 }
 function showNewAddress(){
     document.getElementById("newAddressSection").style.display = "block";
+    document.getElementById("addressButtonSection").style.display = "none";
+}
+function hideNewAddress(){
+    document.getElementById("newAddressSection").style.display = "none";
+    document.getElementById("addressButtonSection").style.display = "block";
 }
 function useShippingAddress(id){
     console.log("Shipping Address: "+ id);
@@ -417,15 +424,17 @@ function usePaymentInstrument(id){
         flipCvvOnly(false);
     }else{
         orderDetails.paymentInstrumentId = id;
+        document.getElementById('billingForm').style.display = "none";
         document.getElementById("storeCardCheck").style.display = "none";
+        document.getElementById("useShipAsBill").checked = true;
         pi=JSON.parse(document.getElementById("pi_"+id).value);
         orderDetails.maskedPan = pi._embedded.instrumentIdentifier.card.number;
         document.getElementById('billToText').innerHTML = stylePaymentInstrument(pi.card,pi._embedded.instrumentIdentifier.card.number,pi.billTo);
         cardType = pi.card.type;
         flipCvvOnly(true, cardType);
+        document.getElementById("summary_billTo").style.display = "block";
     }
     document.getElementById("cardSelectionSection").style.display = "none";
-    document.getElementById("summary_billTo").style.display = "block";
     document.getElementById("paymentDetailsSection").style.display = "block";
 }
 function onTokenCreated(tokenDetails){
@@ -437,13 +446,15 @@ function onTokenCreated(tokenDetails){
     orderDetails.flexToken = tokenDetails.flexToken;
     if(orderDetails.paymentInstrumentId === ""){
         orderDetails.maskedPan = tokenDetails.cardDetails.number;
+        // If storeCard checked, we will create a Token
+        sc = document.getElementById('storeCard');
+        if (sc.checked) {
+            orderDetails.storeCard = true;
+        }
+    }else{
+        orderDetails.storeCard = false;
     }
     setBillingDetails();
-    // If storeCard checked, we will create a Token
-    sc = document.getElementById('storeCard');
-    if (sc.checked) {
-        orderDetails.storeCard = true;
-    }
     if(orderDetails.paymentInstrumentId === ""){
         document.getElementById("summary_billTo").style.display = "block";
         document.getElementById('billToText').innerHTML = 
@@ -500,7 +511,7 @@ function stylePaymentInstrument(card, number, billTo){
             "</div>\n" +
             "<div class=\"row\">\n" +
                 "<div class=\"col-12\">\n"+
-                    "<h5>Billing Address:</h5>" +
+                    "<h5>Billing Address</h5>" +
                 "</div>\n" +
             "</div>" +
             "<div class=\"row\">\n" +

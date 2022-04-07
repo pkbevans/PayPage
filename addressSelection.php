@@ -26,28 +26,26 @@ try {
     echo(json_encode($exception));
 }?>
 <?php if ($count>0): ?>
-<div class="d-grid gap-2">
+<div id="addressButtonSection">
+    <div class="d-grid gap-2">
 <?php foreach ($shippingAddresses as $shippingAddress): ?>
-    <div class="row">
         <input type="hidden" id="<?php echo "sa_" . $shippingAddress->id ;?>" value='<?php echo json_encode($shippingAddress);?>'>
         <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')"> 
             <div class="row">
-                <div class="col-10">
+                <div class="col-12">
                     <ul class="list-unstyled">
                         <li><small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small></li>
                     </ul>
                 </div>
             </div>
         </button>
-    </div>
 <?php endforeach; ?>
-    <div class="row">
         <button type="button" class="btn btn-secondary" onclick="showNewAddress()">Use a different address</button>
     </div>
 </div>
 <?php endif?>
     <div id="newAddressSection" style="display: <?php echo ($count>0?'none':'block')?>">
-    <form id="newAddressForm" class="needs-validation" novalidate>
+    <form id="newAddressForm" class="needs-validation mt-2" novalidate>
         <div class="form-group">
             <div class="row">
                 <div class="col-6">
@@ -108,13 +106,14 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
         </div>
     </form>
     <div class="row">
-        <div class="col-9">
+        <div class="col-12">
             <button type="button" class="btn btn-primary" onclick="useShippingAddress('NEW')">Next</button>
+            <button type="button" class="btn btn-primary" onclick="hideNewAddress()">Back</button>
         </div>
     </div>
 </div>
 <div class="row">
-    <div class="col-9">
+    <div class="col-12">
         <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
 <?php if ($count>0): ?>
         <button type="button" class="btn btn-link" onclick="showManageIframe('ADDRESS')">Manage my addresses</button>
