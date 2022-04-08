@@ -106,14 +106,14 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
         </div>
     </form>
     <div class="row">
-        <div class="col-12">
+        <div class="d-grid gap-2">
             <button type="button" class="btn btn-primary" onclick="useShippingAddress('NEW')">Next</button>
-            <button type="button" class="btn btn-primary" onclick="hideNewAddress()">Back</button>
         </div>
     </div>
 </div>
 <div class="row">
     <div class="col-12">
+        <button type="button" class="btn btn-link" onclick="hideNewAddress()" style="display: none" id="newAddressBackButton">Back</button>
         <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
 <?php if ($count>0): ?>
         <button type="button" class="btn btn-link" onclick="showManageIframe('ADDRESS')">Manage my addresses</button>

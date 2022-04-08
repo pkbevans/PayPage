@@ -362,10 +362,12 @@ function backButton(form){
 }
 function showNewAddress(){
     document.getElementById("newAddressSection").style.display = "block";
+    document.getElementById("newAddressBackButton").style.display = "block";
     document.getElementById("addressButtonSection").style.display = "none";
 }
 function hideNewAddress(){
     document.getElementById("newAddressSection").style.display = "none";
+    document.getElementById("newAddressBackButton").style.display = "none";
     document.getElementById("addressButtonSection").style.display = "block";
 }
 function useShippingAddress(id){

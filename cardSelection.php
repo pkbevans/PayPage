@@ -199,13 +199,11 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
             </div>
         </form>
     </div>
-    <!--<div class="row">-->
-        <div class="col-12">
-            <div class="d-grid gap-2">
-                <button type="button" id="payButton" onclick="nextButton('pay')" class="btn btn-primary" disabled="true">Pay</button>
-            </div>
+    <div class="col-12">
+        <div class="d-grid gap-2">
+            <button type="button" id="payButton" onclick="nextButton('pay')" class="btn btn-primary" disabled="true">Pay</button>
         </div>
-    <!--</div>-->
+    </div>
     <div class="row">
         <div class="col-12">
             <button type="button" class="btn btn-link" onclick="backButton('<?php echo ($count>0?"pay":"pay_new");?>')">Back</button>
