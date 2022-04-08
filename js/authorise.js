@@ -120,6 +120,9 @@ function showStepUpScreen(stepUpURL, jwt) {
     // console.log( "Challenge Screen:\n"+stepUpURL);
     document.getElementById('step_up_form').action = stepUpURL;
     document.getElementById('step_up_form_jwt_input').value = jwt;
+    document.getElementById("step_up_iframe").style.display = "block";
+    document.getElementById("authMessage").style.display = "none";
+    document.getElementById("authSpinner").style.display = "none";
     var stepUpForm = document.getElementById('step_up_form');
     if (stepUpForm){
         stepUpForm.submit();
@@ -128,6 +131,8 @@ function showStepUpScreen(stepUpURL, jwt) {
 function hideStepUpScreen(transactionId) {
     console.log("Challenge Complete TransactionId:\n" + transactionId);
     document.getElementById("step_up_iframe").style.display = "none";
+    document.getElementById("authMessage").style.display = "block";
+    document.getElementById("authSpinner").style.display = "block";
     authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
 }
 function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {

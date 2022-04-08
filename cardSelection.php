@@ -67,7 +67,7 @@ try {
 </div>
 <?php endif?>
 <div id="paymentDetailsSection" style="display: <?php echo ($count>0?"none":"block");?>">
-    <div id="cardInputSection">
+    <div id="cardInputSection" style="width: 90vw">
         <div class="d-flex justify-content-center mb-3">
             <div id="cardInput">
                 <form onsubmit="return false;">

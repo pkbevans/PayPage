@@ -28,57 +28,55 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
         <input id="cardinal_collection_form_input" type="hidden" name="JWT" value=""/>
     </form>
     </<!--Cardinal device data collection code END-->
-    <div class="container">
-        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" role="dialog" aria-hidden="false">
-          <div class="modal-dialog modal-tall">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">3DS</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
-        </div>
+    <div class="container d-flex justify-content-center">
         <div id="inputSection">
             <div class="row">
-                <h3>Your Order</h3>
-            </div>
-            <div class="row">
-                <div class="col-3">
-                    <h5>Total:</h5>
-                </div>
-                <div class="col-9">
-                    <span><?php echo "£" . $_REQUEST['amount'];?></span>
+                <div class="d-flex justify-content-center">
+                    <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-3">
-                    <h5>Email:</h5>
-                </div>
-                <div class="col-9">
-                    <div id="emailSection">
-                        <div id="emailText"><?php echo $defaultEmail;?></div>
-                        <button id="summaryEmailButton" type="button" class="btn btn-link p-0" onclick="editEmail()">Edit</button>
-                    </div>
-                    <form id="emailForm" class="needs-validation" novalidate style="display:none">
+            <div class="d-flex justify-content-center">
+                <div class="card">
+                    <div class="card-body" style="width: 90vw">
+                        <h5 class="card-title">Your Order</h5>
                         <div class="row">
+                            <div class="col-3">
+                                <h5>Total:</h5>
+                            </div>
                             <div class="col-9">
-                                <div class="form-group mb-3">
-                                    <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
-                                </div>
+                                <span><?php echo "£" . $_REQUEST['amount'];?></span>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
-                                <button type="button" class="btn btn-primary" onclick="updateEmail(true)">Update</button>
-                                <button type="button" class="btn btn-secondary" onclick="updateEmail(false)">Cancel</button>
+                            <div class="col-3">
+                                <h5>Email:</h5>
+                            </div>
+                            <div class="col-9">
+                                <div id="emailSection">
+                                    <div id="emailText"><?php echo $defaultEmail;?></div>
+                                    <button id="summaryEmailButton" type="button" class="btn btn-link p-0" onclick="editEmail()">Edit</button>
+                                </div>
+                                <form id="emailForm" class="needs-validation" novalidate style="display:none">
+                                    <div class="row">
+                                        <div class="col-9">
+                                            <div class="form-group mb-3">
+                                                <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button type="button" class="btn btn-primary" onclick="updateEmail(true)">Update</button>
+                                            <button type="button" class="btn btn-secondary" onclick="updateEmail(false)">Cancel</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
+            <BR>
             <div id="summary_delivery" style="display:none">
                 <div class="d-flex justify-content-center">
                     <div class="card">
@@ -111,40 +109,49 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             </div>
             <div id="paymentSection" style="display:none">
             </div>
+            <div id="confirmSection" style="display: none">
+                <div class="row">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-link" onclick="backButton('confirm')">Back</button>
+                        <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasLabel">
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasLabel">My Donuts</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-          </div>
-          <div class="offcanvas-body">
-            <div id="manageAddressSection">
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="manageDataOffCanvas" aria-labelledby="offcanvasLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasLabel"></h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
                 <iframe id="manageIframe" name="manageIframe" src="" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
-            </div>
-          </div>
-        </div>
-        <div id="confirmSection" style="display: none">
-            <div class="row">
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <button type="button" class="btn btn-link" onclick="backButton('confirm')">Back</button>
-                    <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
-                </div>
             </div>
         </div>
         <div id="authSection" style="display: none;">
+            <div class="d-flex justify-content-center">
+                <div id="authSpinner" class="spinner-border"></div>
+            </div>
+            <BR>
+            <div id="authMessage" class="align-self-center">
+                <div class="d-flex justify-content-center">
+                    <div class="card">
+                        <div class="card-body" style="width: 90vw">
+                            <h5 class="card-title">Authorising</h5>
+                            <p class="card-text">We are authorizing your payment. Please be patient.  Please do not press BACK or REFRESH.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <iframe id="step_up_iframe" style="overflow: hidden; display: none; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
             <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
                 <input id="step_up_form_jwt_input" type="hidden" name="JWT" value=""/>
                 <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
             </form>
-            <div class="d-flex justify-content-center">
-                <div id="authSpinner" class="spinner-border" ></div>
-            </div>
-            <iframe id="step_up_iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
         </div>
         <div id="resultSection" style="display: none">
             <div id="resultText"></div>
@@ -217,7 +224,6 @@ var myStyles = {
 };
 var number;
 var payButton;
-var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {keyboard: false});
 
 document.addEventListener("DOMContentLoaded", function (e) {
     showAddresses();
@@ -236,7 +242,7 @@ function showCards(){
         }
     });
 }
-var myOffcanvas = document.getElementById('offcanvasExample');
+var myOffcanvas = document.getElementById('manageDataOffCanvas');
 function showManageIframe(type){
     document.getElementById("offcanvasLabel").innerHTML = (type==="ADDRESS"?"My Addresses":"My Cards");
     var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
@@ -319,7 +325,7 @@ function nextButton(form){
             break;
         case "confirm":
             // Confirm Button clicked
-            document.getElementById("confirmSection").style.display = "none";
+            document.getElementById("inputSection").style.display = "none";
             authorise();
             break;
     }
