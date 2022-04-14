@@ -114,15 +114,19 @@ try {
                             </div>
                             <div  id="storeCardCheck" style="display: <?php echo ($count>0?"none":"block");?>">
                                 <div class="row mt-2">
-                                    <div class="col-12">
+                                    <div class="col-1">
                                         <input type="checkbox" class="form-check-input" onchange="useSameAddressChanged()" id="useShipAsBill" name="useShipAsBill" value="1" checked="checked">
-                                        <label for="useShipAsBill" class="form-check-label">Use Delivery Address as Billing Address</label>
+                                    </div>
+                                    <div class="col-11">
+                                        <label for="useShipAsBill" class="form-check-label">Use Delivery Address as the card billing address</label>
                                     </div>
                                 </div>                            
                                 <div class="row">
-                                    <div class="col-12">
+                                    <div class="col-1">
                                         <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
-                                        <label for="storeCard" class="form-check-label">Store my details for future use</label>
+                                    </div>
+                                    <div class="col-11">
+                                        <label for="storeCard" class="form-check-label">Store these details for future use</label>
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +141,7 @@ try {
             <div id="billingSection">
                 <div class="row">
                     <div class="12">
-                        <h5>Card Billing:</h5>
+                        <h5>Card billing address:</h5>
                     </div>
                 </div>
                 <div class="row">

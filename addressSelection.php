@@ -34,7 +34,7 @@ try {
             <div class="row">
                 <div class="col-12">
                     <ul class="list-unstyled">
-                        <li><small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small></li>
+                        <li><small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>" style="max-height: 999999px;"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small></li>
                     </ul>
                 </div>
             </div>

@@ -1,8 +1,8 @@
 <?php 
-require_once 'PeRestLib/RestRequest.php';
-require_once 'php/utils/logApi.php';
-include_once 'db/db_insert_payment.php';
-
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/logApi.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/db/db_insert_payment.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/addresses.php';
 
 $incoming = json_decode(file_get_contents('php://input'));
 // Key incoming fields:
@@ -56,13 +56,13 @@ try {
     ];
     if(empty($incoming->order->paymentInstrumentId)){
         $billTo = [
-            "firstName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->firstName :$incoming->order->bill_to->firstName), 0, MAXSIZE_NAME),
-            "lastName" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->lastName :$incoming->order->bill_to->lastName), 0, MAXSIZE_NAME),
-            "address1" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address1:$incoming->order->bill_to->address1), 0, MAXSIZE_ADDRESS),
-            "address2" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address2: $incoming->order->bill_to->address2), 0, MAXSIZE_ADDRESS),
-            "locality" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->locality: $incoming->order->bill_to->locality), 0, MAXSIZE_CITY),
-            "postalCode" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->postalCode: $incoming->order->bill_to->postalCode), 0, MAXSIZE_POSTCODE),
-            "country" => substr(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->country: $incoming->order->bill_to->country), 0, MAXSIZE_COUNTRY),
+            "firstName" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->firstName :$incoming->order->bill_to->firstName)), 0, MAXSIZE_NAME),
+            "lastName" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->lastName :$incoming->order->bill_to->lastName)), 0, MAXSIZE_NAME),
+            "address1" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address1:$incoming->order->bill_to->address1)), 0, MAXSIZE_ADDRESS),
+            "address2" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address2: $incoming->order->bill_to->address2)), 0, MAXSIZE_ADDRESS),
+            "locality" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->locality: $incoming->order->bill_to->locality)), 0, MAXSIZE_CITY),
+            "postalCode" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->postalCode: $incoming->order->bill_to->postalCode)), 0, MAXSIZE_POSTCODE),
+            "country" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->country: $incoming->order->bill_to->country)), 0, MAXSIZE_COUNTRY),
             "email" => $incoming->order->bill_to->email
         ];
     }else{
@@ -75,13 +75,13 @@ try {
     if($incoming->order->shippingAddressRequired){
         if(empty($incoming->order->shippingAddressId)){
             $shipTo = [
-                "firstName" => substr($incoming->order->ship_to->firstName, 0, MAXSIZE_NAME),
-                "lastName" => substr($incoming->order->ship_to->lastName, 0, MAXSIZE_NAME),
-                "address1" => substr($incoming->order->ship_to->address1, 0, MAXSIZE_ADDRESS),
-                "address2" => substr($incoming->order->ship_to->address2, 0, MAXSIZE_ADDRESS),
-                "locality" => substr($incoming->order->ship_to->locality, 0, MAXSIZE_CITY),
-                "postalCode" => substr($incoming->order->ship_to->postalCode, 0, MAXSIZE_POSTCODE),
-                "country" => substr($incoming->order->ship_to->country, 0, MAXSIZE_COUNTRY),
+                "firstName" => substr(ppTrim($incoming->order->ship_to->firstName), 0, MAXSIZE_NAME),
+                "lastName" => substr(ppTrim($incoming->order->ship_to->lastName), 0, MAXSIZE_NAME),
+                "address1" => substr(ppTrim($incoming->order->ship_to->address1), 0, MAXSIZE_ADDRESS),
+                "address2" => substr(ppTrim($incoming->order->ship_to->address2), 0, MAXSIZE_ADDRESS),
+                "locality" => substr(ppTrim($incoming->order->ship_to->locality), 0, MAXSIZE_CITY),
+                "postalCode" => substr(ppTrim($incoming->order->ship_to->postalCode), 0, MAXSIZE_POSTCODE),
+                "country" => substr(ppTrim($incoming->order->ship_to->country), 0, MAXSIZE_COUNTRY),
             ];
             $orderInformation['shipTo'] = $shipTo;
         }

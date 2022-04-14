@@ -26,9 +26,9 @@ try {
 }?>
 <!DOCTYPE html>
 <html lang="en-GB">
-<head   >
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/payPage/css/styles.css"/>
@@ -41,185 +41,186 @@ try {
         <div class="row">
             <div class="col-12">
                 <div id="addressSelection">
-<?php if ($count>0): ?>
-<div>
-    <ul class="list-group ">
-<?php foreach ($shippingAddresses as $shippingAddress): ?>
-    <li class="list-group-item <?php echo ($shippingAddress->default?"list-group-item-primary":"");?>">
-<?php if($shippingAddress->default):?>
-        <div class="row"><div class="col-12"><strong>*Default Address</strong></div></div>
-<?php endif?>
-        <small><div><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small>
-        <form id="<?php echo $shippingAddress->id;?>_form" style="display: none">
-            <div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="<?php echo $shippingAddress->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->firstName;?>" placeholder="First name" maxlength="60" required>
-                            <label for="<?php echo $shippingAddress->id;?>_firstName" class="form-label">First name*</label>
+                    <?php if ($count>0): ?>
+                    <div id="storedAddressSection">
+                        <ul class="list-group ">
+                    <?php foreach ($shippingAddresses as $shippingAddress): ?>
+                        <li class="list-group-item <?php echo ($shippingAddress->default?"list-group-item-primary":"");?>">
+                    <?php if($shippingAddress->default):?>
+                            <div class="row"><div class="col-12"><strong>*Default Address</strong></div></div>
+                    <?php endif?>
+                            <div style="max-height: 999999px;"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div>
+                            <form id="<?php echo $shippingAddress->id;?>_form" style="display: none">
+                                <div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="<?php echo $shippingAddress->id;?>_firstName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->firstName;?>" placeholder="First name" maxlength="60" required>
+                                                <label for="<?php echo $shippingAddress->id;?>_firstName" class="form-label">First name*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="<?php echo $shippingAddress->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->lastName;?>" placeholder="Last Name" maxlength="60" required>
+                                                <label for="<?php echo $shippingAddress->id;?>_lastName" class="form-label">Surname*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="<?php echo $shippingAddress->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->address1;?>" placeholder="1st line of address" maxlength="60" required>
+                                                <label for="<?php echo $shippingAddress->id;?>_address1" class="form-label">Address line 1*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="<?php echo $shippingAddress->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($shippingAddress->shipTo->address2)?$shippingAddress->shipTo->address2:"");?>" placeholder="2nd line of address" maxlength="60">
+                                                <label for="<?php echo $shippingAddress->id;?>_address2" class="form-label">Address line 2</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="<?php echo $shippingAddress->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->locality;?>" placeholder="City/County" maxlength="50" required>
+                                                <label for="<?php echo $shippingAddress->id;?>_locality" class="form-label">City/County*</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="<?php echo $shippingAddress->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->postalCode;?>" placeholder="Postcode" maxlength="10" required>
+                                                <label for="<?php echo $shippingAddress->id;?>_postalCode" class="form-label">PostCode*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group form-floating mb-3">
+                                                <select id="<?php echo $shippingAddress->id;?>_country" class="form-select">
+                    <?php
+                    foreach ($countries as $key => $value) {
+                    echo "<option value=\"". $key ."\"" . ( $shippingAddress->shipTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
+                    }
+                    ?>
+                                                </select>
+                                                <label for="<?php echo $shippingAddress->id;?>_address_country" class="form-label">Country*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                            *Required fields
+                                </div>
+                    <?php if(!$shippingAddress->default):?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="<?php echo $shippingAddress->id;?>_defaultAddress" <?php echo ($shippingAddress->default?"checked ":"");?>>
+                                    <label class="form-check-label" for="flexCheckDefault">Make this my default address</label>
+                                </div>
+                    <?php endif?>
+                                <div class="row">
+                                    <div class="col-sm-1">
+                                        <button type="button" class="btn btn-primary" onclick="updateAddress('<?php echo $shippingAddress->id;?>',false)">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+                        <div id="<?php echo $shippingAddress->id."_buttons";?>">
+                            <div class="row">
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-link" onclick="editAddress('<?php echo $shippingAddress->id;?>')">Edit</button>
+                                </div>
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-link" onclick="updateAddress('<?php echo $shippingAddress->id;?>', true)" <?php echo ($shippingAddress->default?"disabled":"")?>>Make default</button>
+                                </div>
+                                <div class="col-3">
+                                    <button type="button" class="btn btn-link" onclick="deleteAddress('<?php echo $shippingAddress->id;?>')"  <?php echo ($shippingAddress->default?"disabled":"")?>>Remove</button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="<?php echo $shippingAddress->id;?>_lastName" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->lastName;?>" placeholder="Last Name" maxlength="60" required>
-                            <label for="<?php echo $shippingAddress->id;?>_lastName" class="form-label">Surname*</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="<?php echo $shippingAddress->id;?>_address1" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->address1;?>" placeholder="1st line of address" maxlength="60" required>
-                            <label for="<?php echo $shippingAddress->id;?>_address1" class="form-label">Address line 1*</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="<?php echo $shippingAddress->id;?>_address2" type="text" class="form-control form-control-sm" value="<?php echo (isset($shippingAddress->shipTo->address2)?$shippingAddress->shipTo->address2:"");?>" placeholder="2nd line of address" maxlength="60">
-                            <label for="<?php echo $shippingAddress->id;?>_address2" class="form-label">Address line 2</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="<?php echo $shippingAddress->id;?>_locality" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->locality;?>" placeholder="City/County" maxlength="50" required>
-                            <label for="<?php echo $shippingAddress->id;?>_locality" class="form-label">City/County*</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="<?php echo $shippingAddress->id;?>_postalCode" type="text" class="form-control form-control-sm" value="<?php echo $shippingAddress->shipTo->postalCode;?>" placeholder="Postcode" maxlength="10" required>
-                            <label for="<?php echo $shippingAddress->id;?>_postalCode" class="form-label">PostCode*</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group form-floating mb-3">
-                            <select id="<?php echo $shippingAddress->id;?>_country" class="form-select">
-<?php
-foreach ($countries as $key => $value) {
-echo "<option value=\"". $key ."\"" . ( $shippingAddress->shipTo->country == $key? "selected": "") . ">" . $value . "</option>\n";
-}
-?>
-                            </select>
-                            <label for="<?php echo $shippingAddress->id;?>_address_country" class="form-label">Country*</label>
-                        </div>
-                    </div>
-                </div>
-        *Required fields
-            </div>
-<?php if(!$shippingAddress->default):?>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="<?php echo $shippingAddress->id;?>_defaultAddress" <?php echo ($shippingAddress->default?"checked ":"");?>>
-                <label class="form-check-label" for="flexCheckDefault">Make this my default address</label>
-            </div>
-<?php endif?>
-            <div class="row">
-                <div class="col-sm-1">
-                    <button type="button" class="btn btn-link" onclick="updateAddress('<?php echo $shippingAddress->id;?>',false)">Save</button>
-                </div>
-            </div>
-        </form>
-    <div id="<?php echo $shippingAddress->id."_buttons";?>">
-        <div class="row">
-            <div class="col-3">
-                <button type="button" class="btn btn-link" onclick="editAddress('<?php echo $shippingAddress->id;?>')">Edit</button>
-            </div>
-            <div class="col-3">
-                <button type="button" class="btn btn-link" onclick="updateAddress('<?php echo $shippingAddress->id;?>', true)" <?php echo ($shippingAddress->default?"disabled":"")?>>Make default</button>
-            </div>
-            <div class="col-3">
-                <button type="button" class="btn btn-link" onclick="deleteAddress('<?php echo $shippingAddress->id;?>')"  <?php echo ($shippingAddress->default?"disabled":"")?>>Remove</button>
-            </div>
-        </div>
-    </div>
-    </li>
-<?php endforeach; ?>
-    <li class="list-group-item">
-        <div class="row">
-            <button type="button" class="btn btn-primary" onclick="newAddress()">Add a new address</button>
-        </div>
-    </li>
-    </ul>
+                        </li>
+                    <?php endforeach; ?>
+                        <li class="list-group-item" id="newAddressButton">
+                            <div class="row">
+                                <button type="button" class="btn btn-primary" onclick="newAddress()">Add a new address</button>
+                            </div>
+                        </li>
+                        </ul>
 
-</div>
-<?php endif?>
-<div id="newAddressSection" style="display: <?php echo ($count>0?'none':'block')?>">
-    <form id="newAddressForm" class="needs-validation" novalidate>
-        <div class="row">
-            <div class="col-12"><h5>Please enter the delivery address</h5></div>
-        </div>
-        <div class="form-group">
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group form-floating mb-3">
-                        <input id="ship_to_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
-                        <label for="ship_to_firstName" class="form-label">First name*</label>
                     </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group form-floating mb-3">
-                        <input id="ship_to_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
-                        <label for="ship_to_lastName" class="form-label">Surname*</label>
+                    <?php endif?>
+                    <div id="newAddressSection" style="display: <?php echo ($count>0?'none':'block')?>">
+                        <form id="newAddressForm" class="needs-validation" novalidate>
+                            <div class="row">
+                                <div class="col-12"><h5>Please enter the delivery address</h5></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="ship_to_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
+                                            <label for="ship_to_firstName" class="form-label">First name*</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="ship_to_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
+                                            <label for="ship_to_lastName" class="form-label">Surname*</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="ship_to_address1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" maxlength="60" required>
+                                            <label for="ship_to_address1" class="form-label">Address line 1*</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="ship_to_address2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address" maxlength="60">
+                                                <label for="ship_to_address2" class="form-label">Address line 2</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="ship_to_locality" type="text" class="form-control form-control-sm" value="" placeholder="City/County" maxlength="50" required>
+                                            <label for="ship_to_locality" class="form-label">City/County*</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group form-floating mb-3">
+                                            <input id="ship_to_postalCode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" maxlength="10" required>
+                                            <label for="ship_to_postalCode" class="form-label">PostCode*</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <select id="ship_to_country" class="form-control form-control-sm">
+                    <?php
+                    foreach ($countries as $key => $value) {
+                    echo "<option value=\"". $key ."\">" . $value . "</option>\n";
+                    }
+                    ?>
+                                            </select>
+                                            <label for="ship_to_country" class="form-label">Country*</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row">
+                            <div class="col-9">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="add_defaultAddress" >
+                                    <label class="form-check-label" for="flexCheckDefault">Make this my default address</label>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="addAddress()">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelAdd()">Cancel</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group form-floating mb-3">
-                        <input id="ship_to_address1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" maxlength="60" required>
-                        <label for="ship_to_address1" class="form-label">Address line 1*</label>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group form-floating mb-3">
-                        <input id="ship_to_address2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address" maxlength="60">
-                            <label for="ship_to_address2" class="form-label">Address line 2</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group form-floating mb-3">
-                        <input id="ship_to_locality" type="text" class="form-control form-control-sm" value="" placeholder="City/County" maxlength="50" required>
-                        <label for="ship_to_locality" class="form-label">City/County*</label>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="form-group form-floating mb-3">
-                        <input id="ship_to_postalCode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" maxlength="10" required>
-                        <label for="ship_to_postalCode" class="form-label">PostCode*</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="form-floating">
-                        <select id="ship_to_country" class="form-control form-control-sm">
-<?php
-foreach ($countries as $key => $value) {
-echo "<option value=\"". $key ."\">" . $value . "</option>\n";
-}
-?>
-                        </select>
-                        <label for="ship_to_country" class="form-label">Country*</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-    <div class="row">
-        <div class="col-9">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="add_defaultAddress" >
-                <label class="form-check-label" for="flexCheckDefault">Make this my default address</label>
-            </div>
-            <button type="button" class="btn btn-primary" onclick="addAddress()">Save</button>
-        </div>
-    </div>
-</div>
                 </div>
             </div>
         </div>
@@ -231,11 +232,19 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
 var customerId = "<?php echo $_REQUEST['customerId'];?>";
 function newAddress(){
     console.log("New Address");
-    document.getElementById("newAddressSection").style = "block";
+    document.getElementById("newAddressSection").style.display = "block";
+    document.getElementById("newAddressButton").style.display = "none";
+    document.getElementById("storedAddressSection").style.display = "none";
 }
 function editAddress(id){
     document.getElementById(id+"_form").style.display = "block";
     document.getElementById(id+"_buttons").style.display = "none";
+    document.getElementById("newAddressButton").style.display = "none";
+}
+function cancelAdd(){
+    document.getElementById("newAddressSection").style.display = "none";
+    document.getElementById("newAddressButton").style.display = "block";
+    document.getElementById("storedAddressSection").style.display = "block";
 }
 function updateAddress(id, setDefaultOnly){
     console.log("\nUpdating Shipping Address: "+id);

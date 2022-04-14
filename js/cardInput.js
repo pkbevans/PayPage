@@ -279,7 +279,7 @@ function fieldsValid() {
     // Check PAN and CVN both Populated and valid
     getTokenButton.disabled = (panValid && cvnValid && expDateValid)?false:true;
     if(!getTokenButton.disabled){
-        getTokenButton.focus();
+//        getTokenButton.focus();
     }
 }
 function getJTI(jwt) {

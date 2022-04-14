@@ -13,10 +13,9 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    ​
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="/payPage/css/styles.css"/>
     <title>Payment Page</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -30,11 +29,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     </<!--Cardinal device data collection code END-->
     <div class="container d-flex justify-content-center">
         <div id="inputSection">
-            <div class="row">
-                <div class="d-flex justify-content-center">
-                    <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
-                </div>
-            </div>
             <div class="d-flex justify-content-center">
                 <div class="card">
                     <div class="card-body" style="width: 90vw">
@@ -73,38 +67,32 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                                 </form>
                             </div>
                         </div>
+                        <div id="summary_delivery" style="display:none">
+                            <hr class="solid">
+                            <h5 class="card-title">Delivery Address</h5>
+                            <div id="shipToText" class="card-text small" style="max-height: 999999px;"></div>
+                        </div>
+                        <div id="summary_billTo" style="display:none">
+                            <hr class="solid">
+                            <h5 class="card-title">Payment Card</h5>
+                            <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
+                        </div>
                     </div>
                 </div>
             </div>
             <BR>
-            <div id="summary_delivery" style="display:none">
-                <div class="d-flex justify-content-center">
-                    <div class="card">
-                        <div class="card-body" style="width: 90vw">
-                            <h5 class="card-title">Delivery Address</h5>
-                            <p id="shipToText" class="card-text"></p>
-                        </div>
-                    </div>
-                </div>
-                <BR>
-            </div>
-            <div id="summary_billTo" style="display:none">
-                <div class="d-flex justify-content-center">
-                    <div class="card">
-                        <div class="card-body" style="width: 90vw">
-                            <h5 class="card-title">Payment Card</h5>
-                            <p id="billToText" class="card-text"></p>
-                        </div>
-                    </div>
-                </div>
-                <BR>
-            </div>
             <div id="addressSection">
                 <div class="row">
                     <div class="col-12"><h5>Tell us where to deliver your stuff:</h5></div>
                 </div>
                 <div class="row">
-                    <div id="addressSelection"></div>
+                    <div id="addressSelection">
+                        <div class="row">
+                            <div class="d-flex justify-content-center">
+                                <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="paymentSection" style="display:none">
@@ -140,9 +128,9 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <div id="authMessage" class="align-self-center">
                 <div class="d-flex justify-content-center">
                     <div class="card">
-                        <div class="card-body" style="width: 90vw">
+                        <div class="card-body" style="width: 90vw; max-height: 999999px;">
                             <h5 class="card-title">Authorising</h5>
-                            <p class="card-text">We are authorizing your payment. Please be patient.  Please do not press BACK or REFRESH.</p>
+                            <p class="card-text small">We are authorizing your payment. Please be patient.  Please do not press BACK or REFRESH.</p>
                         </div>
                     </div>
                 </div>
@@ -238,7 +226,7 @@ function showCards(){
         }),
         success: function (result) {
             document.getElementById('paymentSection').innerHTML = result;
-            createCardInput("mainSpinner","payButton", false, false,"");
+            createCardInput("","payButton", false, false,"");
         }
     });
 }
