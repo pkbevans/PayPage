@@ -217,6 +217,11 @@ document.addEventListener("DOMContentLoaded", function (e) {
     showAddresses();
     showCards();
 });
+//Disable Back Button
+window.history.pushState(null, null, window.location.href);
+window.onpopstate = function () {
+    window.history.go(1);
+};
 function showCards(){
     $.ajax({
         type: "POST",
