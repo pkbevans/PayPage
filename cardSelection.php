@@ -41,14 +41,14 @@ try {
                     <div class="col-3">
                         <img src="images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>">
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 text-start">
                         <strong><?php echo $paymentInstrument->_embedded->instrumentIdentifier->card->number; ?></strong>
                     </div>
-                    <div class="row">
-                        <div class="col-6"></div>
-                        <div class="col-6">
-                            <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col-6 text-start">
+                        <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
                     </div>
                 </div>
             </button>

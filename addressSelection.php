@@ -33,9 +33,7 @@ try {
         <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')"> 
             <div class="row">
                 <div class="col-12">
-                    <ul class="list-unstyled">
-                        <li><small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>" style="max-height: 999999px;"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small></li>
-                    </ul>
+                    <small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>" style="max-height: 999999px;"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small>
                 </div>
             </div>
         </button>

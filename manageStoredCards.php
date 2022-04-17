@@ -50,33 +50,39 @@ try {
 <?php if($paymentInstrument->default):?>
                             <div class="row"><div class="col-12"><strong>*Default Card</strong></div></div>
 <?php endif?>
-                                    <div class="row">
-                                        <div class="col-3">
-                                            <img src="/payPage/images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>">
-                                        </div>
-                                        <div class="col-6">
-                                            <strong><?php echo $paymentInstrument->_embedded->instrumentIdentifier->card->number; ?></strong>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6"></div>
-                                            <div class="col-6">
-                                                <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
-                                            </div>
-                                        </div>
-                                    </div>
-                        <div id="<?php echo $paymentInstrument->id."_buttons";?>">
                             <div class="row">
                                 <div class="col-3">
-                                    <button type="button" class="btn btn-link" onclick="editCard('<?php echo $paymentInstrument->id;?>')">Edit</button>
+                                    <img src="/payPage/images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>">
                                 </div>
-                                <div class="col-3">
-                                    <button type="button" class="btn btn-link" onclick="updateCard('<?php echo $paymentInstrument->id;?>', true)" <?php echo ($paymentInstrument->default?"disabled":"")?>>Make default</button>
-                                </div>
-                                <div class="col-3">
-                                    <button type="button" class="btn btn-link" onclick="deleteCard('<?php echo $paymentInstrument->id;?>')"  <?php echo ($paymentInstrument->default?"disabled":"")?>>Remove</button>
+                                <div class="col-6 text-start">
+                                    <strong><?php echo $paymentInstrument->_embedded->instrumentIdentifier->card->number; ?></strong>
                                 </div>
                             </div>
-                        </div>
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-6 text-start">
+                                    <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
+                                </div>
+                            </div><br>
+                            <div class="row">
+                                <div class="col-3">Billing Address:</div>
+                                <div class="col-9">
+                                    <div style="max-height: 999999px;"><small><?php echo concatinateNameAddress($paymentInstrument->billTo);?></small></div>
+                                </div>
+                            </div>
+                            <div id="<?php echo $paymentInstrument->id."_buttons";?>">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <button type="button" class="btn btn-link" onclick="editCard('<?php echo $paymentInstrument->id;?>')">Edit</button>
+                                    </div>
+                                    <div class="col-3">
+                                        <button type="button" class="btn btn-link" onclick="updateCard('<?php echo $paymentInstrument->id;?>', true)" <?php echo ($paymentInstrument->default?"disabled":"")?>>Make default</button>
+                                    </div>
+                                    <div class="col-3">
+                                        <button type="button" class="btn btn-link" onclick="deleteCard('<?php echo $paymentInstrument->id;?>')"  <?php echo ($paymentInstrument->default?"disabled":"")?>>Remove</button>
+                                    </div>
+                                </div>
+                            </div>
                             <form id="<?php echo $paymentInstrument->id;?>_form" style="display: none">
                                 <div>
                                     <div class="row">
