@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/card_types.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
@@ -28,7 +28,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     </form>
     </<!--Cardinal device data collection code END-->
     <div class="container d-flex justify-content-center">
-        <div id="inputSection">
+        <div id="inputSection" style="display: none">
             <div class="d-flex justify-content-center">
                 <div class="card">
                     <div class="card-body" style="width: 90vw">
@@ -146,7 +146,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <div class="row">
                 <div class="col-12">
                     <button type="button" class="btn btn-primary" onclick="window.open('index.php', '_parent')">Continue shopping</button>
-                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="window.location.reload(true)">Try again</button>
+                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="retry();">Try again</button>
                 </div>
             </div>
         </div>
@@ -158,7 +158,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <script src="js/utils.js"></script>
 <script src="js/authorise.js"></script>
 <script>
-var oldPaymentInstrumentId;
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
         referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
@@ -174,6 +173,7 @@ let orderDetails = {
         flexToken: "",
         maskedPan: "",
         storeCard: false,
+        buyNow: <?php echo isset($_REQUEST['buyNow']) && $_REQUEST['buyNow'] === "true"?"true":"false";?>,
         capture: <?php echo isset($_REQUEST['autoCapture']) && $_REQUEST['autoCapture'] === "true"?"true":"false";?>,
         ship_to: {
             firstName: "",
@@ -214,14 +214,52 @@ var number;
 var payButton;
 
 document.addEventListener("DOMContentLoaded", function (e) {
-    showAddresses();
-    showCards();
+    start();
 });
+function start(){
+    if(orderDetails.buyNow){
+        getCustomer();  //NOT BLOCKING
+        authorise();
+    }else{
+        showAddresses();
+        showCards();
+        document.getElementById("inputSection").style.display = "block";
+    }
+}
+function retry(){
+    // Authorization failed so give user chance to try again or use a
+    // different card
+    console.log("retry");
+    if(orderDetails.buyNow){
+        orderDetails.buyNow = false;
+        start();
+    }else{
+        document.getElementById("resultSection").style.display = "none";
+        document.getElementById("inputSection").style.display = "block";
+        backButton("confirm");
+    }
+}
 //Disable Back Button
 window.history.pushState(null, null, window.location.href);
 window.onpopstate = function () {
     window.history.go(1);
 };
+function getCustomer(){
+    $.ajax({
+        type: "POST",
+        url: "rest_get_customer.php",
+        data: JSON.stringify({
+            "customerId": orderDetails.customerId
+        }),
+        success: function (result) {
+            res = JSON.parse(result);
+            console.log("\nCustomer:\n" + JSON.stringify(res, undefined, 2));
+            if (res.responseCode === 200){
+                orderDetails.maskedPan = res.response._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
+            }
+        }
+    });
+}
 function showCards(){
     $.ajax({
         type: "POST",
@@ -334,7 +372,7 @@ function backButton(form){
             document.getElementById("summary_billTo").style.display = "none";
             break;
         case "pay":
-            // Existing Customer who has payment Instruments => back to Card selection 
+            // Existing Customer who has payment Instruments => back to Card selection
             document.getElementById("paymentDetailsSection").style.display = "none";
             document.getElementById("cardSelectionSection").style.display = "block";
             document.getElementById("summary_billTo").style.display = "none";
@@ -458,7 +496,7 @@ function onTokenCreated(tokenDetails){
     setBillingDetails();
     if(orderDetails.paymentInstrumentId === ""){
         document.getElementById("summary_billTo").style.display = "block";
-        document.getElementById('billToText').innerHTML = 
+        document.getElementById('billToText').innerHTML =
             stylePaymentInstrument(tokenDetails.cardDetails, orderDetails.maskedPan, orderDetails.bill_to);
     }
 }
@@ -485,6 +523,9 @@ function authorise() {
     document.getElementById('authSection').style.display = "block";
     setUpPayerAuth();
 }
+function  expiredCard(){
+    console.log("expired Card");
+}
 function stylePaymentInstrument(card, number, billTo){
     img = "";
     alt = "";
@@ -498,7 +539,7 @@ function stylePaymentInstrument(card, number, billTo){
         img = "images/Amex.svg";
         alt = "Amex card logo";
     }
-    html =  
+    html =
             "<div class=\"row\">\n" +
                 "<div class=\"col-3\">\n"+
                     "<img src=\"" + img + "\" class=\"img-fluid\" alt=\"" + alt + "\">"+

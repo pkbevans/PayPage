@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/card_types.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT']. '/payPage/php/utils/addresses.php';
 $count=0;
 $paymentInstruments = new stdClass();
@@ -46,7 +46,7 @@ try {
                     <div>
                         <ul class="list-group ">
 <?php foreach ($paymentInstruments as $paymentInstrument): ?>
-                        <li class="list-group-item <?php echo ($paymentInstrument->default?"list-group-item-primary":"");?>">
+                        <li class="list-group-item <?php echo (cardExpired($paymentInstrument)? "list-group-item-warning":($paymentInstrument->default?"list-group-item-primary":"list-group-item-success"));?>">
 <?php if($paymentInstrument->default):?>
                             <div class="row"><div class="col-12"><strong>*Default Card</strong></div></div>
 <?php endif?>
@@ -62,6 +62,9 @@ try {
                                 <div class="col-3"></div>
                                 <div class="col-6 text-start">
                                     <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
+                                    <?php if(cardExpired($paymentInstrument)): ?>
+                                        <small>****EXPIRED CARD****</small>
+                                    <?php endif ?>
                                 </div>
                             </div><br>
                             <div class="row">
@@ -332,6 +335,7 @@ let orderDetails = {
     flexToken: "",
     maskedPan: "",
     storeCard: true,
+    buyNow: false,
     capture: false,
     bill_to: {
         firstName: "",

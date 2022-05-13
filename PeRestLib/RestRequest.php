@@ -51,10 +51,12 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
 
     $result = new stdClass();
     $result->url = $url;
+    $result->mid = $mid . (is_null($child)?"":"/".$child);
     $result->method = $method;
     $result->request = json_decode($payload);
     $result->responseCode = $response_info['http_code'];
-    if($resource == API_FLEX_V2_SESSIONS || $resource == API_MICROFORM_SESSIONS){
+    if($resource == API_FLEX_V2_SESSIONS || $resource == API_MICROFORM_SESSIONS
+            || $resource == API_UNIFIED_CHECKOUT_CAPTURE_CONTEXTS){
         $result->rawResponse = $http_body;
     }else{
         $response = json_decode($http_body);

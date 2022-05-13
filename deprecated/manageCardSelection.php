@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/card_types.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/addresses.php';
 $count=0;
 $incoming = json_decode(file_get_contents('php://input'));

@@ -8,7 +8,14 @@ $reference_number = $incoming->order->referenceNumber;
 $request = new stdClass();
 $request->clientReferenceInformation = new stdClass();
 $request->clientReferenceInformation->code = $reference_number;
-if(!empty($incoming->order->paymentInstrumentId)){
+if($incoming->order->buyNow){
+    $paymentInformation = [
+            "customer" => [
+                "id" => $incoming->order->customerId
+            ]
+    ];
+    $request->paymentInformation = $paymentInformation;
+}else if(!empty($incoming->order->paymentInstrumentId)){
     $paymentInformation = [
             "paymentInstrument" => [
                 "id" => $incoming->order->paymentInstrumentId

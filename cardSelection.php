@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/card_types.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/addresses.php';
 $count=0;
 $incoming = json_decode(file_get_contents('php://input'));
@@ -33,10 +33,10 @@ try {
     <div class="d-grid gap-2">
     <?php foreach ($paymentInstruments as $paymentInstrument): ?>
             <input type="hidden" id="<?php echo "pi_" . $paymentInstrument->id ;?>" value='<?php echo json_encode($paymentInstrument);?>'>
-            <button type="button" class="btn btn-primary" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')"> 
+            <button type="button" class="<?php echo cardExpired($paymentInstrument)?'btn btn-warning':'btn btn-primary';?>" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')">
                 <div class="row">
                     <div class="col-3">
-                        Pay with:&nbsp; 
+                        Pay with:&nbsp;
                     </div>
                     <div class="col-3">
                         <img src="images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>">
@@ -48,7 +48,10 @@ try {
                 <div class="row">
                     <div class="col-6"></div>
                     <div class="col-6 text-start">
-                        <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
+                            <small>Expires:&nbsp;<?php echo $paymentInstrument->card->expirationMonth . "/" . $paymentInstrument->card->expirationYear;?></small>
+                        <?php if(cardExpired($paymentInstrument)): ?>
+                            <small>****EXPIRED CARD****</small>
+                        <?php endif ?>
                     </div>
                 </div>
             </button>
@@ -120,7 +123,7 @@ try {
                                     <div class="col-11">
                                         <label for="useShipAsBill" class="form-check-label">Use Delivery Address as the card billing address</label>
                                     </div>
-                                </div>                            
+                                </div>
                                 <div class="row">
                                     <div class="col-1">
                                         <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">

@@ -1,7 +1,7 @@
 <?php
 include "rest_get_customer_cards.php";
 include_once 'countries.php';
-include_once 'card_types.php';
+include_once 'cards.php';
 ////////////////////////////////////FUNCTIONS
 function concatinateNameAddress($nameAddress){
     // return name and address string

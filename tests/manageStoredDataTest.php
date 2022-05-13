@@ -1,6 +1,6 @@
 <?php
 include_once '../countries.php';
-include_once '../card_types.php';
+include_once '../cards.php';
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">

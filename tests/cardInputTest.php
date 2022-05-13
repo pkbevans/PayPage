@@ -1,6 +1,6 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/card_types.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/cards.php';
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">

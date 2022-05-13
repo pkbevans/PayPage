@@ -1,11 +1,11 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'].'/ppSecure/PeRestLibKeys.php';
 
-//const PORTFOLIO = "barclayssitt00";
-//const MID = "paulspants21005";
-const PORTFOLIO = "pemid03";
-const MID = "";
-const TARGET_ORIGIN =  "https://bondevans.com";  
+const PORTFOLIO = "barclayssitt00";
+const MID = "paulspants21005";
+// const PORTFOLIO = "pemid03";
+// const MID = "";
+const TARGET_ORIGIN =  "https://bondevans.com";
 // Endpoints
 const REQUEST_HOST =  "apitest.cybersource.com";  // TEST
 //const REQUEST_HOST = "api.cybersource.com";  // PRODUCTION
@@ -35,6 +35,8 @@ const API_TMS_V2_CUSTOMER_PAYMENT_INSTRUMENTS = '/tms/v2/customers/{customerId}/
 const API_TMS_V2_CUSTOMER_SHIPPING_ADDRESSES = '/tms/v2/customers/{customerId}/shipping-addresses';
 const API_TMS_V2_INSTRUMENT_IDS = '/tms/v1/instrumentidentifiers';
 const API_OMS_V1_ORGANIZATIONS = '/oms/v1/organizations';
+const API_UNIFIED_CHECKOUT_CAPTURE_CONTEXTS = '/up/v1/capture-contexts';
+const API_PAYMENT_DETAILS = '/up/v1/payment-details';
 
 // HTTP METHODS
 const METHOD_POST = "POST";

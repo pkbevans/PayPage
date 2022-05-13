@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/logApi.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/db/db_insert_payment.php';
@@ -7,6 +7,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/addresses.php';
 $incoming = json_decode(file_get_contents('php://input'));
 // Key incoming fields:
 //  "storeCard" : If true create a token
+//  "buyNow" : If true use Customer Token only (i.e. default paymentInstrument and ShippingId)
 //  "paymentInstrumentId" : if true, use supplied Payment Instrument
 //  "shippingAddressId" : if not blank, use supplied Shipping Address
 //  "customerId" : If not blank and storeCard is true, then add new payment Instrument to existing Customer.
@@ -46,6 +47,7 @@ try {
         $actionList = [$incoming->paAction];
     }
     $processingInfo->actionList = $actionList;
+    $processingInfo->commerceIndicator = "internet";
     $request->processingInformation = $processingInfo;
 
     $orderInformation = [
@@ -54,41 +56,43 @@ try {
             "currency"=>$incoming->order->currency
         ]
     ];
-    if(empty($incoming->order->paymentInstrumentId)){
-        $billTo = [
-            "firstName" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->firstName :$incoming->order->bill_to->firstName)), 0, MAXSIZE_NAME),
-            "lastName" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->lastName :$incoming->order->bill_to->lastName)), 0, MAXSIZE_NAME),
-            "address1" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address1:$incoming->order->bill_to->address1)), 0, MAXSIZE_ADDRESS),
-            "address2" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address2: $incoming->order->bill_to->address2)), 0, MAXSIZE_ADDRESS),
-            "locality" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->locality: $incoming->order->bill_to->locality)), 0, MAXSIZE_CITY),
-            "postalCode" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->postalCode: $incoming->order->bill_to->postalCode)), 0, MAXSIZE_POSTCODE),
-            "country" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->country: $incoming->order->bill_to->country)), 0, MAXSIZE_COUNTRY),
-            "email" => $incoming->order->bill_to->email
-        ];
-    }else{
-        $billTo = [
-            "email" => $incoming->order->bill_to->email     // Email may have been updated/changed
-        ];
-    }
-    $orderInformation['billTo'] = $billTo;
-
-    if($incoming->order->shippingAddressRequired){
-        if(empty($incoming->order->shippingAddressId)){
-            $shipTo = [
-                "firstName" => substr(ppTrim($incoming->order->ship_to->firstName), 0, MAXSIZE_NAME),
-                "lastName" => substr(ppTrim($incoming->order->ship_to->lastName), 0, MAXSIZE_NAME),
-                "address1" => substr(ppTrim($incoming->order->ship_to->address1), 0, MAXSIZE_ADDRESS),
-                "address2" => substr(ppTrim($incoming->order->ship_to->address2), 0, MAXSIZE_ADDRESS),
-                "locality" => substr(ppTrim($incoming->order->ship_to->locality), 0, MAXSIZE_CITY),
-                "postalCode" => substr(ppTrim($incoming->order->ship_to->postalCode), 0, MAXSIZE_POSTCODE),
-                "country" => substr(ppTrim($incoming->order->ship_to->country), 0, MAXSIZE_COUNTRY),
+    if(!$incoming->order->buyNow){
+        if(empty($incoming->order->paymentInstrumentId)){
+            $billTo = [
+                "firstName" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->firstName :$incoming->order->bill_to->firstName)), 0, MAXSIZE_NAME),
+                "lastName" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->lastName :$incoming->order->bill_to->lastName)), 0, MAXSIZE_NAME),
+                "address1" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address1:$incoming->order->bill_to->address1)), 0, MAXSIZE_ADDRESS),
+                "address2" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address2: $incoming->order->bill_to->address2)), 0, MAXSIZE_ADDRESS),
+                "locality" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->locality: $incoming->order->bill_to->locality)), 0, MAXSIZE_CITY),
+                "postalCode" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->postalCode: $incoming->order->bill_to->postalCode)), 0, MAXSIZE_POSTCODE),
+                "country" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->country: $incoming->order->bill_to->country)), 0, MAXSIZE_COUNTRY),
+                "email" => $incoming->order->bill_to->email
             ];
-            $orderInformation['shipTo'] = $shipTo;
+        }else{
+            $billTo = [
+                "email" => $incoming->order->bill_to->email     // Email may have been updated/changed
+            ];
+        }
+        $orderInformation['billTo'] = $billTo;
+        if($incoming->order->shippingAddressRequired){
+            if(empty($incoming->order->shippingAddressId)){
+                $shipTo = [
+                    "firstName" => substr(ppTrim($incoming->order->ship_to->firstName), 0, MAXSIZE_NAME),
+                    "lastName" => substr(ppTrim($incoming->order->ship_to->lastName), 0, MAXSIZE_NAME),
+                    "address1" => substr(ppTrim($incoming->order->ship_to->address1), 0, MAXSIZE_ADDRESS),
+                    "address2" => substr(ppTrim($incoming->order->ship_to->address2), 0, MAXSIZE_ADDRESS),
+                    "locality" => substr(ppTrim($incoming->order->ship_to->locality), 0, MAXSIZE_CITY),
+                    "postalCode" => substr(ppTrim($incoming->order->ship_to->postalCode), 0, MAXSIZE_POSTCODE),
+                    "country" => substr(ppTrim($incoming->order->ship_to->country), 0, MAXSIZE_COUNTRY),
+                ];
+                $orderInformation['shipTo'] = $shipTo;
+            }
         }
     }
     $request->orderInformation = $orderInformation;
 
-    if(!empty($incoming->order->paymentInstrumentId) ||
+    if( $incoming->order->buyNow ||
+            !empty($incoming->order->paymentInstrumentId) ||
             !empty($incoming->order->shippingAddressId) ||
             ($incoming->order->storeCard && !empty($incoming->order->customerId))){
         $paymentInformation = [
@@ -98,19 +102,20 @@ try {
         ];
         $request->paymentInformation = $paymentInformation;
     }
-    if(!empty($incoming->order->shippingAddressId)){
-        $request->paymentInformation['shippingAddress']['id'] = $incoming->order->shippingAddressId;
-    }
+    if( !$incoming->order->buyNow ){
+        if(!empty($incoming->order->shippingAddressId)){
+            $request->paymentInformation['shippingAddress']['id'] = $incoming->order->shippingAddressId;
+        }
 
-    if(!empty($incoming->order->paymentInstrumentId)){
-        $request->paymentInformation['paymentInstrument']['id'] = $incoming->order->paymentInstrumentId;
+        if(!empty($incoming->order->paymentInstrumentId)){
+            $request->paymentInformation['paymentInstrument']['id'] = $incoming->order->paymentInstrumentId;
+        }
+        // Always meed the transient token
+        $tokenInformation = [
+            "jti" => $incoming->order->flexToken
+        ];
+        $request->tokenInformation = $tokenInformation;
     }
-    // Always meed the transient token
-    $tokenInformation = [
-        "jti" => $incoming->order->flexToken
-    ];
-
-    $request->tokenInformation = $tokenInformation;
 
     $request->clientReferenceInformation = new stdClass();
     $request->clientReferenceInformation->code = $incoming->order->referenceNumber;
@@ -151,12 +156,12 @@ try {
     $result->payment = $dbResult;
 
     $json = json_encode($result);
-    
-    logApi($incoming->order->referenceNumber, 
+
+    logApi($incoming->order->referenceNumber,
             "auth-". $incoming->paAction,           // API Type
             $result->response->status,              // Status
             $incoming->order->amount,               // Amount
-            $incoming->order->storeCard,            // Token created? 
+            $incoming->order->storeCard,            // Token created?
             $json);                                 // Complete request + response
     echo($json);
 } catch (Exception $exception) {

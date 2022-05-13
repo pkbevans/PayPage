@@ -10,15 +10,22 @@ function setUpPayerAuth(){
             res = JSON.parse(result);
             console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
             // If OK, set up device collection
-            let httpCode = res.responseCode;
-            if (httpCode === 201) {
-                // Set up device collection
-                deviceDataCollectionURL = res.response.consumerAuthenticationInformation.deviceDataCollectionUrl;
-                accessToken = res.response.consumerAuthenticationInformation.accessToken;
-                doDeviceCollection(deviceDataCollectionURL, accessToken);
+            if (res.responseCode === 201){ 
+                if( res.response.status === "COMPLETED") {
+                    // Set up device collection
+                    deviceDataCollectionURL = res.response.consumerAuthenticationInformation.deviceDataCollectionUrl;
+                    accessToken = res.response.consumerAuthenticationInformation.accessToken;
+                    doDeviceCollection(deviceDataCollectionURL, accessToken);
+                }
+//                else if("errorInformation" in res.response && res.response.errorInformation.reason === "EXPIRED_CARD" ){
+//                    expiredCard();
+//                }
+                else{
+                    onFinish2("SETUPPA", status, "", false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                }
             } else {
                 // 500 System error or anything else
-                onFinish2("SETUPPA", status, "", false, false, httpCode, res.response.reason, res.response.message);
+                onFinish2("SETUPPA", status, "", false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
             }
         }
     });
