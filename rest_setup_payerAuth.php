@@ -32,7 +32,7 @@ if($incoming->order->buyNow){
 $requestBody = json_encode($request);
 
 try{
-    $result = ProcessRequest(PORTFOLIO, API_RISK_V1_AUTHENTICATION_SETUPS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
+    $result = ProcessRequest(MID, API_RISK_V1_AUTHENTICATION_SETUPS, METHOD_POST, $requestBody, CHILD_MID, AUTH_TYPE_SIGNATURE );
     $json = json_encode($result);
     logApi($incoming->order->referenceNumber, 
             "setupPA",                              // API Type

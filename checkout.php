@@ -164,7 +164,6 @@ let orderDetails = {
         orderId: "<?php echo $_REQUEST['orderId'];?>",
         amount: "<?php echo $_REQUEST['amount'];?>",
         currency: "<?php echo $_REQUEST['currency'];?>",
-        local: <?php echo isset($_REQUEST['local']) && $_REQUEST['local'] === "true"?"true":"false";?>,
         shippingAddressRequired: true,
         useShippingAsBilling: true,
         customerId: "<?php echo isset($_REQUEST['customerToken'])?$_REQUEST['customerToken']:"";?>", // TODO

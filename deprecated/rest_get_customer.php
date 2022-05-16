@@ -16,7 +16,7 @@ if(isset($_REQUEST['customerToken'])){
         try {
             // Get Customer TODO - NOT REQUIRED
             $api = API_TMS_V2_CUSTOMERS ."/" . $customerToken;
-            $result = ProcessRequest(PORTFOLIO, $api , METHOD_GET, "", MID, AUTH_TYPE_SIGNATURE );
+            $result = ProcessRequest(MID, $api , METHOD_GET, "", CHILD_MID, AUTH_TYPE_SIGNATURE );
             if($result->responseCode === 200){
                 if($verbose){
                     echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");

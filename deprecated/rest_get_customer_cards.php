@@ -12,7 +12,7 @@ if(isset($_REQUEST['customerToken'])){
             // Get Payment Instruments
             $api = str_replace('{customerId}', $customerToken, API_TMS_V2_CUSTOMER_PAYMENT_INSTRUMENTS);
 
-            $result = ProcessRequest(PORTFOLIO, $api , METHOD_GET, "", MID, AUTH_TYPE_SIGNATURE );
+            $result = ProcessRequest(MID, $api , METHOD_GET, "", CHILD_MID, AUTH_TYPE_SIGNATURE );
             // echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
             if($result->responseCode === 200){
                 if(isset($result->response->_embedded->paymentInstruments)){

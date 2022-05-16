@@ -128,11 +128,7 @@ try {
         }else{
             $challengeCode = "01";
         }
-        if($incoming->order->local){
-            $returnUrl = "http://localhost/payPage/php/utils/redirect.php";
-        }else{
-            $returnUrl = TARGET_ORIGIN . "/payPage/php/utils/redirect.php";
-        }
+        $returnUrl = "https://" . (strstr($_SERVER['HTTP_HOST'],LOCALHOST_TARGET_ORIGIN)?LOCALHOST_TARGET_ORIGIN:PRODUCTION_TARGET_ORIGIN) . "/payPage/php/utils/redirect.php";
         $consumerAuthenticationInformation = [
             "challengeCode"=> $challengeCode,
             "referenceId" => $incoming->referenceID,
@@ -150,7 +146,7 @@ try {
 
     $requestBody = json_encode($request);
 
-    $result = ProcessRequest(PORTFOLIO, API_PAYMENTS, METHOD_POST, $requestBody, MID, AUTH_TYPE_SIGNATURE );
+    $result = ProcessRequest(MID, API_PAYMENTS, METHOD_POST, $requestBody, CHILD_MID, AUTH_TYPE_SIGNATURE );
     // Update DB
     $dbResult=insertPayment($incoming->order, $result);
     $result->payment = $dbResult;

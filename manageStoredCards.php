@@ -9,7 +9,7 @@ try {
     // Get Payment Instruments
     $api = str_replace('{customerId}', $_REQUEST['customerId'], API_TMS_V2_CUSTOMER_PAYMENT_INSTRUMENTS);
 
-    $result = ProcessRequest(PORTFOLIO, $api , METHOD_GET, "", MID, AUTH_TYPE_SIGNATURE );
+    $result = ProcessRequest(MID, $api , METHOD_GET, "", CHILD_MID, AUTH_TYPE_SIGNATURE );
     // echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
     if($result->responseCode === 200){
         $count = $result->response->count;
@@ -326,7 +326,6 @@ let orderDetails = {
     orderId: "<?php echo $_REQUEST['orderId'];?>",
     amount: "0.00",
     currency: "<?php echo $_REQUEST['currency'];?>",
-    local: <?php echo isset($_REQUEST['local']) && $_REQUEST['local'] === "true"?"true":"false";?>,
     shippingAddressRequired: false,
     useShippingAsBilling: false,
     customerId: customerId,

@@ -1,14 +1,21 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/ppSecure/PeRestLibKeys.php';
+const KEYS_PATH =  "/ppSecure/";   // Replace with path to the PeRestLibKeys file.
+include_once $_SERVER["DOCUMENT_ROOT"] . KEYS_PATH. "PeRestLibKeys.php";
+// You need a PeRestLibKeys.php file in this format, with REST keys matching the MID value
+// $keys = [
+//    "pemid03" => [
+//        'key_id' => "fa4143be-1234-436d-aa5c-f8fbbb4b6bfd",
+//        'secret_key'=> "rzabWA0SFyDXlVY/dTEA123456shJm/5IaNElBachZk="
+//    ]
+// ];
 
-const PORTFOLIO = "barclayssitt00";
-const MID = "paulspants21005";
-// const PORTFOLIO = "pemid03";
-// const MID = "";
-const TARGET_ORIGIN =  "https://bondevans.com";
+const MID = "pemid03";      // Replace with MID (Can be PORTFOLIO or Account-level)
+const CHILD_MID = "";       // Replace with Transacting MID if using PORTFOLIO or Account-level mid in MID
+const PRODUCTION_TARGET_ORIGIN =  "bondevans.com";  // Replace with Production URL for non-localhost testing
+const LOCALHOST_TARGET_ORIGIN =  "site.test";   // Replace with your localhost HTTPS alias.  MUST BE HTTPS
 // Endpoints
-const REQUEST_HOST =  "apitest.cybersource.com";  // TEST
-//const REQUEST_HOST = "api.cybersource.com";  // PRODUCTION
+const REQUEST_HOST =  "apitest.cybersource.com";  // CYBS TEST endpoint
+//const REQUEST_HOST = "api.cybersource.com";  // CYBS PRODUCTION endpoint
 
 // APIs
 const API_PAYMENTS = "/pts/v2/payments/";

@@ -1,9 +1,4 @@
 <?php
-if(strstr($_SERVER['HTTP_HOST'],"localhost")){
-    $local = "true";
-}else{
-    $local = "false";
-}
 //////////////////////FUNCTIONS
 function getCookie($name){
     if(isset($_COOKIE[$name])){
@@ -39,7 +34,6 @@ function getCookie($name){
                 <!--<label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>-->
                 <input id="currency" type="hidden" name="currency" value="GBP"/>
                 <input id="orderId" type="hidden" name="orderId" value=""/>
-                <label for="local" class="form-label">Local</label><input id="local" class="form-control" type="text" name="local" value="<?php echo $local; ?>"/>
                 <label for="autoCapture" class="form-label">Auto Capture</label>
                 <select id="autoCapture" class="form-select" name="autoCapture">
                     <option value="true" selected>Yes</option>
