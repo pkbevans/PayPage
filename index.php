@@ -40,7 +40,7 @@ function getCookie($name){
                     <option value="false" selected>No</option>
                 </select>
                 <BR>
-                <button type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
+                <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
                 <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
                 <input id="buyNow" type="hidden" name="buyNow" value="false"/>
             </form>

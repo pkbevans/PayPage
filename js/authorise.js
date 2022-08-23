@@ -7,10 +7,18 @@ function setUpPayerAuth(){
             "order": orderDetails
         }),
         success: function (result) {
-            res = JSON.parse(result);
-            console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
+            // Response is a json string - turn it into a javascript object
+            let res = "";
+            try{
+                res = JSON.parse(result);
+                console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
+            } catch(error){
+                console.log("ERROR:"+ result);
+                onFinish2("SETUPPA, "ERROR", "", false, false, "n/a", "JSON PARSE", result);
+                return;
+            }
             // If OK, set up device collection
-            if (res.responseCode === 201){ 
+            if (res.responseCode === 201){
                 if( res.response.status === "COMPLETED") {
                     // Set up device collection
                     deviceDataCollectionURL = res.response.consumerAuthenticationInformation.deviceDataCollectionUrl;
@@ -73,8 +81,15 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
         }),
         success: function (result) {
             // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\nResults:\n" + JSON.stringify(res, undefined, 2));
+            let res = "";
+            try{
+                res = JSON.parse(result);
+                console.log("\nResults:\n" + JSON.stringify(res, undefined, 2));
+            } catch(error){
+                console.log("ERROR:"+ result);
+                onFinish2("AUTH+"+paAction, "ERROR", "", false, false, "n/a", "JSON PARSE", result);
+                return;
+            }
             let httpCode = res.responseCode;
             let status = res.response.status;
             if (httpCode === 201) {
@@ -179,7 +194,7 @@ function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentC
     }
 }
 function successHTML(finish){
-    template = 
+    template =
         "<h3>Thank you for your order.  Your payment was successful</h3><br>"+
         "<div class='row'><div class='col-4'>Order Reference</div><div class='col-8'>?mr?</div></div>"+
         "<div class='row'><div class='col-4'>Request ID</div><div class='col-8'>?requestId?</div></div><br>"
@@ -189,7 +204,7 @@ function successHTML(finish){
     return html;
 }
 function failHTML(finish){
-    template = 
+    template =
         "<h3>Oh dear. Something is not working. Please check your internet connection and try again.</h3><br>"+
         "<div class='row'><div class='col-4'>Order Reference</div><div class='col-8'>?mr?</div></div>"+
         "<div class='row'><div class='col-4'>Request ID</div><div class='col-8'>?requestId?</div></div><br>"
