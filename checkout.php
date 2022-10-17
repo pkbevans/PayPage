@@ -155,8 +155,12 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script src="js/cardInput.js"></script>
-<script src="js/utils.js"></script>
 <script src="js/authorise.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/googlePay.js"></script>
+<script async src="https://pay.google.com/gp/p/js/pay.js"></script>
+
+
 <script>
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
@@ -170,6 +174,7 @@ let orderDetails = {
         paymentInstrumentId: "",
         shippingAddressId: "",
         flexToken: "",
+        googlePayToken: "",
         maskedPan: "",
         storeCard: false,
         buyNow: <?php echo isset($_REQUEST['buyNow']) && $_REQUEST['buyNow'] === "true"?"true":"false";?>,
@@ -269,6 +274,7 @@ function showCards(){
         success: function (result) {
             document.getElementById('paymentSection').innerHTML = result;
             createCardInput("","payButton", false, false,"");
+            onGooglePayLoaded();
         }
     });
 }
@@ -520,6 +526,12 @@ function setBillingDetails() {
 }
 function authorise() {
     document.getElementById('authSection').style.display = "block";
+    setUpPayerAuth();
+}
+function onGooglePayCardSelected(paymentData){
+    console.log(paymentData);
+    orderDetails.maskedPan = paymentData.paymentMethodData.description;
+    orderDetails.googlePayToken = paymentData.paymentMethodData.tokenizationData.token;
     setUpPayerAuth();
 }
 function  expiredCard(){

@@ -48,6 +48,9 @@ try {
     }
     $processingInfo->actionList = $actionList;
     $processingInfo->commerceIndicator = "internet";
+    if(!empty($incoming->order->googlePayToken)){
+        $processingInfo->paymentSolution = "012";
+    }
     $request->processingInformation = $processingInfo;
 
     $orderInformation = [
@@ -110,11 +113,15 @@ try {
         if(!empty($incoming->order->paymentInstrumentId)){
             $request->paymentInformation['paymentInstrument']['id'] = $incoming->order->paymentInstrumentId;
         }
-        // Always meed the transient token
-        $tokenInformation = [
-            "jti" => $incoming->order->flexToken
-        ];
-        $request->tokenInformation = $tokenInformation;
+        // Always meed the transient token - unless its a Google Pay token
+        if(!empty($incoming->order->googlePayToken)){
+            $request->paymentInformation['fluidData']['value'] = base64_encode($incoming->order->googlePayToken);
+        }else{
+            $tokenInformation = [
+                "jti" => $incoming->order->flexToken
+            ];
+            $request->tokenInformation = $tokenInformation;
+        }
     }
 
     $request->clientReferenceInformation = new stdClass();
