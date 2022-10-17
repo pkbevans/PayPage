@@ -30,7 +30,7 @@ try {
     <div class="d-grid gap-2">
 <?php foreach ($shippingAddresses as $shippingAddress): ?>
         <input type="hidden" id="<?php echo "sa_" . $shippingAddress->id ;?>" value='<?php echo json_encode($shippingAddress);?>'>
-        <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')"> 
+        <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')">
             <div class="row">
                 <div class="col-12">
                     <small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>" style="max-height: 999999px;"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small>
@@ -104,6 +104,14 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
         </div>
     </form>
     <div class="row">
+        <div class="col-1">
+            <input type="checkbox" class="form-check-input" id="storeAddress" name="storeAddress" value="1">
+        </div>
+        <div class="col-11">
+            <label for="storeAddress" class="form-check-label">Store this address for future use</label>
+        </div>
+    </div>
+    <div class="row">
         <div class="d-grid gap-2">
             <button type="button" class="btn btn-primary" onclick="useShippingAddress('NEW')">Next</button>
         </div>
@@ -118,4 +126,3 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
 <?php endif ?>
     </div>
 </div>
-    

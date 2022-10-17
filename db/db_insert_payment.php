@@ -3,7 +3,7 @@ include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
 
 function insertPayment($orderDetails, $request){
     global $servername,$username,$password,$dbName;
-    
+
     $authCode="";
     $requestId="";
     $cardType="";
@@ -12,7 +12,11 @@ function insertPayment($orderDetails, $request){
     }
     if($request->responseCode === 201){
         $requestId = $request->response->id;
-        $cardType = $request->response->paymentInformation->card->type;
+        if(property_exists($request->response->paymentInformation, "card")){
+          $cardType = $request->response->paymentInformation->card->type;
+        }else{
+          $cardType = "N/A";
+        }
     }
     $paymentSql = "INSERT INTO payments ("
                 . "orderId, "
@@ -22,21 +26,21 @@ function insertPayment($orderDetails, $request){
                 . "authCode, "
                 . "gatewayRequestId, "
                 . "status) " .
-            "VALUES (" . 
-                $orderDetails->orderId . "," . 
-                $orderDetails->amount . ",'" . 
-                $orderDetails->maskedPan . "','" . 
-                $cardType . "','" . 
-                $authCode . "','" . 
-                $requestId . "','" . 
+            "VALUES (" .
+                $orderDetails->orderId . "," .
+                $orderDetails->amount . ",'" .
+                $orderDetails->maskedPan . "','" .
+                $cardType . "','" .
+                $authCode . "','" .
+                $requestId . "','" .
                 $request->response->status . "')";
-    
+
     $orderSql = "UPDATE orders set " .
             "customerId = '" . $orderDetails->customerId . "'," .
             "customerEmail = '" . $orderDetails->bill_to->email . "'," .
             "status = '" . $request->response->status . "' " .
             "WHERE id = " . $orderDetails->orderId .";";
-    
+
     $result= new stdClass();
     $result->paymentSql=$paymentSql;
     $result->orderSql=$orderSql;

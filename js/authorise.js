@@ -14,7 +14,7 @@ function setUpPayerAuth(){
                 console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
             } catch(error){
                 console.log("ERROR:"+ result);
-                onFinish2("SETUPPA, "ERROR", "", false, false, "n/a", "JSON PARSE", result);
+                onFinish2("SETUPPA", "ERROR", "", false, false, "n/a", "JSON PARSE", result);
                 return;
             }
             // If OK, set up device collection

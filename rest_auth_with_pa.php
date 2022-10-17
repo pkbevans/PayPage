@@ -18,27 +18,31 @@ try {
     $processingInfo = new stdClass();
     // Dont capture a zero-value auth
     $processingInfo->capture = $incoming->order->amount>0?$incoming->order->capture:false;
-    if($incoming->order->storeCard){
+    if($incoming->order->storeCard || $incoming->order->storeAddress){
         if($incoming->paAction === "NO_PA"){
             $actionList = ["TOKEN_CREATE"];
         }else{
             $actionList = [$incoming->paAction, "TOKEN_CREATE"];
         }
         if(empty($incoming->order->customerId)){
+            // NEW CUSTOMER
             $buyerInformation = [
                 "merchantCustomerID" => "Your customer identifier",
                 "email" => $incoming->order->bill_to->email
             ];
             $request->buyerInformation = $buyerInformation;
-            if($incoming->order->shippingAddressRequired){
+            if($incoming->order->shippingAddressRequired && $incoming->order->storeAddress){
                 $processingInfo->actionTokenTypes = ["customer", "paymentInstrument", "shippingAddress"];
             }else{
                 $processingInfo->actionTokenTypes = ["customer", "paymentInstrument"];
             }
         } else{
-            // Add Payment Instrument and/or Shipping Address to existing Customer
-            if($incoming->order->shippingAddressRequired && empty($incoming->order->shippingAddressId)){
-                $processingInfo->actionTokenTypes = ["paymentInstrument", "shippingAddress"];
+            // EXISTING CUSTOMER - Add Payment Instrument and/or Shipping Address to existing Customer
+            if($incoming->order->shippingAddressRequired && $incoming->order->storeAddress){
+                $processingInfo->actionTokenTypes = ["shippingAddress"];
+                if($incoming->order->storeCard){
+                    array_push($processingInfo->actionTokenTypes, "paymentInstrument");
+                }
             }else{
                 $processingInfo->actionTokenTypes = ["paymentInstrument"];
             }
@@ -94,7 +98,7 @@ try {
     if( $incoming->order->buyNow ||
             !empty($incoming->order->paymentInstrumentId) ||
             !empty($incoming->order->shippingAddressId) ||
-            ($incoming->order->storeCard && !empty($incoming->order->customerId))){
+            (($incoming->order->storeCard || $incoming->order->storeAddress)  && !empty($incoming->order->customerId))){
         $paymentInformation = [
             "customer" => [
                 "id" => $incoming->order->customerId
@@ -147,19 +151,25 @@ try {
     $requestBody = json_encode($request);
 
     $result = ProcessRequest(MID, API_PAYMENTS, METHOD_POST, $requestBody, CHILD_MID, AUTH_TYPE_SIGNATURE );
-    // Update DB
-    $dbResult=insertPayment($incoming->order, $result);
-    $result->payment = $dbResult;
+
+    try{
+        // Update DB
+        $dbResult=insertPayment($incoming->order, $result);
+        $result->payment = $dbResult;
+    }catch(Exception $exception){
+        $result->payment = "DB ERROR";
+    }
 
     $json = json_encode($result);
-
     logApi($incoming->order->referenceNumber,
             "auth-". $incoming->paAction,           // API Type
             $result->response->status,              // Status
             $incoming->order->amount,               // Amount
             $incoming->order->storeCard,            // Token created?
             $json);                                 // Complete request + response
+
     echo($json);
 } catch (Exception $exception) {
-    echo(json_encode($exception));
+    // echo(json_encode($exception));
+    echo('{"status":"ERROR"}');
 }
