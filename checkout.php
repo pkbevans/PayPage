@@ -177,6 +177,7 @@ let orderDetails = {
         googlePayToken: "",
         maskedPan: "",
         storeCard: false,
+        storeAddress: false,
         buyNow: <?php echo isset($_REQUEST['buyNow']) && $_REQUEST['buyNow'] === "true"?"true":"false";?>,
         capture: <?php echo isset($_REQUEST['autoCapture']) && $_REQUEST['autoCapture'] === "true"?"true":"false";?>,
         ship_to: {
@@ -409,6 +410,12 @@ function hideNewAddress(){
 function useShippingAddress(id){
     console.log("Shipping Address: "+ id);
     if(id === "NEW"){
+    // If storeCard checked, we will create a Token
+        sa = document.getElementById('storeAddress');
+        if (sa.checked) {
+            orderDetails.storeAddress = true;
+        }
+
         orderDetails.shippingAddressId = "";
         form = document.getElementById('newAddressForm');
         if(validateForm(form)){
