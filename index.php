@@ -21,32 +21,44 @@ function getCookie($name){
         <title>View Basket</title>
     </head>
     <body>
-        <span>5200000000001047,5200000000000007,371449111020228,340000000001007</span><br>
-        <div class="container-fluid justify-content-center">
-        <div class="row">
-            <div id="formSection">
-            <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
-                <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
-                <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
-                <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="pkbevans@gmail.com" />
-                <label for="customer_reference" class="form-label">Merchants Customer Reference</label><input id="customerRef" class="form-control" type="text" name="customerRef" value="" />
-                <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value="<?php echo getCookie("customerId")?>"/>
-                <!--<label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>-->
-                <input id="currency" type="hidden" name="currency" value="GBP"/>
-                <input id="orderId" type="hidden" name="orderId" value=""/>
-                <label for="autoCapture" class="form-label">Auto Capture</label>
-                <select id="autoCapture" class="form-select" name="autoCapture">
-                    <option value="true" selected>Yes</option>
-                    <option value="false" selected>No</option>
-                </select>
-                <BR>
-                <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
-                <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
-                <input id="buyNow" type="hidden" name="buyNow" value="false"/>
-            </form>
-            </div>
-            <iframe id="checkoutIframe" name="checkout_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: none; border:none; height:90vh; width:100vw" ></iframe>
+        <div class="container">
+
         </div>
+        <div class="container-fluid justify-content-center">
+            <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                    <span class="fs-4">Paul's Pants Checkout</span>
+                </a>
+                <ul class="nav nav-pills">
+                    <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                </ul>
+            </header>
+            <!-- <small>5200000000001047, 5200000000000007, 371449111020228, 340000000001007</small> -->
+            <div class="row">
+                <div id="formSection">
+                <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
+                    <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
+                    <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
+                    <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="pkbevans@gmail.com" />
+                    <label for="customer_reference" class="form-label">Merchants Customer Reference</label><input id="customerRef" class="form-control" type="text" name="customerRef" value="" />
+                    <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value="<?php echo getCookie("customerId")?>"/>
+                    <!--<label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>-->
+                    <input id="currency" type="hidden" name="currency" value="GBP"/>
+                    <input id="orderId" type="hidden" name="orderId" value=""/>
+                    <label for="autoCapture" class="form-label">Auto Capture</label>
+                    <select id="autoCapture" class="form-select" name="autoCapture">
+                        <option value="true" selected>Yes</option>
+                        <option value="false" selected>No</option>
+                    </select>
+                    <BR>
+                    <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
+                    <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
+                    <input id="buyNow" type="hidden" name="buyNow" value="false"/>
+                </form>
+                </div>
+                <iframe id="checkoutIframe" name="checkout_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: none; border:none; height:90vh; width:100vw" ></iframe>
+            </div>
         </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script src="js/authorise.js"></script>

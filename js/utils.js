@@ -4,6 +4,7 @@ function formatNameAddress(nameAddress){
             xtrim(nameAddress.address1, ", ") +
             xtrim(nameAddress.address2, ", ") +
             xtrim(nameAddress.locality, ", ") +
+            xtrim(nameAddress.administrativeArea, ", ") +
             xtrim(nameAddress.postalCode, ", ") +
             xtrim(nameAddress.country, "</p>");
 }

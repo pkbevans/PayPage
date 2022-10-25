@@ -5,8 +5,8 @@
  * @see {@link https://developers.google.com/pay/api/web/reference/request-objects#PaymentDataRequest|apiVersion in PaymentDataRequest}
  */
 const baseRequest = {
-  apiVersion: 2,
-  apiVersionMinor: 0
+    apiVersion: 2,
+    apiVersionMinor: 0
 };
 
 /**
@@ -36,11 +36,11 @@ const allowedCardAuthMethods = ["PAN_ONLY", "CRYPTOGRAM_3DS"];
  * @see {@link https://developers.google.com/pay/api/web/reference/request-objects#gateway|PaymentMethodTokenizationSpecification}
  */
 const tokenizationSpecification = {
-  type: 'PAYMENT_GATEWAY',
-  parameters: {
-    'gateway': 'cybersource',
-    'gatewayMerchantId': 'paulspants45010'
-  }
+    type: 'PAYMENT_GATEWAY',
+    parameters: {
+        'gateway': 'cybersource',
+        'gatewayMerchantId': "paulspants45011"
+    }
 };
 
 /**
@@ -50,11 +50,17 @@ const tokenizationSpecification = {
  * @see {@link https://developers.google.com/pay/api/web/reference/request-objects#CardParameters|CardParameters}
  */
 const baseCardPaymentMethod = {
-  type: 'CARD',
-  parameters: {
-    allowedAuthMethods: allowedCardAuthMethods,
-    allowedCardNetworks: allowedCardNetworks
-  }
+    type: 'CARD',
+    parameters: {
+        allowedAuthMethods: allowedCardAuthMethods,
+        allowedCardNetworks: allowedCardNetworks,
+        assuranceDetailsRequired: true,
+        billingAddressRequired: true,
+        billingAddressParameters: {
+            format: "FULL",
+            phoneNumberRequired: false
+        }
+    }
 };
 
 /**
@@ -64,11 +70,11 @@ const baseCardPaymentMethod = {
  * @see {@link https://developers.google.com/pay/api/web/reference/request-objects#CardParameters|CardParameters}
  */
 const cardPaymentMethod = Object.assign(
-  {},
-  baseCardPaymentMethod,
-  {
-    tokenizationSpecification: tokenizationSpecification
-  }
+    {},
+    baseCardPaymentMethod,
+    {
+        tokenizationSpecification: tokenizationSpecification
+    }
 );
 
 /**
@@ -89,13 +95,13 @@ let paymentsClient = null;
  * @returns {object} Google Pay API version, payment methods supported by the site
  */
 function getGoogleIsReadyToPayRequest() {
-  return Object.assign(
-      {},
-      baseRequest,
-      {
-        allowedPaymentMethods: [baseCardPaymentMethod]
-      }
-  );
+    return Object.assign(
+        {},
+        baseRequest,
+        {
+            allowedPaymentMethods: [baseCardPaymentMethod]
+        }
+    );
 }
 
 /**
@@ -105,16 +111,16 @@ function getGoogleIsReadyToPayRequest() {
  * @returns {object} PaymentDataRequest fields
  */
 function getGooglePaymentDataRequest() {
-  const paymentDataRequest = Object.assign({}, baseRequest);
-  paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod];
-  paymentDataRequest.transactionInfo = getGoogleTransactionInfo();
-  paymentDataRequest.merchantInfo = {
-    // @todo a merchant ID is available for a production environment after approval by Google
-    // See {@link https://developers.google.com/pay/api/web/guides/test-and-deploy/integration-checklist|Integration checklist}
-    // merchantId: '12345678901234567890',
-    merchantName: 'Pauls Pants'
-  };
-  return paymentDataRequest;
+    const paymentDataRequest = Object.assign({}, baseRequest);
+    paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod];
+    paymentDataRequest.transactionInfo = getGoogleTransactionInfo();
+    paymentDataRequest.merchantInfo = {
+        // @todo a merchant ID is available for a production environment after approval by Google
+        // See {@link https://developers.google.com/pay/api/web/guides/test-and-deploy/integration-checklist|Integration checklist}
+        // merchantId: '12345678901234567890',
+        merchantName: "Pauls Pants Ltd"
+    };
+    return paymentDataRequest;
 }
 
 /**
@@ -124,10 +130,10 @@ function getGooglePaymentDataRequest() {
  * @returns {google.payments.api.PaymentsClient} Google Pay API client
  */
 function getGooglePaymentsClient() {
-  if ( paymentsClient === null ) {
-    paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
-  }
-  return paymentsClient;
+    if ( paymentsClient === null ) {
+        paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
+    }
+    return paymentsClient;
 }
 
 /**
@@ -137,19 +143,19 @@ function getGooglePaymentsClient() {
  * ability to pay.
  */
 function onGooglePayLoaded() {
-  const paymentsClient = getGooglePaymentsClient();
-  paymentsClient.isReadyToPay(getGoogleIsReadyToPayRequest())
-      .then(function(response) {
+    const paymentsClient = getGooglePaymentsClient();
+    paymentsClient.isReadyToPay(getGoogleIsReadyToPayRequest())
+    .then(function(response) {
         if (response.result) {
-          addGooglePayButton();
-          // @todo prefetch payment data to improve performance after confirming site functionality
-          // prefetchGooglePaymentData();
+            addGooglePayButton();
+            // @todo prefetch payment data to improve performance after confirming site functionality
+            // prefetchGooglePaymentData();
         }
-      })
-      .catch(function(err) {
+    })
+    .catch(function(err) {
         // show error in developer console for debugging
         console.error(err);
-      });
+    });
 }
 
 /**
@@ -159,16 +165,16 @@ function onGooglePayLoaded() {
  * @see {@link https://developers.google.com/pay/api/web/guides/brand-guidelines|Google Pay brand guidelines}
  */
 function addGooglePayButton() {
-  const paymentsClient = getGooglePaymentsClient();
-  const button =
-      paymentsClient.createButton({
-          buttonColor: 'white',
-          buttonType: 'pay',
-          buttonSizeMode: 'fill',
-          onClick: onGooglePaymentButtonClicked,
-          allowedPaymentMethods: [baseCardPaymentMethod]
-      });
-  document.getElementById('googleContainer').appendChild(button);
+    const paymentsClient = getGooglePaymentsClient();
+    const button =
+        paymentsClient.createButton({
+            buttonColor: 'white',
+            buttonType: 'pay',
+            buttonSizeMode: 'fill',
+            onClick: onGooglePaymentButtonClicked,
+            allowedPaymentMethods: [baseCardPaymentMethod]
+        });
+        document.getElementById('googleContainer').appendChild(button);
 }
 
 /**
@@ -178,13 +184,13 @@ function addGooglePayButton() {
  * @returns {object} transaction info, suitable for use as transactionInfo property of PaymentDataRequest
  */
 function getGoogleTransactionInfo() {
-  return {
-    countryCode: 'GB',
-    currencyCode: orderDetails.currency,
-    totalPriceStatus: 'FINAL',
-    // set to cart total
-    totalPrice: orderDetails.amount
-  };
+    return {
+        countryCode: 'GB',
+        currencyCode: orderDetails.currency,
+        totalPriceStatus: 'FINAL',
+        // set to cart total
+        totalPrice: orderDetails.amount
+    };
 }
 
 /**
@@ -193,9 +199,9 @@ function getGoogleTransactionInfo() {
  * @see {@link https://developers.google.com/pay/api/web/reference/client#prefetchPaymentData|prefetchPaymentData()}
  */
 function prefetchGooglePaymentData() {
-  const paymentDataRequest = getGooglePaymentDataRequest();
-  // transactionInfo must be set but does not affect cache
-  paymentDataRequest.transactionInfo = {
+    const paymentDataRequest = getGooglePaymentDataRequest();
+    // transactionInfo must be set but does not affect cache
+    paymentDataRequest.transactionInfo = {
     totalPriceStatus: 'NOT_CURRENTLY_KNOWN',
     currencyCode: 'GBP'
   };
@@ -207,32 +213,17 @@ function prefetchGooglePaymentData() {
  * Show Google Pay payment sheet when Google Pay payment button is clicked
  */
 function onGooglePaymentButtonClicked() {
-  const paymentDataRequest = getGooglePaymentDataRequest();
-  paymentDataRequest.transactionInfo = getGoogleTransactionInfo();
+    const paymentDataRequest = getGooglePaymentDataRequest();
+    paymentDataRequest.transactionInfo = getGoogleTransactionInfo();
 
-  const paymentsClient = getGooglePaymentsClient();
-  paymentsClient.loadPaymentData(paymentDataRequest)
-      .then(function(paymentData) {
-        // handle the response
-        processPayment(paymentData);
-      })
-      .catch(function(err) {
-        // show error in developer console for debugging
-        console.error(err);
-      });
-}
-/**
- * Process payment data returned by the Google Pay API
- *
- * @param {object} paymentData response from Google Pay API after user approves payment
- * @see {@link https://developers.google.com/pay/api/web/reference/response-objects#PaymentData|PaymentData object reference}
- */
-function processPayment(paymentData) {
-    // show returned data in developer console for debugging
-    console.log(paymentData);
-    // @todo pass payment token to your gateway to process payment
-    // @note DO NOT save the payment credentials for future transactions,
-    // unless they're used for merchant-initiated transactions with user
-    // consent in place.
-    onGooglePayCardSelected(paymentData);
+    const paymentsClient = getGooglePaymentsClient();
+    paymentsClient.loadPaymentData(paymentDataRequest)
+        .then(function(paymentData) {
+            // handle the response
+            onGooglePayCardSelected(paymentData);
+        })
+        .catch(function(err) {
+            // show error in developer console for debugging
+            console.error(err);
+        });
 }

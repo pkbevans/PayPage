@@ -120,21 +120,13 @@ try {
                                     </div>
                                 </div>
                             </div>
-                            <div  id="storeCardCheck" style="display: <?php echo ($count>0?"none":"block");?>">
+                            <div  id="sameAddressCheck" style="display: <?php echo ($count>0?"none":"block");?>">
                                 <div class="row mt-2">
                                     <div class="col-1">
                                         <input type="checkbox" class="form-check-input" onchange="useSameAddressChanged()" id="useShipAsBill" name="useShipAsBill" value="1" checked="checked">
                                     </div>
                                     <div class="col-11">
                                         <label for="useShipAsBill" class="form-check-label">Use Delivery Address as the card billing address</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-1">
-                                        <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
-                                    </div>
-                                    <div class="col-11">
-                                        <label for="storeCard" class="form-check-label">Store these details for future use</label>
                                     </div>
                                 </div>
                             </div>
@@ -155,56 +147,62 @@ try {
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group form-floating mb-3">
-                            <input id="bill_to_forename" type="text" class="form-control form-control-sm" value="" tabindex="1" placeholder="First name" maxlength="60" required>
-                            <label for="bill_to_forename" class="form-label">First name*</label>
+                            <input id="bill_to_firstName" type="text" class="form-control form-control-sm" value="" tabindex="1" placeholder="First name" maxlength="60" required>
+                            <label for="bill_to_firstName" class="form-label">First name*</label>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group form-floating mb-3">
-                            <input id="bill_to_surname" type="text" class="form-control form-control-sm" value="" tabindex="2" placeholder="Last Name" maxlength="60" required>
-                            <label for="bill_to_surname" class="form-label">Last name*</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="bill_to_address_line1" type="text" class="form-control form-control-sm" value="" tabindex="3" placeholder="1st line of address" maxlength="60" required>
-                            <label for="bill_to_address_line1" class="form-label">Address line 1*</label>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-group form-floating mb-3">
-                            <input id="bill_to_address_line2" type="text" class="form-control form-control-sm" value="" tabindex="4" placeholder="2nd line of address" maxlength="60">
-                            <label for="bill_to_address_line2" class="form-label">Address line 2</label>
+                            <input id="bill_to_lastName" type="text" class="form-control form-control-sm" value="" tabindex="2" placeholder="Last Name" maxlength="60" required>
+                            <label for="bill_to_lastName" class="form-label">Last name*</label>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group form-floating mb-3">
-                            <input id="bill_to_address_city" type="text" class="form-control form-control-sm" value="" tabindex="5" placeholder="City/County" required maxlength="50">
-                            <label for="bill_to_address_city" class="form-label">City/County*</label>
+                            <input id="bill_to_address1" type="text" class="form-control form-control-sm" value="" tabindex="3" placeholder="1st line of address" maxlength="60" required>
+                            <label for="bill_to_address1" class="form-label">Address line 1*</label>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-group form-floating mb-3">
-                            <input id="bill_to_postcode" type="text" class="form-control form-control-sm" value="" tabindex="6" placeholder="Postcode" required maxlength="10">
-                            <label for="bill_to_postcode" class="form-label">PostCode*</label>
+                            <input id="bill_to_address2" type="text" class="form-control form-control-sm" value="" tabindex="4" placeholder="2nd line of address" maxlength="60">
+                            <label for="bill_to_address2" class="form-label">Address line 2</label>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6">
                         <div class="form-group form-floating mb-3">
-                            <select id="bill_to_address_country" class="form-control form-control-sm" tabindex="7" >
+                            <input id="bill_to_address2_locality" type="text" class="form-control form-control-sm" value="" tabindex="5" placeholder="City/County" required maxlength="50">
+                            <label for="bill_to_address2_locality" class="form-label">City/County*</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group form-floating mb-3">
+                            <input id="bill_to_administrativeArea" type="text" class="form-control form-control-sm" value="" tabindex="6" placeholder="State" required maxlength="10">
+                            <label for="bill_to_administrativeArea" class="form-label">PostCode*</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group form-floating mb-3">
+                            <input id="bill_to_postalCode" type="text" class="form-control form-control-sm" value="" tabindex="6" placeholder="Postcode" required maxlength="10">
+                            <label for="bill_to_postalCode" class="form-label">PostCode*</label>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group form-floating mb-3">
+                            <select id="bill_to_country" class="form-control form-control-sm" tabindex="7" >
 <?php
 foreach ($countries as $key => $value) {
 echo "<option value=\"". $key ."\">" . $value . "</option>\n";
 }
 ?>
                             </select>
-                            <label for="bill_to_address_country" class="form-label">Country*</label>
+                            <label for="bill_to_country" class="form-label">Country*</label>
                         </div>
                     </div>
                 </div>

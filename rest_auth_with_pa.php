@@ -31,14 +31,16 @@ try {
                 "email" => $incoming->order->bill_to->email
             ];
             $request->buyerInformation = $buyerInformation;
-            if($incoming->order->shippingAddressRequired && $incoming->order->storeAddress){
-                $processingInfo->actionTokenTypes = ["customer", "paymentInstrument", "shippingAddress"];
-            }else{
-                $processingInfo->actionTokenTypes = ["customer", "paymentInstrument"];
+            $processingInfo->actionTokenTypes = ["customer"];
+            if($incoming->order->storeAddress){
+                array_push($processingInfo->actionTokenTypes, "shippingAddress");
+            }
+            if($incoming->order->storeCard){
+                array_push($processingInfo->actionTokenTypes, "paymentInstrument");
             }
         } else{
             // EXISTING CUSTOMER - Add Payment Instrument and/or Shipping Address to existing Customer
-            if($incoming->order->shippingAddressRequired && $incoming->order->storeAddress){
+            if($incoming->order->storeAddress){
                 $processingInfo->actionTokenTypes = ["shippingAddress"];
                 if($incoming->order->storeCard){
                     array_push($processingInfo->actionTokenTypes, "paymentInstrument");
@@ -71,6 +73,7 @@ try {
                 "address1" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address1:$incoming->order->bill_to->address1)), 0, MAXSIZE_ADDRESS),
                 "address2" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->address2: $incoming->order->bill_to->address2)), 0, MAXSIZE_ADDRESS),
                 "locality" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->locality: $incoming->order->bill_to->locality)), 0, MAXSIZE_CITY),
+                "administrativeArea" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->administrativeArea: $incoming->order->bill_to->administrativeArea)), 0, MAXSIZE_CITY),
                 "postalCode" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->postalCode: $incoming->order->bill_to->postalCode)), 0, MAXSIZE_POSTCODE),
                 "country" => substr(ppTrim(($incoming->order->useShippingAsBilling?$incoming->order->ship_to->country: $incoming->order->bill_to->country)), 0, MAXSIZE_COUNTRY),
                 "email" => $incoming->order->bill_to->email
@@ -89,6 +92,7 @@ try {
                     "address1" => substr(ppTrim($incoming->order->ship_to->address1), 0, MAXSIZE_ADDRESS),
                     "address2" => substr(ppTrim($incoming->order->ship_to->address2), 0, MAXSIZE_ADDRESS),
                     "locality" => substr(ppTrim($incoming->order->ship_to->locality), 0, MAXSIZE_CITY),
+                    "administrativeArea" => substr(ppTrim($incoming->order->ship_to->administrativeArea), 0, MAXSIZE_CITY),
                     "postalCode" => substr(ppTrim($incoming->order->ship_to->postalCode), 0, MAXSIZE_POSTCODE),
                     "country" => substr(ppTrim($incoming->order->ship_to->country), 0, MAXSIZE_COUNTRY),
                 ];

@@ -71,11 +71,23 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                             <hr class="solid">
                             <h5 class="card-title">Delivery Address</h5>
                             <div id="shipToText" class="card-text small" style="max-height: 999999px;"></div>
+                            <div class="row" id="storeAddressSection" style="display:none">
+                                <div class="col-12">
+                                    <input type="checkbox" class="form-check-input" id="storeAddress" name="storeAddress" value="1">
+                                    <label for="storeAddress" class="form-check-label">Store this address for future use</label>
+                                </div>
+                            </div>
                         </div>
                         <div id="summary_billTo" style="display:none">
                             <hr class="solid">
                             <h5 class="card-title">Payment Card</h5>
                             <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
+                            <div class="row" id="storeCardSection" style="display:none">
+                                <div class="col-12">
+                                    <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
+                                    <label for="storeCard" class="form-check-label">Store this card for future use</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -186,6 +198,7 @@ let orderDetails = {
             address1: "",
             address2: "",
             locality: "",
+            administrativeArea: "",
             postalCode: "",
             country: ""
         },
@@ -196,6 +209,7 @@ let orderDetails = {
             address1: "",
             address2: "",
             locality: "",
+            administrativeArea: "",
             postalCode: "",
             country: ""
         }
@@ -350,6 +364,7 @@ function updateEmail(update){
 function nextButton(form){
     switch(form){
         case "pay":
+            orderDetails.useShippingAsBilling = shipAsBill();
             // Pay Button clicked
             if(orderDetails.useShippingAsBilling){
                 getToken(onTokenCreated);
@@ -363,6 +378,12 @@ function nextButton(form){
         case "confirm":
             // Confirm Button clicked
             document.getElementById("inputSection").style.display = "none";
+            // If storeCard checked, we will create a Payment Instrument Token
+            sc = document.getElementById('storeCard');
+            orderDetails.storeCard = sc.checked;
+            // If storeAddress checked, we will create a shipping Token
+            sa = document.getElementById('storeAddress');
+            orderDetails.storeAddress = sa.checked;
             authorise();
             break;
     }
@@ -392,6 +413,7 @@ function backButton(form){
             document.getElementById("summary_billTo").style.display = "none";
             break;
         case "confirm":
+            document.getElementById("storeCardSection").style.display = "none";
             document.getElementById("paymentDetailsSection").style.display = "block";
             document.getElementById("confirmSection").style.display = "none";
             break;
@@ -410,12 +432,6 @@ function hideNewAddress(){
 function useShippingAddress(id){
     console.log("Shipping Address: "+ id);
     if(id === "NEW"){
-    // If storeCard checked, we will create a Token
-        sa = document.getElementById('storeAddress');
-        if (sa.checked) {
-            orderDetails.storeAddress = true;
-        }
-
         orderDetails.shippingAddressId = "";
         form = document.getElementById('newAddressForm');
         if(validateForm(form)){
@@ -425,6 +441,7 @@ function useShippingAddress(id){
             document.getElementById("addressSection").style.display = "none";
             document.getElementById("summaryEmailButton").style.display = "none";
             document.getElementById("cardSelectionSection").style.display = "block";
+            document.getElementById("storeAddressSection").style.display = "block";
             document.getElementById('shipToText').innerHTML = formatNameAddress(orderDetails.ship_to);
         }
     }else{
@@ -436,6 +453,7 @@ function useShippingAddress(id){
         document.getElementById("paymentSection").style.display = "block";
         document.getElementById("addressSection").style.display = "none";
         document.getElementById("summaryEmailButton").style.display = "none";
+        document.getElementById("storeAddressSection").style.display = "none";
         document.getElementById('shipToText').innerHTML = formatNameAddress(address.shipTo);
     }
 }
@@ -470,13 +488,13 @@ function usePaymentInstrument(id){
     console.log("Payment Instrument: "+ id);
     if(id === "NEW"){
         orderDetails.paymentInstrumentId = "";
-        document.getElementById("storeCardCheck").style.display = "block";
+        document.getElementById("sameAddressCheck").style.display = "block";
         document.getElementById('billToText').innerHTML = "";
         flipCvvOnly(false);
     }else{
         orderDetails.paymentInstrumentId = id;
         document.getElementById('billingForm').style.display = "none";
-        document.getElementById("storeCardCheck").style.display = "none";
+        document.getElementById("sameAddressCheck").style.display = "none";
         document.getElementById("useShipAsBill").checked = true;
         pi=JSON.parse(document.getElementById("pi_"+id).value);
         orderDetails.maskedPan = pi._embedded.instrumentIdentifier.card.number;
@@ -493,15 +511,15 @@ function onTokenCreated(tokenDetails){
     // Hide card input, show Confirmation section
     document.getElementById("paymentDetailsSection").style.display = "none";
     document.getElementById("confirmSection").style.display = "block";
+    if(orderDetails.paymentInstrumentId === ""){
+        document.getElementById("storeCardSection").style.display = "block";
+    }else{
+        document.getElementById("storeCardSection").style.display = "none";
+    }
 
     orderDetails.flexToken = tokenDetails.flexToken;
     if(orderDetails.paymentInstrumentId === ""){
         orderDetails.maskedPan = tokenDetails.cardDetails.number;
-        // If storeCard checked, we will create a Token
-        sc = document.getElementById('storeCard');
-        if (sc.checked) {
-            orderDetails.storeCard = true;
-        }
     }else{
         orderDetails.storeCard = false;
     }
@@ -512,6 +530,17 @@ function onTokenCreated(tokenDetails){
             stylePaymentInstrument(tokenDetails.cardDetails, orderDetails.maskedPan, orderDetails.bill_to);
     }
 }
+function setGooglePayBillingDetails(billingAddress) {
+    let names = billingAddress.name.split(/(?<=^\S+)\s/)
+    orderDetails.bill_to.firstName = names[0];
+    orderDetails.bill_to.lastName = names[1];
+    orderDetails.bill_to.address1 = billingAddress.address1;
+    orderDetails.bill_to.address2 = billingAddress.address2;
+    orderDetails.bill_to.locality = billingAddress.locality;
+    orderDetails.bill_to.administrativeArea = billingAddress.administrativeArea;
+    orderDetails.bill_to.postalCode = billingAddress.postalCode;
+    orderDetails.bill_to.country = billingAddress.countryCode;
+}
 function setBillingDetails() {
     if(orderDetails.useShippingAsBilling) {
         orderDetails.bill_to.firstName = orderDetails.ship_to.firstName;
@@ -519,16 +548,18 @@ function setBillingDetails() {
         orderDetails.bill_to.address1 = orderDetails.ship_to.address1;
         orderDetails.bill_to.address2 = orderDetails.ship_to.address2;
         orderDetails.bill_to.locality = orderDetails.ship_to.locality;
+        orderDetails.bill_to.administrativeArea = orderDetails.ship_to.administrativeArea;
         orderDetails.bill_to.postalCode = orderDetails.ship_to.postalCode;
         orderDetails.bill_to.country = orderDetails.ship_to.country;
     }else{
-        orderDetails.bill_to.firstName = document.getElementById('bill_to_forename').value;
-        orderDetails.bill_to.lastName = document.getElementById('bill_to_surname').value;
-        orderDetails.bill_to.address1 = document.getElementById('bill_to_address_line1').value;
-        orderDetails.bill_to.address2 = document.getElementById('bill_to_address_line2').value;
-        orderDetails.bill_to.locality = document.getElementById('bill_to_address_city').value;
-        orderDetails.bill_to.postalCode = document.getElementById('bill_to_postcode').value;
-        orderDetails.bill_to.country = document.getElementById('bill_to_address_country').value;
+        orderDetails.bill_to.firstName = document.getElementById('bill_to_firstName').value;
+        orderDetails.bill_to.lastName = document.getElementById('bill_to_lastName').value;
+        orderDetails.bill_to.address1 = document.getElementById('bill_to_address1').value;
+        orderDetails.bill_to.address2 = document.getElementById('bill_to_address2').value;
+        orderDetails.bill_to.locality = document.getElementById('bill_to_address2_locality').value;
+        orderDetails.bill_to.administrativeArea = document.getElementById('bill_to_administrativeArea').value;
+        orderDetails.bill_to.postalCode = document.getElementById('bill_to_postalCode').value;
+        orderDetails.bill_to.country = document.getElementById('bill_to_country').value;
     }
 }
 function authorise() {
@@ -536,10 +567,35 @@ function authorise() {
     setUpPayerAuth();
 }
 function onGooglePayCardSelected(paymentData){
-    console.log(paymentData);
-    orderDetails.maskedPan = paymentData.paymentMethodData.description;
+    console.log(JSON.stringify(paymentData, undefined, 2));
+    // Hide card input, show Confirmation section
+    document.getElementById("paymentDetailsSection").style.display = "none";
+    document.getElementById("summary_billTo").style.display = "none";
+    document.getElementById("confirmSection").style.display = "block";
+    document.getElementById("cardSelectionSection").style.display = "none";
+    document.getElementById("storeCardSection").style.display = "block";
+
+    orderDetails.paymentInstrumentId = "";
+    orderDetails.useShippingAsBilling = false;
+    orderDetails.maskedPan = "xxxxxxxxxxxx"+paymentData.paymentMethodData.info.cardDetails;
     orderDetails.googlePayToken = paymentData.paymentMethodData.tokenizationData.token;
-    setUpPayerAuth();
+    setGooglePayBillingDetails(paymentData.paymentMethodData.info.billingAddress);
+    document.getElementById("summary_billTo").style.display = "block";
+    let type="";
+    if(paymentData.paymentMethodData.info.cardNetwork === "VISA"){
+        type="001";
+    }else if(paymentData.paymentMethodData.info.cardNetwork === "MASTERCARD"){
+        type="002";
+    }else{
+        type="003";
+    }
+    cardDetails = {
+        type: type,
+        expirationMonth: "",
+        expirationYear: ""
+    };
+    document.getElementById('billToText').innerHTML =
+        stylePaymentInstrument(cardDetails, orderDetails.maskedPan, orderDetails.bill_to);
 }
 function  expiredCard(){
     console.log("expired Card");
@@ -565,7 +621,7 @@ function stylePaymentInstrument(card, number, billTo){
                 "<div class=\"col-7 \">\n" +
                     "<ul class=\"list-unstyled\">" +
                         "<li><strong>" + number + "</strong></li>\n" +
-                        "<li><small>Expires:&nbsp;" + card.expirationMonth + "/" + card.expirationYear + "</small></li>\n" +
+                        (card.expirationMonth?"<li><small>Expires:&nbsp;" + card.expirationMonth + "/" + card.expirationYear + "</small></li>\n":"") +
                     "</ul>\n" +
                 "</div>\n" +
             "</div>\n" +

@@ -14,7 +14,7 @@ function setUpPayerAuth(){
                 console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
             } catch(error){
                 console.log("ERROR:"+ result);
-                onFinish2("SETUPPA", "ERROR", "", false, false, "n/a", "JSON PARSE", result);
+                onFinish2("SETUPPA", "ERROR", "", false, false, false, "n/a", "JSON PARSE", result);
                 return;
             }
             // If OK, set up device collection
@@ -29,11 +29,13 @@ function setUpPayerAuth(){
 //                    expiredCard();
 //                }
                 else{
-                    onFinish2("SETUPPA", status, "", false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                    onFinish2("SETUPPA", status, "", false, false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
                 }
-            } else {
+            }else if(res.responseCode === 400){
+                onFinish2("SETUPPA", status, "", false, false, false, res.responseCode, res.response.reason, res.response.message);
+            }else {
                 // 500 System error or anything else
-                onFinish2("SETUPPA", status, "", false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                onFinish2("SETUPPA", status, "", false, false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
             }
         }
     });
@@ -87,7 +89,7 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                 console.log("\nResults:\n" + JSON.stringify(res, undefined, 2));
             } catch(error){
                 console.log("ERROR:"+ result);
-                onFinish2("AUTH+"+paAction, "ERROR", "", false, false, "n/a", "JSON PARSE", result);
+                onFinish2("AUTH+"+paAction, "ERROR", "", false, false, false, "n/a", "JSON PARSE", result);
                 return;
             }
             let httpCode = res.responseCode;
@@ -101,11 +103,13 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                     // Card is enrolled - Kick off the cardholder authentication
                     showStepUpScreen(res.response.consumerAuthenticationInformation.stepUpUrl, res.response.consumerAuthenticationInformation.accessToken);
                 } else if (status === "AUTHORIZED") {
-                    if (orderDetails.storeCard) {
-                        paymentInstrumentCreated = true;
-                        orderDetails.paymentInstrumentId = res.response.tokenInformation.paymentInstrument.id;
-                        if(orderDetails.shippingAddressId === ""){
-                            // Not using an existing shippingAddress so must be creating a new one
+                    if (orderDetails.storeCard || orderDetails.storeAddress) {
+                        if(orderDetails.storeCard){
+                            paymentInstrumentCreated = true;
+                            orderDetails.paymentInstrumentId = res.response.tokenInformation.paymentInstrument.id;
+                        }
+                        if(orderDetails.storeAddress){
+                            shippingAddressCreated = true;
                             orderDetails.shippingAddressId = res.response.tokenInformation.shippingAddress.id;
                         }
                         if (!orderDetails.customerId) {
@@ -114,25 +118,25 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
                             orderDetails.customerId = res.response.tokenInformation.customer.id;
                         }
                     }
-                    onFinish2("AUTH+"+paAction, status, res.response.id, customerCreated, paymentInstrumentCreated, httpCode, "", "");
+                    onFinish2("AUTH+"+paAction, status, res.response.id, customerCreated, paymentInstrumentCreated, shippingAddressCreated, httpCode, "", "");
                 } else {
                     // Decline
-                    onFinish2("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                    onFinish2("AUTH+"+paAction, status, res.response.id, false, false, false,httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
                 }
             } else {
                 // 500 System error or anything else
                 switch(httpCode){
                     case 202:
-                        onFinish2("AUTH+"+paAction, status, res.response.id, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
+                        onFinish2("AUTH+"+paAction, status, res.response.id, false, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
                         break;
                     case 502:
-                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                        onFinish2("AUTH+"+paAction, status, "", false, false, false, httpCode, res.response.reason, res.response.message);
                         break;
                     case 400:
-                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                        onFinish2("AUTH+"+paAction, status, "", false, false, false, httpCode, res.response.reason, res.response.message);
                         break;
                     default:
-                        onFinish2("AUTH+"+paAction, status, "", false, false, httpCode, res.response.reason, res.response.message);
+                        onFinish2("AUTH+"+paAction, status, "", false, false, false, httpCode, res.response.reason, res.response.message);
                 }
             }
         }
@@ -157,7 +161,7 @@ function hideStepUpScreen(transactionId) {
     document.getElementById("authSpinner").style.display = "block";
     authorizeWithPA("", transactionId, "VALIDATE_CONSUMER_AUTHENTICATION");
 }
-function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentCreated, httpResponseCode, errorReason, errorMessage) {
+function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentCreated, shippingAddressCreated, httpResponseCode, errorReason, errorMessage) {
     document.getElementById('authSection').style.display = "none";
     document.getElementById('inputSection').style.display = "none";
     document.getElementById('confirmSection').style.display = "none";
@@ -173,6 +177,7 @@ function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentC
         "pan": orderDetails.maskedPan,
         "newCustomer": newCustomer,
         "newPaymentInstrument": paymentInstrumentCreated,
+        "newShippingAddress": shippingAddressCreated,
         "customerId": orderDetails.customerId,
         "paymentInstrumentId": orderDetails.paymentInstrumentId,
         "shippingAddressId": orderDetails.shippingAddressId,
