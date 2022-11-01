@@ -366,14 +366,14 @@ function nextButton(form){
         case "pay":
             orderDetails.useShippingAsBilling = shipAsBill();
             // Pay Button clicked
-            if(orderDetails.useShippingAsBilling){
-                getToken(onTokenCreated);
-            }else{
-                form = document.getElementById('billingForm');
-                if(validateForm(form)){
-                    getToken(onTokenCreated);
+            if(!orderDetails.useShippingAsBilling){
+                // Validate billing data form if neccessary
+                // form = ;
+                if(!validateForm(document.getElementById('billingForm'))){
+                    break;
                 }
             }
+            getToken(onTokenCreated);
             break;
         case "confirm":
             // Confirm Button clicked
@@ -531,7 +531,7 @@ function onTokenCreated(tokenDetails){
     }
 }
 function setGooglePayBillingDetails(billingAddress) {
-    let names = billingAddress.name.split(/(?<=^\S+)\s/)
+    let names = billingAddress.name.split(/(?<=^\S+)\s/);
     orderDetails.bill_to.firstName = names[0];
     orderDetails.bill_to.lastName = names[1];
     orderDetails.bill_to.address1 = billingAddress.address1;

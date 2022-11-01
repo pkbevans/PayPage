@@ -49,7 +49,7 @@ function getCookie($name){
                     <label for="autoCapture" class="form-label">Auto Capture</label>
                     <select id="autoCapture" class="form-select" name="autoCapture">
                         <option value="true" selected>Yes</option>
-                        <option value="false" selected>No</option>
+                        <option value="false">No</option>
                     </select>
                     <BR>
                     <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
