@@ -237,13 +237,42 @@ document.addEventListener("DOMContentLoaded", function (e) {
 });
 function start(){
     if(orderDetails.buyNow){
-        getCustomer();  //NOT BLOCKING
-        authorise();
+        getCustomer(orderDetails.customerId)
+        .then (pan=>{
+            orderDetails.maskedPan = pan;
+            authorise()
+        })
+        .catch(error => {
+            window.alert("Sorry. Something went wrong: " + error);
+            console.log("ERROR: " + error)
+        })
     }else{
         showAddresses();
         showCards();
         document.getElementById("inputSection").style.display = "block";
     }
+}
+function getCustomer(id){
+    return fetch("/payPage/api/get_customer.php", {
+      method: "post",
+      body: JSON.stringify({
+          "customerId" : id
+      })
+    })
+    .then((result) => result.json())
+    .then(res => {
+        console.log(JSON.stringify(res, undefined, 2));
+        if(res.responseCode === 200){
+            try{
+                // Need to check that customer has a saved card
+                return res.response._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
+            }catch(err){
+                throw "Unable to get saved card for customerId: "+id;
+            }
+        }else{
+             throw "Unable to retreive customerId="+id;
+        }
+    })
 }
 function retry(){
     // Authorization failed so give user chance to try again or use a
@@ -263,22 +292,6 @@ window.history.pushState(null, null, window.location.href);
 window.onpopstate = function () {
     window.history.go(1);
 };
-function getCustomer(){
-    $.ajax({
-        type: "POST",
-        url: "rest_get_customer.php",
-        data: JSON.stringify({
-            "customerId": orderDetails.customerId
-        }),
-        success: function (result) {
-            res = JSON.parse(result);
-            console.log("\nCustomer:\n" + JSON.stringify(res, undefined, 2));
-            if (res.responseCode === 200){
-                orderDetails.maskedPan = res.response._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
-            }
-        }
-    });
-}
 function showCards(){
     $.ajax({
         type: "POST",
