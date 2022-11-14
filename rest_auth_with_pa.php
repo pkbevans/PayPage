@@ -165,7 +165,7 @@ try {
 
     try{
         // Update DB
-        $dbResult=insertPayment($incoming->order, $result);
+        $dbResult=insertPayment("PAYMENT", $incoming->order, $result);
         $result->payment = $dbResult;
     }catch(Exception $exception){
         $result->payment = "DB ERROR";
