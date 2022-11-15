@@ -1,7 +1,7 @@
 <?php include "../db/get_orders.php"; ?>
 <div class="container">
     <h3>Orders</h3>
-    <table class="table">
+    <table class="table table-hover">
         <thead><tr>
             <th>Order Id</th>
             <th>Reference</th>

@@ -85,7 +85,7 @@
     function getOrders(){
         document.getElementById('backButton').style.display = "block";
         document.getElementById('ordersSection').style.display = "block";
-        return fetch("/payPage/view/show_orders.php", {
+        return fetch("/payPage/view/listOrders.php", {
           method: "post",
           body: JSON.stringify({
               "orderId":    document.getElementById('orderId').value,
@@ -108,7 +108,7 @@
         document.getElementById('ordersSection').style.display = "none";
         document.getElementById('orderSection').style.display = "block";
         console.log("GOT ID: "+id)
-        return fetch("/payPage/view/show_order.php", {
+        return fetch("/payPage/view/viewOrder.php", {
             method: "post",
             body: JSON.stringify({
                 "orderId":    id
@@ -168,6 +168,7 @@
                 console.log(res);
                 if(res.responseCode === 201){
                     document.getElementById('statusSection').innerHTML = "SUCCESS. The refund has been submitted";
+                    // Refresh the order    
                     getOrder(selectedOrderId);
                     backButton();
                 }else{
@@ -181,7 +182,7 @@
         }
     }
     function showRequest(id){
-        return fetch("/payPage/view/showRequest.php", {
+        return fetch("/payPage/view/viewGatewayRequest.php", {
             method: "post",
             body: JSON.stringify({
                 "requestId": id

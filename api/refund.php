@@ -1,15 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/db/db_insert_payment.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/db/paymentUtils.php';
 $incoming = json_decode(file_get_contents('php://input'));
-
-$orderDetails = new stdClass();
-$orderDetails->referenceNumber = $incoming->referenceNumber;
-$orderDetails->orderId = $incoming->orderId;
-$orderDetails->amount = $incoming->amount;
-$orderDetails->currency = $incoming->currency;
-$orderDetails->maskedPan = "TODO";
-$orderDetails->capture = true;
 
 $result = new stdClass();
 try {
@@ -28,15 +20,18 @@ try {
     // Get Customer
     $api = API_PAYMENTS . "/" . $incoming->requestId . "/refunds";
     $result = ProcessRequest(MID, $api , METHOD_POST, $requestBody, CHILD_MID, AUTH_TYPE_SIGNATURE );
-
-    try{
-        // Update DB
-        $dbResult=insertPayment("REFUND", $orderDetails, $result);
-        $result->payment = $dbResult;
-    }catch(Exception $exception){
-        $result->payment = "DB ERROR";
+    $dbError = "";
+    if($result->responseCode == 201){
+        if( !insertPayment("REFUND", $incoming->orderId, $incoming->amount, 0, $incoming->currency,
+                "n/a","n/a","n/a", $result->response->id, "SUBMITTED")){
+            $dbError .= "DBError inserting Payment. ";
+            $result->dberror = $dbError;
+        }
+        if( !updateOrder($incoming->orderId, "REFUNDED")){
+            $dbError .= "DBError updating Order";
+            $result->dberror = $dbError;
+        }
     }
-
 } catch (Exception $exception) {
     $result->responseCode = 500;
     $result->exception = $exception;

@@ -73,7 +73,7 @@
                         <td><?php echo $payment['authCode'];?></td>
                         <td><button type="button" class="btn btn-link" onclick="showRequest('<?php echo $payment['gatewayRequestId'];?>')"><?php echo $payment['gatewayRequestId'];?></button></td>
                         <td><?php echo $payment['datetime'];?></td>
-<?php if($payment['status'] == "AUTHORIZED"): ?>
+<?php if($order['status'] == "AUTHORIZED"): ?>
                         <td><button type="button" class="btn btn-outline-primary" onclick="showRefundPage('<?php echo $payment['id'];?>')">Refund...</button></td>
 <?php endif; ?>
                     </tr>
