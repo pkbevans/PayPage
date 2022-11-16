@@ -1,4 +1,4 @@
-<?php include "../api/get_gateway_txn.php"; ?>
+<?php include "../api/getGatewayTxn.php"; ?>
 <div class="d-flex justify-content-center">
     <div class="card">
         <div class="card-body" style="width: 90vw">

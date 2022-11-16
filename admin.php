@@ -126,7 +126,7 @@
         console.log("showRefundPage: "+paymentId)
         ++back;
         document.getElementById('refundSection').style.display = "block";
-        return fetch("/payPage/view/create_refund.php", {
+        return fetch("/payPage/view/createRefund.php", {
             method: "post",
             body: JSON.stringify({
                 "paymentId": paymentId
@@ -140,7 +140,7 @@
             console.log("ERROR: "+error)
         })
     }
-    function refund(requestId, currency, originalAmount){
+    function submitRefund(requestId, currency, originalAmount, cardNumber){
         refundReference = document.getElementById('refundReference').value;
         refundAmount = Number(document.getElementById('refundAmount').value);
         var form = document.getElementById('refundForm');
@@ -150,14 +150,15 @@
             form.classList.add('was-validated');
         }else{
             console.log("refund: " + requestId + " Amount: " + refundAmount);
-            return fetch("/payPage/api/refund.php", {
+            return fetch("/payPage/api/submitRefund.php", {
                 method: "post",
                 body: JSON.stringify({
                     "orderId": selectedOrderId,
                     "referenceNumber": refundReference,
                     "requestId": requestId,
                     "currency": currency,
-                    "amount": refundAmount
+                    "amount": refundAmount,
+                    "cardNumber": cardNumber
                 })
             })
             .then((result) => {
@@ -168,11 +169,79 @@
                 console.log(res);
                 if(res.responseCode === 201){
                     document.getElementById('statusSection').innerHTML = "SUCCESS. The refund has been submitted";
-                    // Refresh the order    
+                    // Refresh the order
                     getOrder(selectedOrderId);
                     backButton();
                 }else{
-                    document.getElementById('statusSection').innerHTML = "ERROR. The refund could not be submitted";
+                    $errMessage = "";
+                    if(res.responseCode === 400){
+                        $errMessage = res.response.message;
+                    }
+                    document.getElementById('statusSection').innerHTML = "ERROR. The refund could not be submitted: " + $errMessage;
+                }
+                return "OK";
+            })
+            .catch(error => {
+                console.log("ERROR: "+error)
+            })
+        }
+    }
+    function showReversalPage(paymentId){
+        console.log("showReversalPage: "+paymentId)
+        ++back;
+        document.getElementById('refundSection').style.display = "block";
+        return fetch("/payPage/view/createReversal.php", {
+            method: "post",
+            body: JSON.stringify({
+                "paymentId": paymentId
+            })
+        })
+        .then((result) => result.text())
+        .then(res => {
+            return document.getElementById('refundSection').innerHTML = res;
+        })
+        .catch(error => {
+            console.log("ERROR: "+error)
+        })
+    }
+    function submitReversal(requestId, currency, originalAmount, cardNumber){
+        reversalReference = document.getElementById('reversalReference').value;
+        reversalAmount = Number(document.getElementById('reversalAmount').value);
+        var form = document.getElementById('reversalForm');
+        if(!form.checkValidity()|| reversalAmount > originalAmount) {
+            event.preventDefault();
+            event.stopPropagation();
+            form.classList.add('was-validated');
+        }else{
+            console.log("reversal: " + requestId + " Amount: " + reversalAmount);
+            return fetch("/payPage/api/submitReversal.php", {
+                method: "post",
+                body: JSON.stringify({
+                    "orderId": selectedOrderId,
+                    "referenceNumber": reversalReference,
+                    "requestId": requestId,
+                    "currency": currency,
+                    "amount": reversalAmount,
+                    "cardNumber": cardNumber
+                })
+            })
+            .then((result) => {
+                console.log(result);
+                return result.json()
+            })
+            .then(res => {
+                console.log(res);
+                if(res.responseCode === 201){
+                    document.getElementById('statusSection').innerHTML = "SUCCESS. The reversal has been submitted";
+                    // Refresh the order
+                    getOrder(selectedOrderId);
+                    backButton();
+                }else{
+                    $errMessage = "";
+                    if(res.responseCode === 400){
+                        $errMessage = res.response.message;
+                    }
+                    document.getElementById('statusSection').innerHTML = "ERROR. The reversal could not be submitted: " + $errMessage;
                 }
                 return "OK";
             })
@@ -202,6 +271,7 @@
         })
     }
     function backButton() {
+        document.getElementById('statusSection').innerHTML = "";
         switch (back){
             case 1: // Orders
                 document.getElementById('formSection').style.display="block";
@@ -212,7 +282,7 @@
                 document.getElementById('orderSection').style.display="none";
                 document.getElementById('ordersSection').style.display="block";
                 break;
-            case 3: //  Refund Screen
+            case 3: //  Refund/Reversal Screen
                 document.getElementById('refundSection').style.display="none";
                 document.getElementById('orderSection').style.display="block";
                 break;

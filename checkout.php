@@ -253,7 +253,7 @@ function start(){
     }
 }
 function getCustomer(id){
-    return fetch("/payPage/api/get_customer.php", {
+    return fetch("/payPage/api/getCustomer.php", {
       method: "post",
       body: JSON.stringify({
           "customerId" : id

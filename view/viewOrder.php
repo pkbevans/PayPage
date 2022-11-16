@@ -1,8 +1,9 @@
-<?php include "../db/get_order.php"; ?>
+<?php include "../db/getOrder.php"; ?>
 <div class="d-flex justify-content-center">
     <div class="card">
         <div class="card-body" style="width: 90vw">
             <h5 class="card-title">Your Order</h5>
+<?php if($order): ?>
             <div class="row">
                 <div class="col-3">
                     <h5>Order Id:</h5>
@@ -51,6 +52,9 @@
                     <span><?php echo $order['status'];?></span>
                 </div>
             </div>
+<?php else: ?>
+    UNABLE TO FIND THIS ORDER
+<?php endif; ?>
         </div>
     </div>
 </div>
@@ -74,7 +78,11 @@
                         <td><button type="button" class="btn btn-link" onclick="showRequest('<?php echo $payment['gatewayRequestId'];?>')"><?php echo $payment['gatewayRequestId'];?></button></td>
                         <td><?php echo $payment['datetime'];?></td>
 <?php if($order['status'] == "AUTHORIZED" && $payment['status'] == "AUTHORIZED" ): ?>
+    <?php if($payment['captured'] == 1):?>
                         <td><button type="button" class="btn btn-outline-primary" onclick="showRefundPage('<?php echo $payment['id'];?>')">Refund...</button></td>
+    <?php else:?>
+                        <td><button type="button" class="btn btn-outline-primary" onclick="showReversalPage('<?php echo $payment['id'];?>')">Reverse...</button></td>
+    <?php endif; ?>
 <?php endif; ?>
                     </tr>
 <?php endforeach; ?>

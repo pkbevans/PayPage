@@ -14,7 +14,8 @@ try {
                 "totalAmount"  =>  $incoming->amount,
                 "currency"  =>  $incoming->currency
             ]
-        ]
+        ],
+        "reason" => "TODO"
     ];
     $requestBody = json_encode($request);
     // Get Customer
@@ -23,7 +24,7 @@ try {
     $dbError = "";
     if($result->responseCode == 201){
         if( !insertPayment("REFUND", $incoming->orderId, $incoming->amount, 0, $incoming->currency,
-                "n/a","n/a","n/a", $result->response->id, "SUBMITTED")){
+                $incoming->cardNumber,"n/a","n/a", $result->response->id, "SUBMITTED")){
             $dbError .= "DBError inserting Payment. ";
             $result->dberror = $dbError;
         }
