@@ -36,7 +36,7 @@
             <div id="ordersSection"></div>
             <div id="orderSection">
                 <div id="orderDetailSection"></div>
-                <div id="refundSection"></div>
+                <div id="actionSection"></div>
                 <div id="statusSection"></div>
             </div>
             <div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
@@ -122,11 +122,11 @@
             console.log("ERROR: "+error)
         })
     }
-    function showRefundPage(paymentId){
+    function showActionPage(paymentId, action){
         console.log("showRefundPage: "+paymentId)
         ++back;
-        document.getElementById('refundSection').style.display = "block";
-        return fetch("/payPage/view/createRefund.php", {
+        document.getElementById('actionSection').style.display = "block";
+        return fetch("/payPage/view/create"+action+".php", {
             method: "post",
             body: JSON.stringify({
                 "paymentId": paymentId
@@ -134,30 +134,34 @@
         })
         .then((result) => result.text())
         .then(res => {
-            return document.getElementById('refundSection').innerHTML = res;
+            return document.getElementById('actionSection').innerHTML = res;
         })
         .catch(error => {
             console.log("ERROR: "+error)
         })
     }
-    function submitRefund(requestId, currency, originalAmount, cardNumber){
-        refundReference = document.getElementById('refundReference').value;
-        refundAmount = Number(document.getElementById('refundAmount').value);
-        var form = document.getElementById('refundForm');
-        if(!form.checkValidity()|| refundAmount > originalAmount) {
+    function submitAction(action, orderId, requestId, currency, originalAmount, cardNumber){
+        reason = document.getElementById('reason').value;
+        reference = document.getElementById('reference').value;
+        amount = Number(document.getElementById('amount').value);
+        var form = document.getElementById('actionForm');
+        let amountOK=true;
+        if((action == "Refund" && amount > originalAmount)
+                || (!form.checkValidity())) {
             event.preventDefault();
             event.stopPropagation();
             form.classList.add('was-validated');
         }else{
-            console.log("refund: " + requestId + " Amount: " + refundAmount);
-            return fetch("/payPage/api/submitRefund.php", {
+            console.log(action + ": " + requestId + " Amount: " + amount);
+            return fetch("/payPage/api/submit" + action + ".php", {
                 method: "post",
                 body: JSON.stringify({
-                    "orderId": selectedOrderId,
-                    "referenceNumber": refundReference,
+                    "orderId": orderId,
+                    "referenceNumber": reference,
+                    "reason": reason,
                     "requestId": requestId,
                     "currency": currency,
-                    "amount": refundAmount,
+                    "amount": amount,
                     "cardNumber": cardNumber
                 })
             })
@@ -168,80 +172,18 @@
             .then(res => {
                 console.log(res);
                 if(res.responseCode === 201){
-                    document.getElementById('statusSection').innerHTML = "SUCCESS. The refund has been submitted";
-                    // Refresh the order
-                    getOrder(selectedOrderId);
+                    document.getElementById('statusSection').innerHTML = "SUCCESS. The " + action + " has been submitted";
+                    // Refresh the order list and the specific order
+                    getOrders();
+                    getOrder(orderId);
+                    --back;
                     backButton();
                 }else{
                     $errMessage = "";
                     if(res.responseCode === 400){
                         $errMessage = res.response.message;
                     }
-                    document.getElementById('statusSection').innerHTML = "ERROR. The refund could not be submitted: " + $errMessage;
-                }
-                return "OK";
-            })
-            .catch(error => {
-                console.log("ERROR: "+error)
-            })
-        }
-    }
-    function showReversalPage(paymentId){
-        console.log("showReversalPage: "+paymentId)
-        ++back;
-        document.getElementById('refundSection').style.display = "block";
-        return fetch("/payPage/view/createReversal.php", {
-            method: "post",
-            body: JSON.stringify({
-                "paymentId": paymentId
-            })
-        })
-        .then((result) => result.text())
-        .then(res => {
-            return document.getElementById('refundSection').innerHTML = res;
-        })
-        .catch(error => {
-            console.log("ERROR: "+error)
-        })
-    }
-    function submitReversal(requestId, currency, originalAmount, cardNumber){
-        reversalReference = document.getElementById('reversalReference').value;
-        reversalAmount = Number(document.getElementById('reversalAmount').value);
-        var form = document.getElementById('reversalForm');
-        if(!form.checkValidity()|| reversalAmount > originalAmount) {
-            event.preventDefault();
-            event.stopPropagation();
-            form.classList.add('was-validated');
-        }else{
-            console.log("reversal: " + requestId + " Amount: " + reversalAmount);
-            return fetch("/payPage/api/submitReversal.php", {
-                method: "post",
-                body: JSON.stringify({
-                    "orderId": selectedOrderId,
-                    "referenceNumber": reversalReference,
-                    "requestId": requestId,
-                    "currency": currency,
-                    "amount": reversalAmount,
-                    "cardNumber": cardNumber
-                })
-            })
-            .then((result) => {
-                console.log(result);
-                return result.json()
-            })
-            .then(res => {
-                console.log(res);
-                if(res.responseCode === 201){
-                    document.getElementById('statusSection').innerHTML = "SUCCESS. The reversal has been submitted";
-                    // Refresh the order
-                    getOrder(selectedOrderId);
-                    backButton();
-                }else{
-                    $errMessage = "";
-                    if(res.responseCode === 400){
-                        $errMessage = res.response.message;
-                    }
-                    document.getElementById('statusSection').innerHTML = "ERROR. The reversal could not be submitted: " + $errMessage;
+                    document.getElementById('statusSection').innerHTML = "ERROR. The "+ action + " could not be submitted: " + $errMessage;
                 }
                 return "OK";
             })
@@ -283,11 +225,11 @@
                 document.getElementById('ordersSection').style.display="block";
                 break;
             case 3: //  Refund/Reversal Screen
-                document.getElementById('refundSection').style.display="none";
+                document.getElementById('actionSection').style.display="none";
                 document.getElementById('orderSection').style.display="block";
                 break;
             case 4: // Refund submitted
-                document.getElementById('refundSection').style.display="none";
+                document.getElementById('actionSection').style.display="none";
                 document.getElementById('orderSection').style.display="block";
                 break;
         }

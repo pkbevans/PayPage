@@ -78,10 +78,13 @@
                         <td><button type="button" class="btn btn-link" onclick="showRequest('<?php echo $payment['gatewayRequestId'];?>')"><?php echo $payment['gatewayRequestId'];?></button></td>
                         <td><?php echo $payment['datetime'];?></td>
 <?php if($order['status'] == "AUTHORIZED" && $payment['status'] == "AUTHORIZED" ): ?>
-    <?php if($payment['captured'] == 1):?>
-                        <td><button type="button" class="btn btn-outline-primary" onclick="showRefundPage('<?php echo $payment['id'];?>')">Refund...</button></td>
+<?php if($payment['captured'] == 1):?>
+<?php if(isDateToday($payment['datetime'])):?>
+                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>', 'Void')">Void...</button></td>
+<?php endif?>
+                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>','Refund')">Refund...</button></td>
     <?php else:?>
-                        <td><button type="button" class="btn btn-outline-primary" onclick="showReversalPage('<?php echo $payment['id'];?>')">Reverse...</button></td>
+                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>','Reversal')">Reverse...</button></td>
     <?php endif; ?>
 <?php endif; ?>
                     </tr>

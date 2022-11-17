@@ -6,9 +6,7 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
     $where = " where id=\"" . $incoming->orderId . "\" ";
 
-    $stmt = "select id, merchantReference, amount, currency, " .
-        "customerId, customerEmail, status, dateTime" .
-        " from orders " . $where . ";";
+    $stmt = "select * from orders " . $where . ";";
 
     // echo "STMT=" . $stmt . "<BR>";
     $stmtOrder = $conn->query($stmt);
@@ -24,5 +22,13 @@ try {
     unset($conn);
 } catch(PDOException $e) {
   echo "Connection failed: " . $e->getMessage();
+}
+function isDateToday($dateString){
+    $today = date('Y-m-d');
+    if(strncmp($dateString, $today, 10)){
+        return false;
+    }else{
+        return true;
+    }
 }
 ?>

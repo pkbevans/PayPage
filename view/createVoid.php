@@ -2,7 +2,7 @@
 <div class="d-flex justify-content-center">
     <div class="card">
         <div class="card-body" style="width: 90vw">
-            <h5 class="card-title">Reversal</h5>
+            <h5 class="card-title">Void</h5>
             <div class="row">
                 <div class="col-3">
                     Original Amount
@@ -20,6 +20,7 @@
                 </div>
             </div>
             <form class="needs-validation" id="actionForm" name="checkout" method="POST" target="" action="" novalidate >
+                <input id="amount" type="hidden" name="amount" value="<?php echo $payment['amount'];?>" />
                 <div class="row">
                     <div class="col-3">
                         <label for="reference" class="form-label">Reference</label>
@@ -36,16 +37,8 @@
                         <input id="reason" class="form-control" type="text" name="reason" value="" required />
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-3">
-                        <label for="amount" class="form-label">Reversal Amount</label>
-                    </div>
-                    <div class="col-3">
-                        <input id="amount" class="form-control" type="number" name="amount" value="<?php echo $payment['amount'];?>" required step="0.01" min="1.00" max="<?php echo $payment['amount'];?>" />
-                    </div>
-                </div>
-                <button id="reversalButton" type="button" class="btn btn-primary"
-                    onclick="submitAction('Reversal', '<?php echo $payment['orderId'];?>', '<?php echo $payment['gatewayRequestId'];?>', '<?php echo $payment['currency'];?>', <?php echo $payment['amount'];?>, '<?php echo $payment['cardNumber'];?>')">Reverse</button>
+                <button id="voidButton" type="button" class="btn btn-primary"
+                    onclick="submitAction('Void', '<?php echo $payment['orderId'];?>', '<?php echo $payment['gatewayRequestId'];?>', '<?php echo $payment['currency'];?>', <?php echo $payment['amount'];?>, '<?php echo $payment['cardNumber'];?>')">Void</button>
             </form>
         </div>
     </div>

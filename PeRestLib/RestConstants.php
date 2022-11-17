@@ -20,7 +20,7 @@ const REQUEST_HOST =  "apitest.cybersource.com";  // CYBS TEST endpoint
 //const REQUEST_HOST = "api.cybersource.com";  // CYBS PRODUCTION endpoint
 
 // APIs
-const API_PAYMENTS = "/pts/v2/payments/";
+const API_PAYMENTS = "/pts/v2/payments";
 const API_TMS_PAYMENT_INSTRUMENTS = "/tms/v1/paymentinstruments";
 const API_FLEX_V1_KEYS = '/flex/v1/keys';
 const API_FLEX_V2_SESSIONS = '/flex/v2/sessions';
