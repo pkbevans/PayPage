@@ -77,16 +77,19 @@
                         <td><?php echo $payment['authCode'];?></td>
                         <td><button type="button" class="btn btn-link" onclick="showRequest('<?php echo $payment['gatewayRequestId'];?>')"><?php echo $payment['gatewayRequestId'];?></button></td>
                         <td><?php echo $payment['datetime'];?></td>
-<?php if($order['status'] == "AUTHORIZED" && $payment['status'] == "AUTHORIZED" ): ?>
-<?php if($payment['captured'] == 1):?>
-<?php if(isDateToday($payment['datetime'])):?>
+    <?php if($order['status'] == "AUTHORIZED" && $payment['status'] == "AUTHORIZED" ): ?>
+        <?php if($payment['captured'] == 1):?>
+            <?php if(isDateToday($payment['datetime'])):?>
                         <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>', 'Void')">Void...</button></td>
-<?php endif?>
-                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>','Refund')">Refund...</button></td>
-    <?php else:?>
-                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>','Reversal')">Reverse...</button></td>
+            <?php else:?>
+                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>', 'Refund')">Refund...</button></td>
+            <?php endif?>
+        <?php else:?>
+                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>', 'Reversal')">Reverse...</button></td>
+        <?php endif; ?>
+    <?php elseif($order['status'] == "VOIDED" && $payment['status'] == "AUTHORIZED" ): ?>
+                        <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment['id'];?>', 'Reversal')">Reverse...</button></td>
     <?php endif; ?>
-<?php endif; ?>
                     </tr>
 <?php endforeach; ?>
                 </tbody>
