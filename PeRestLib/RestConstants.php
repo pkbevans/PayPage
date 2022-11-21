@@ -51,7 +51,7 @@ const API_PAYMENT_DETAILS = '/up/v1/payment-details';
 const METHOD_POST = "POST";
 const METHOD_GET = "GET";
 const METHOD_PATCH = "PATCH";
-const METHOD_DELETE = 'DELETE';
+const METHOD_DELETE = "DELETE";
 const METHOD_PUT = 'PUT';
 
 const AUTH_TYPE_SIGNATURE = "signature";

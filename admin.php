@@ -16,8 +16,9 @@
                     <span class="fs-4">Admin Portal</span>
                 </a>
                 <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>
+                    <li class="nav-item"><a href="/payPage/" class="nav-link active" aria-current="page">Home</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="index.php" class="nav-link">Checkout</a></li>
                 </ul>
             </header>
             <div class="row">
@@ -193,10 +194,33 @@
         }
     }
     function showRequest(id){
+        document.getElementById('requestModalLabel').innerHTML = "Request Details";
         return fetch("/payPage/view/viewGatewayRequest.php", {
             method: "post",
             body: JSON.stringify({
                 "requestId": id
+            })
+        })
+        .then((result) => {
+            console.log(result);
+            return result.text()
+        })
+        .then(res => {
+            document.getElementById('requestSection').innerHTML = res;
+            var myModal = new bootstrap.Modal(document.getElementById('requestModal'), {keyboard: false});
+            myModal.show();
+        })
+        .catch(error => {
+            console.log("ERROR: "+error)
+        })
+    }
+    function showCustomer(customerId){
+        document.getElementById('requestModalLabel').innerHTML = "Customer Details";
+        return fetch("/payPage/view/viewGatewayCustomer.php", {
+            method: "post",
+            body: JSON.stringify({
+                "customerId": customerId,
+                "noEcho": true
             })
         })
         .then((result) => {
@@ -234,6 +258,9 @@
                 break;
         }
         --back;
+    }
+    function refresh(){
+        getOrders();
     }
     </script>
     </body>

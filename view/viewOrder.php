@@ -25,7 +25,7 @@
                     <h5>Customer Id:</h5>
                 </div>
                 <div class="col-9">
-                    <span><?php echo $order['customerId'];?></span>
+                    <button type="button" class="btn btn-link" onclick="showCustomer('<?php echo $order['customerId'];?>')"><?php echo $order['customerId'];?></button>
                 </div>
             </div>
             <div class="row">

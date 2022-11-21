@@ -13,16 +13,17 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 USE `bondevans_com` ;
 
-
 -- -----------------------------------------------------
 -- Table `bondevans_com`.`orders`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `bondevans_com`.`payments` ;
 DROP TABLE IF EXISTS `bondevans_com`.`orders` ;
 
 CREATE TABLE IF NOT EXISTS `bondevans_com`.`orders` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `merchantReference` VARCHAR(50) NOT NULL,
   `amount` FLOAT NOT NULL DEFAULT 0,
+  `refundAmount` FLOAT NOT NULL DEFAULT 0,
   `currency` VARCHAR(3) NOT NULL,
   `customerId` VARCHAR(32) NOT NULL,
   `customerEmail` VARCHAR(45) NOT NULL,
@@ -33,21 +34,22 @@ CREATE TABLE IF NOT EXISTS `bondevans_com`.`orders` (
   INDEX `MRN` (`merchantReference` ASC))
 ENGINE = InnoDB;
 
-
 -- -----------------------------------------------------
 -- Table `bondevans_com`.`payments`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `bondevans_com`.`payments` ;
 
 CREATE TABLE IF NOT EXISTS `bondevans_com`.`payments` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `orderId` INT NOT NULL,
+  `type` VARCHAR(20) NOT NULL DEFAULT 'PAYMENT',
   `amount` FLOAT NOT NULL DEFAULT 0,
+  `currency` VARCHAR(3) NOT NULL DEFAULT 'GBP',
   `cardNumber` VARCHAR(19) NOT NULL,
   `cardType` VARCHAR(20) NOT NULL,
   `authCode` VARCHAR(45) NOT NULL,
   `gatewayRequestId` VARCHAR(45) NOT NULL,
   `status` VARCHAR(30) NOT NULL DEFAULT 'NEW',
+  `captured` INT NOT NULL DEFAULT 0,
   `datetime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),

@@ -30,8 +30,9 @@ function getCookie($name){
                     <span class="fs-4">Paul's Pants Checkout</span>
                 </a>
                 <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>
+                    <li class="nav-item"><a href="/payPage/" class="nav-link active" aria-current="page">Home</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">About</a></li>
+                    <li class="nav-item"><a href="admin.php" class="nav-link">Admin portal...</a></li>
                 </ul>
             </header>
             <!-- <small>5200000000001047, 5200000000000007, 371449111020228, 340000000001007</small> -->

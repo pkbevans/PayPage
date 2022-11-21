@@ -1,6 +1,13 @@
-<?php include "../db/get_orders.php"; ?>
+<?php include "../db/getOrders.php"; ?>
 <div class="container">
-    <h3>Orders</h3>
+    <div class="row">
+        <div class="col-6">
+            <h3>Orders</h3>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" onclick="refresh()">Refresh</button>
+        </div>
+    </div>
     <table class="table table-hover">
         <thead><tr>
             <th>Timestamp</th>
