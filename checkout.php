@@ -259,19 +259,24 @@ function getCustomer(id){
           "customerId" : id
       })
     })
+    .then(response =>{
+        if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        return response;
+    })
     .then((result) => result.json())
     .then(res => {
         console.log(JSON.stringify(res, undefined, 2));
-        if(res.responseCode === 200){
-            try{
-                // Need to check that customer has a saved card
-                return res.response._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
-            }catch(err){
-                throw "Unable to get saved card for customerId: "+id;
-            }
-        }else{
-             throw "Unable to retreive customerId="+id;
+        try{
+            // Need to check that customer has a saved card
+            return res._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
+        }catch(err){
+            throw "No saved cards for customerId: "+id;
         }
+    })
+    .catch(error =>{
+        throw "Can't get card for customer: " + id;
     })
 }
 function retry(){

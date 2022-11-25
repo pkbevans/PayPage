@@ -6,20 +6,18 @@ if(property_exists($incoming, "noEcho")){
     $echo = false;
 }
 $result = new stdClass();
-try {
-    // Get Customer
-    $api = API_TMS_V2_CUSTOMERS . "/" . $incoming->customerId;
-    $result = ProcessRequest(MID, $api , METHOD_GET, "", CHILD_MID, AUTH_TYPE_SIGNATURE );
-    if(!$echo){
-        if($result->responseCode == 200){
-            $customer= $result->response;
-        }
+// Get Customer
+$api = API_TMS_V2_CUSTOMERS . "/" . $incoming->customerId;
+$result = ProcessRequest(MID, $api , METHOD_GET, "", CHILD_MID, AUTH_TYPE_SIGNATURE );
+if($result->responseCode == 200){
+    header('HTTP/1.1 200 OK');
+    if($echo){
+        echo(json_encode($result->response));
+    }else{
+        $customer = $result->response;
     }
-} catch (Exception $exception) {
-    $result->responseCode = 500;
-    $result->exception = $exception;
+}else{
+    header('HTTP/1.1 ' . $result->responseCode . ' ERROR');
 }
-if($echo){
-    echo(json_encode($result));
-}
+
 ?>
