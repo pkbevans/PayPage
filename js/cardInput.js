@@ -13,7 +13,7 @@ var myStyles = {
     'valid': {'color': 'green'},
     'invalid': {'color': 'red'}
 };
-var captureContext;
+// var captureContext;
 var cardType;
 var flexToken;
 var expDate;
@@ -47,25 +47,19 @@ function createCardInput(progressName, buttonName, cvvOnlyFlag=false, panOnlyFla
     }
     getCaptureContext();
 }
-function getCaptureContext() {
-    $.ajax({
-        type: "POST",
-        url: "/payPage/api/generateCaptureContext.php",
-        success: function (result) {
-            res = JSON.parse(result);
-//            console.log("\nCapture Context:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            if (httpCode === 201) {
-                captureContext = res.rawResponse;
-                setUpMicroform();
-            } else {
-                // 500 System error or anything else TODO
-                console.log("Capture Context ERROR");
-            }
-        }
-    });
+function getCaptureContext(){
+    return fetch("/payPage/api/getCaptureContext.php", {
+      method: "post"
+    })
+    .then((result) => result.text())
+    .then(res => {
+        setUpMicroform(res);
+    })
+    .catch(error=>{
+        console.log("Capture Context ERROR")    
+    })
 }
-function setUpMicroform(){
+function setUpMicroform(captureContext){
     panValid=false;
     cvnValid=false;
     expDateValid=false;
