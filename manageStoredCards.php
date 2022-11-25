@@ -384,7 +384,7 @@ function updateCard(id, setDefaultOnly){
 
     $.ajax({
         type: "POST",
-        url: "/payPage/rest_update_customer_payment_instrument.php",
+        url: "/payPage/api/updateCustomerPaymentInstrument.php",
         data: JSON.stringify({
             "setDefaultOnly": setDefaultOnly,
             "customerId": customerId,
@@ -445,7 +445,7 @@ function addCard(){
     console.log("\nAdding Payment Instrument");
     $.ajax({
         type: "POST",
-        url: "/payPage/rest_auth_with_pa.php",
+        url: "/payPage/api/authWithPa.php",
         data: JSON.stringify({
             "order": orderDetails,
             "paAction": "NO_PA",
@@ -493,7 +493,7 @@ function deleteCard(id){
     console.log("\nDeleting Card: "+id);
     $.ajax({
         type: "POST",
-        url: "/payPage/rest_delete_customer_payment_instrument.php",
+        url: "/payPage/api/deleteCustomerPaymentInstrument.php",
         data: JSON.stringify({
             "customerId": customerId,
             "paymentInstrumentId": id

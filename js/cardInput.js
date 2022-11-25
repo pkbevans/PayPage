@@ -45,15 +45,12 @@ function createCardInput(progressName, buttonName, cvvOnlyFlag=false, panOnlyFla
     if(progress){
         progress.style.display = "none";
     }
-    getCaptureContext(window.location.href.includes("localhost")?true:false);
+    getCaptureContext();
 }
-function getCaptureContext(local) {
+function getCaptureContext() {
     $.ajax({
         type: "POST",
-        url: "/payPage/rest_generate_capture_context.php",
-        data: JSON.stringify({
-            "local": local
-        }),
+        url: "/payPage/api/generateCaptureContext.php",
         success: function (result) {
             res = JSON.parse(result);
 //            console.log("\nCapture Context:\n" + JSON.stringify(res, undefined, 2));
@@ -258,7 +255,7 @@ function getToken(tokenCallBack) {
             console.log("Status: "+err.status+". Reason: "+err.reason);
             getTokenButton.disabled = true;
             errorAlert.style.display = "block";
-            getCaptureContext(window.location.href.includes("localhost")?true:false);
+            getCaptureContext();
         } else {
             // Token received.
             cardDetails = getCardDetails(jwt);

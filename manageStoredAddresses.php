@@ -273,7 +273,7 @@ function updateAddress(id, setDefaultOnly){
 
     $.ajax({
         type: "POST",
-        url: "/payPage/rest_update_customer_shipping_address.php",
+        url: "/payPage/api/updateCustomerShippingAddress.php",
         data: JSON.stringify({
             "setDefaultOnly": setDefaultOnly,
             "customerId": customerId,
@@ -311,7 +311,7 @@ function deleteAddress(id){
     console.log("\nDeleting Shipping Address: "+id);
     $.ajax({
         type: "POST",
-        url: "/payPage/rest_delete_customer_shipping_address.php",
+        url: "/payPage/api/deleteCustomerShippingAddress.php",
         data: JSON.stringify({
             "customerId": customerId,
             "shippingAddressId": id
@@ -354,7 +354,7 @@ function addAddress(){
 
     $.ajax({
         type: "POST",
-        url: "/payPage/rest_add_customer_shipping_address.php",
+        url: "/payPage/api/addCustomerShippingAddress.php",
         data: JSON.stringify({
             "customerId": customerId,
             "default": defaultAddress,

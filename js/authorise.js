@@ -2,7 +2,7 @@ function setUpPayerAuth(){
     document.getElementById('authSpinner').style.display = "block";
     $.ajax({
         type: "POST",
-        url: "rest_setup_payerAuth.php",
+        url: "api/setupPayerAuth.php",
         data: JSON.stringify({
             "order": orderDetails
         }),
@@ -74,7 +74,7 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
     console.log("\nAuthorizing +" + paAction + " ...\n");
     $.ajax({
         type: "POST",
-        url: "rest_auth_with_pa.php",
+        url: "api/authWithPa.php",
         data: JSON.stringify({
             "order": orderDetails,
             "paAction": paAction,
