@@ -253,6 +253,7 @@ function start(){
     }
 }
 function getCustomer(id){
+    console.log("geCustomer: "+id);
     return fetch("/payPage/api/getCustomer.php", {
       method: "post",
       body: JSON.stringify({
@@ -263,11 +264,9 @@ function getCustomer(id){
         if (!response.ok) {
             throw Error(response.statusText);
         }
-        return response;
+        return response.json();
     })
-    .then((result) => result.json())
     .then(res => {
-        console.log(JSON.stringify(res, undefined, 2));
         try{
             // Need to check that customer has a saved card
             return res._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;

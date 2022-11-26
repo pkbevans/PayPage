@@ -1,44 +1,26 @@
 function setUpPayerAuth(){
+    console.log("setUpPayerAuth");
     document.getElementById('authSpinner').style.display = "block";
-    $.ajax({
-        type: "POST",
-        url: "api/setupPayerAuth.php",
-        data: JSON.stringify({
-            "order": orderDetails
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = "";
-            try{
-                res = JSON.parse(result);
-                console.log("\nSetup Payer Auth:\n" + JSON.stringify(res, undefined, 2));
-            } catch(error){
-                console.log("ERROR:"+ result);
-                onFinish2("SETUPPA", "ERROR", "", false, false, false, "n/a", "JSON PARSE", result);
-                return;
-            }
-            // If OK, set up device collection
-            if (res.responseCode === 201){
-                if( res.response.status === "COMPLETED") {
-                    // Set up device collection
-                    deviceDataCollectionURL = res.response.consumerAuthenticationInformation.deviceDataCollectionUrl;
-                    accessToken = res.response.consumerAuthenticationInformation.accessToken;
-                    doDeviceCollection(deviceDataCollectionURL, accessToken);
-                }
-//                else if("errorInformation" in res.response && res.response.errorInformation.reason === "EXPIRED_CARD" ){
-//                    expiredCard();
-//                }
-                else{
-                    onFinish2("SETUPPA", status, "", false, false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
-                }
-            }else if(res.responseCode === 400){
-                onFinish2("SETUPPA", status, "", false, false, false, res.responseCode, res.response.reason, res.response.message);
-            }else {
-                // 500 System error or anything else
-                onFinish2("SETUPPA", status, "", false, false, false, res.responseCode, res.response.errorInformation.reason, res.response.errorInformation.message);
-            }
+    return fetch("api/setupPayerAuth.php", {
+        method: "post",
+        body: JSON.stringify({
+            "order" : orderDetails
+        })
+    })
+    .then(response =>{
+        if (!response.ok) {
+            throw Error(response.statusText);
         }
-    });
+        return response.json();
+    })
+    .then(res => {
+        doDeviceCollection(res.consumerAuthenticationInformation.deviceDataCollectionUrl, 
+            res.consumerAuthenticationInformation.accessToken);
+    })
+    .catch(error =>{
+        onFinish2("SETUPPA", "FAILED", "", false, false, false, "n/a", 
+                "SetupPa Failed", error);
+    })
 }
 function doDeviceCollection(url, accessTokenJwt) {
     console.log("\ndoDeviceCollection URL:" + url);
