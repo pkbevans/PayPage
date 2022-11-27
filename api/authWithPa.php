@@ -165,7 +165,7 @@ try {
 
     try{
         // Update DB
-        $dbResult=insertPayment("PAYMENT", $incoming->order, $result);
+        $dbResult=insertPayment2("PAYMENT", $incoming->order, $result);
         $result->payment = $dbResult;
     }catch(Exception $exception){
         $result->payment = "DB ERROR";
@@ -179,7 +179,12 @@ try {
             $incoming->order->storeCard,            // Token created?
             $json);                                 // Complete request + response
 
-    echo($json);
+    if($result->responseCode == 201 || $result->responseCode == 202) {
+        header('HTTP/1.1 ' . $result->responseCode . ' OK');
+        echo json_encode($result->response);
+    }else{
+        header('HTTP/1.1 ' . $result->responseCode . ' ERROR');
+    }
 } catch (Exception $exception) {
     // echo(json_encode($exception));
     echo('{"status":"ERROR"}');

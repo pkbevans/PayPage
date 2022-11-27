@@ -236,6 +236,27 @@
             console.log("ERROR: "+error)
         })
     }
+    function showLog(referenceNumber){
+        document.getElementById('requestModalLabel').innerHTML = "Order Logs";
+        return fetch("/payPage/view/viewGatewayLog.php", {
+            method: "post",
+            body: JSON.stringify({
+                "referenceNumber": referenceNumber
+            })
+        })
+        .then((result) => {
+            console.log(result);
+            return result.text()
+        })
+        .then(res => {
+            document.getElementById('requestSection').innerHTML = res;
+            var myModal = new bootstrap.Modal(document.getElementById('requestModal'), {keyboard: false});
+            myModal.show();
+        })
+        .catch(error => {
+            console.log("ERROR: "+error)
+        })
+    }
     function backButton() {
         document.getElementById('statusSection').innerHTML = "";
         switch (back){

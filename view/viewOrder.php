@@ -8,8 +8,11 @@
                 <div class="col-3">
                     <h5>Order Id:</h5>
                 </div>
-                <div class="col-9">
+                <div class="col-2">
                     <span><?php echo $order['id'];?></span>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn btn-link" onclick="showLog('<?php echo $order['merchantReference'];?>')">View Log</button>
                 </div>
             </div>
             <div class="row">
@@ -24,7 +27,7 @@
                 <div class="col-3">
                     <h5>Customer Id:</h5>
                 </div>
-                <div class="col-9">
+                <div class="col-9 px-0" >
                     <button type="button" class="btn btn-link" onclick="showCustomer('<?php echo $order['customerId'];?>')"><?php echo $order['customerId'];?></button>
                 </div>
             </div>

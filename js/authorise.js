@@ -54,75 +54,59 @@ window.addEventListener("message", (event) => {
  */
 function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
     console.log("\nAuthorizing +" + paAction + " ...\n");
-    $.ajax({
-        type: "POST",
-        url: "api/authWithPa.php",
-        data: JSON.stringify({
+    let httpCode = 0;
+    return fetch("api/authWithPa.php", {
+        method: "post",
+        body: JSON.stringify({
             "order": orderDetails,
             "paAction": paAction,
             "referenceID": dfReferenceId,
             "authenticationTransactionID": authenticationTransactionID
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = "";
-            try{
-                res = JSON.parse(result);
-                console.log("\nResults:\n" + JSON.stringify(res, undefined, 2));
-            } catch(error){
-                console.log("ERROR:"+ result);
-                onFinish2("AUTH+"+paAction, "ERROR", "", false, false, false, "n/a", "JSON PARSE", result);
-                return;
-            }
-            let httpCode = res.responseCode;
-            let status = res.response.status;
-            if (httpCode === 201) {
-                customerCreated = false;
-                paymentInstrumentCreated = false;
-                shippingAddressCreated = false;
-                // Successfull response (but could be declined)
-                if (status === "PENDING_AUTHENTICATION") {
-                    // Card is enrolled - Kick off the cardholder authentication
-                    showStepUpScreen(res.response.consumerAuthenticationInformation.stepUpUrl, res.response.consumerAuthenticationInformation.accessToken);
-                } else if (status === "AUTHORIZED") {
-                    if (orderDetails.storeCard || orderDetails.storeAddress) {
-                        if(orderDetails.storeCard){
-                            paymentInstrumentCreated = true;
-                            orderDetails.paymentInstrumentId = res.response.tokenInformation.paymentInstrument.id;
-                        }
-                        if(orderDetails.storeAddress){
-                            shippingAddressCreated = true;
-                            orderDetails.shippingAddressId = res.response.tokenInformation.shippingAddress.id;
-                        }
-                        if (!orderDetails.customerId) {
-                            // New Customer
-                            customerCreated = true;
-                            orderDetails.customerId = res.response.tokenInformation.customer.id;
-                        }
-                    }
-                    onFinish2("AUTH+"+paAction, status, res.response.id, customerCreated, paymentInstrumentCreated, shippingAddressCreated, httpCode, "", "");
-                } else {
-                    // Decline
-                    onFinish2("AUTH+"+paAction, status, res.response.id, false, false, false,httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
-                }
-            } else {
-                // 500 System error or anything else
-                switch(httpCode){
-                    case 202:
-                        onFinish2("AUTH+"+paAction, status, res.response.id, false, false, false, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
-                        break;
-                    case 502:
-                        onFinish2("AUTH+"+paAction, status, "", false, false, false, httpCode, res.response.reason, res.response.message);
-                        break;
-                    case 400:
-                        onFinish2("AUTH+"+paAction, status, "", false, false, false, httpCode, res.response.reason, res.response.message);
-                        break;
-                    default:
-                        onFinish2("AUTH+"+paAction, status, "", false, false, false, httpCode, res.response.reason, res.response.message);
-                }
-            }
+        })
+    })
+    .then(response =>{
+        console.log(response);
+        if (!response.ok) {
+            throw Error(response.statusText);
         }
-    });
+        httpCode = response.status;
+        return response.json();
+    })
+    .then(res => {
+        console.log(res);
+        let status = res.status;
+        let customerCreated = false;
+        let paymentInstrumentCreated = false;
+        let shippingAddressCreated = false;
+        // Successfull response (but could be declined)
+        if (status === "PENDING_AUTHENTICATION") {
+            // Card is enrolled - Kick off the cardholder authentication
+            showStepUpScreen(res.consumerAuthenticationInformation.stepUpUrl, res.consumerAuthenticationInformation.accessToken);
+        } else if (status === "AUTHORIZED") {
+            if (orderDetails.storeCard || orderDetails.storeAddress) {
+                if(orderDetails.storeCard){
+                    paymentInstrumentCreated = true;
+                    orderDetails.paymentInstrumentId = res.tokenInformation.paymentInstrument.id;
+                }
+                if(orderDetails.storeAddress){
+                    shippingAddressCreated = true;
+                    orderDetails.shippingAddressId = res.tokenInformation.shippingAddress.id;
+                }
+                if (!orderDetails.customerId) {
+                    // New Customer
+                    customerCreated = true;
+                    orderDetails.customerId = res.tokenInformation.customer.id;
+                }
+            }
+            onFinish2("AUTH+"+paAction, status, res.id, customerCreated, paymentInstrumentCreated, shippingAddressCreated, httpCode, "", "");
+        } else {
+            // Decline
+            onFinish2("AUTH+"+paAction, status, res.id, false, false, false,httpCode, res.errorInformation.reason, res.errorInformation.message);
+        }
+    })
+    .catch(error =>{
+        onFinish2("AUTH+"+paAction, "FAILED", "", false, false, false, httpCode, "Auth failed", error);
+    })
 }
 function showStepUpScreen(stepUpURL, jwt) {
     // console.log( "Challenge Screen:\n"+stepUpURL);

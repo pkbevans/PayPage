@@ -56,3 +56,30 @@ function updateOrder($id, $status){
     }
     return $result;
 }
+function insertApiLog($orderId, $type, $status, $payload){
+    global $servername,$username,$password,$dbName;
+
+    $logSql = "INSERT INTO apilogs ("
+                . "orderId, "
+                . "type, "
+                . "status, "
+                . "payload) " .
+            "VALUES (" .
+                $orderId . ",'" .
+                $type . "','" .
+                $status . "','" .
+                $payload . "')";
+
+    $result = new stdClass();
+    echo $logSql;
+    $result->sql = $logSql;
+    try{
+        $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
+        $conn->exec($logSql);
+        $result->status = "OK";
+        unset($conn);
+    } catch(PDOException $e){
+        $result->status = "ERROR";
+    }
+    return $result;
+}

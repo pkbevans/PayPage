@@ -56,7 +56,29 @@ CREATE TABLE IF NOT EXISTS `paypage`.`payments` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `ORDER` (`orderId` ASC),
-  CONSTRAINT `ORDER`
+  CONSTRAINT `PAYMENTS_ORDER`
+    FOREIGN KEY (`orderId`)
+    REFERENCES `paypage`.`orders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `paypage`.`apiLogs`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `paypage`.`apiLogs` ;
+
+CREATE TABLE IF NOT EXISTS `paypage`.`apiLogs` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `orderId` INT NOT NULL,
+  `payload` BLOB NOT NULL,
+  `type` VARCHAR(45) NOT NULL,
+  `status` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
+  INDEX `ORDER_idx` (`orderId` ASC),
+  CONSTRAINT `ORDERS_APILOGS`
     FOREIGN KEY (`orderId`)
     REFERENCES `paypage`.`orders` (`id`)
     ON DELETE NO ACTION

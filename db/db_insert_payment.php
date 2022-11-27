@@ -1,7 +1,7 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
 
-function insertPayment($type, $orderDetails, $request){
+function insertPayment2($type, $orderDetails, $request){
     global $servername,$username,$password,$dbName;
 
     $authCode="";
