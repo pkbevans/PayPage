@@ -26,9 +26,9 @@ try {
     echo(json_encode($exception));
 }?>
 <div id="cardSelectionSection">
-<div class="row">
-    <div class="col-12"><h5>Choose your payment method:</h5></div>
-</div>
+    <div class="row">
+        <div class="col-12"><h5>Choose your payment method:</h5></div>
+    </div>
 <?php if ($count>0): ?>
     <div class="d-grid gap-2">
     <?php foreach ($paymentInstruments as $paymentInstrument): ?>

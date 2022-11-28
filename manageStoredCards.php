@@ -40,8 +40,8 @@ try {
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <div id="cardSelection">
-                    <div id="cardSelectionSection">
+                <div id="cardSelection2">
+                    <div id="cardSelectionSection2">
 <?php if ($count>0): ?>
                     <div>
                         <ul class="list-group ">
@@ -332,8 +332,10 @@ let orderDetails = {
     paymentInstrumentId: "",
     shippingAddressId: "",
     flexToken: "",
+    googlePayToken: "",
     maskedPan: "",
     storeCard: true,
+    storeAddress: false,
     buyNow: false,
     capture: false,
     bill_to: {
@@ -343,6 +345,7 @@ let orderDetails = {
         address1: "",
         address2: "",
         locality: "",
+        administrativeArea: "",
         postalCode: "",
         country: ""
     }
@@ -443,45 +446,31 @@ function setBillingDetails() {
 function addCard(){
     // Zero-value auth without Payer Auth
     console.log("\nAdding Payment Instrument");
-    $.ajax({
-        type: "POST",
-        url: "/payPage/api/authWithPa.php",
-        data: JSON.stringify({
+    return fetch("api/authWithPa.php", {
+        method: "post",
+        body: JSON.stringify({
             "order": orderDetails,
             "paAction": "NO_PA",
             "referenceID": "",
             "authenticationTransactionID": ""
-        }),
-        success: function (result) {
-            console.log("\Auth:\n" + result);
-            // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\Auth:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            let status = res.response.status;
-            if (httpCode === 201) {
-                let requestID = res.response.id;
-                // Successfull response (but could be declined)
-                if (status === "AUTHORIZED") {
-                    // Get Payment instrument
-                    location.reload();
-                    parent.onStoredDataUpdated("CARD", "ADD");
-                } else {
-                    // TODO - let user know that it failed
-                }
-            } else {
-                // 500 System error or anything else
-                switch(httpCode){
-                    case "202":
-                        onAuthError(status, httpCode, res.response.errorInformation.reason, res.response.errorInformation.message);
-                        break;
-                    case "400":
-                        onAuthError(status, httpCode, res.response.reason, res.response.details);
-                        break;
-                    default:
-                        onAuthError(status, httpCode, res.response.reason, res.response.message);
-                }
-            }
+        })
+    })
+    .then(response =>{
+        console.log(response);
+        if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        httpCode = response.status;
+        return response.json();
+    })
+    .then(res => {
+        // Successfull response (but could be declined)
+        if (res.status === "AUTHORIZED") {
+            // Get Payment instrument
+            location.reload();
+            parent.onStoredDataUpdated("CARD", "ADD");
+        } else {
+            // TODO - let user know that it failed
         }
     });
 }

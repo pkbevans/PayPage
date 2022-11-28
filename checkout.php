@@ -82,12 +82,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                             <hr class="solid">
                             <h5 class="card-title">Payment Card</h5>
                             <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
-                            <div class="row" id="storeCardSection" style="display:none">
-                                <div class="col-12">
-                                    <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
-                                    <label for="storeCard" class="form-check-label">Store this card for future use</label>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -110,6 +105,12 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <div id="paymentSection" style="display:none">
             </div>
             <div id="confirmSection" style="display: none">
+                <div class="row" id="storeCardSection" style="display:none">
+                    <div class="col-12">
+                        <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
+                        <label for="storeCard" class="form-check-label">Store these details for future use</label>
+                    </div>
+                </div>                
                 <div class="row">
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
@@ -398,9 +399,14 @@ function nextButton(form){
             // If storeCard checked, we will create a Payment Instrument Token
             sc = document.getElementById('storeCard');
             orderDetails.storeCard = sc.checked;
-            // If storeAddress checked, we will create a shipping Token
-            sa = document.getElementById('storeAddress');
-            orderDetails.storeAddress = sa.checked;
+            // If its a brand new customer then store card stores the address as well
+            if(orderDetails.customerId === "" && orderDetails.storeCard){
+                orderDetails.storeAddress = true;        
+            }else{
+                // If storeAddress checked, we will create a shipping Token
+                sa = document.getElementById('storeAddress');
+                orderDetails.storeAddress = sa.checked;
+            }
             authorise();
             break;
     }
@@ -458,7 +464,11 @@ function useShippingAddress(id){
             document.getElementById("addressSection").style.display = "none";
             document.getElementById("summaryEmailButton").style.display = "none";
             document.getElementById("cardSelectionSection").style.display = "block";
-            document.getElementById("storeAddressSection").style.display = "block";
+            // Dont show the storeAddress? question if it's a brand new custome - just ask if they want to
+            // store all details
+            if(orderDetails.customerId != ""){
+                document.getElementById("storeAddressSection").style.display = "block";
+            }
             document.getElementById('shipToText').innerHTML = formatNameAddress(orderDetails.ship_to);
         }
     }else{
@@ -526,6 +536,7 @@ function usePaymentInstrument(id){
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
     // Hide card input, show Confirmation section
+    document.getElementById("cardSelectionSection").style.display = "none";
     document.getElementById("paymentDetailsSection").style.display = "none";
     document.getElementById("confirmSection").style.display = "block";
     if(orderDetails.paymentInstrumentId === ""){

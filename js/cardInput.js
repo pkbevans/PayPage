@@ -211,7 +211,7 @@ function dateInput(event){
                 break;
             case 5:
                 // Move focus to CVV input
-                securityCode.focus();
+                // securityCode.focus();
                 break;
         }
         expDateValid = expiryDateValid();
