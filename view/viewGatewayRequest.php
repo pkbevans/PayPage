@@ -1,4 +1,5 @@
 <?php include "../api/getGatewayTxn.php"; ?>
+<?php if(property_exists($txn, "id")):?>
 <div class="d-flex justify-content-center">
     <div class="card">
         <div class="card-body" style="width: 90vw">
@@ -32,3 +33,6 @@
         </div>
     </div>
 </div>
+<?php else:?>
+    UNABLE TO RETRIEVE TXN DETAILS. PLEASE TRY AGAIN LATER
+<?php endif?>

@@ -108,7 +108,7 @@
         ++back;
         document.getElementById('ordersSection').style.display = "none";
         document.getElementById('orderSection').style.display = "block";
-        console.log("GOT ID: "+id)
+        // console.log("GOT ID: "+id)
         return fetch("/payPage/view/viewOrder.php", {
             method: "post",
             body: JSON.stringify({
@@ -124,7 +124,7 @@
         })
     }
     function showActionPage(paymentId, action){
-        console.log("showRefundPage: "+paymentId)
+        // console.log("showRefundPage: "+paymentId)
         ++back;
         document.getElementById('actionSection').style.display = "block";
         return fetch("/payPage/view/create"+action+".php", {
@@ -153,7 +153,7 @@
             event.stopPropagation();
             form.classList.add('was-validated');
         }else{
-            console.log(action + ": " + requestId + " Amount: " + amount);
+            // console.log(action + ": " + requestId + " Amount: " + amount);
             return fetch("/payPage/api/submit" + action + ".php", {
                 method: "post",
                 body: JSON.stringify({
@@ -166,12 +166,9 @@
                     "cardNumber": cardNumber
                 })
             })
-            .then((result) => {
-                console.log(result);
-                return result.json()
-            })
+            .then(result => result.json())
             .then(res => {
-                console.log(res);
+                // console.log(res);
                 if(res.responseCode === 201){
                     document.getElementById('statusSection').innerHTML = "SUCCESS. The " + action + " has been submitted";
                     // Refresh the order list and the specific order
@@ -202,7 +199,7 @@
             })
         })
         .then((result) => {
-            console.log(result);
+            // console.log(result);
             return result.text()
         })
         .then(res => {
@@ -224,7 +221,7 @@
             })
         })
         .then((result) => {
-            console.log(result);
+            // console.log(result);
             return result.text()
         })
         .then(res => {
@@ -245,7 +242,7 @@
             })
         })
         .then((result) => {
-            console.log(result);
+            // console.log(result);
             return result.text()
         })
         .then(res => {

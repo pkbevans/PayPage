@@ -13,7 +13,6 @@ var myStyles = {
     'valid': {'color': 'green'},
     'invalid': {'color': 'red'}
 };
-// var captureContext;
 var cardType;
 var flexToken;
 var expDate;
@@ -45,19 +44,15 @@ function createCardInput(progressName, buttonName, cvvOnlyFlag=false, panOnlyFla
     if(progress){
         progress.style.display = "none";
     }
-    getCaptureContext();
+    return getCaptureContext();
 }
 function getCaptureContext(){
     return fetch("/payPage/api/getCaptureContext.php", {
       method: "post"
     })
     .then((result) => result.text())
-    .then(res => {
-        setUpMicroform(res);
-    })
-    .catch(error=>{
-        console.log("Capture Context ERROR")    
-    })
+    .then((result) => setUpMicroform(result))
+    .catch((error) => console.log("Capture Context ERROR"))
 }
 function setUpMicroform(captureContext){
     panValid=false;
@@ -86,7 +81,7 @@ function setUpMicroform(captureContext){
         securityCode.load('#securityCode-container');
         secCodeLbl = document.querySelector('#securityCodeLabel');
         securityCode.on('change', function (data) {
-            console.log(data);
+            // console.log(data);
             cvnValid = data.valid;
             fieldsValid();
         });
@@ -98,6 +93,7 @@ function setUpMicroform(captureContext){
     setUpExpiryDate("expiryDate");
     getTokenButton = document.querySelector('#'+getTokenButtonId);
     errorAlert = document.getElementById("cardError");
+    return "OK";
 }
 function setUpPanField(){
     // Set up PAN field
@@ -105,7 +101,7 @@ function setUpPanField(){
     numberContainer = document.querySelector('#number-container');
     number.load('#number-container');
     number.on('change', function (data) {
-        console.log(data);
+        // console.log(data);
         if(!panOnly){
             // Set "CVV" text with name based on scheme
             secCodeLbl.textContent = (data.card && data.card.length > 0) ? data.card[0].securityCode.name : 'CVN';
@@ -117,7 +113,7 @@ function setUpPanField(){
         fieldsValid();
     });
     number.on('autocomplete', function (data) {
-        console.log(data);
+        // console.log(data);
         let xDate = "";
         if (data.expirationMonth) {
             xDate = data.expirationMonth + "/";
@@ -166,7 +162,7 @@ function expiryDateValid() {
     return true;
 }
 function dateInput(event){
-        console.log(event.target.value);
+        // console.log(event.target.value);
         const val = event.target.value.toString();
         // If last char is invalid - ignore it
         myChar = val.charAt(val.length-1);
@@ -245,7 +241,6 @@ function getToken(tokenCallBack) {
     microform.createToken(options, function (err, jwt) {
         if (err) {
             // handle error.  Probably a timeout. Start again
-            console.log(err);
             console.log("Status: "+err.status+". Reason: "+err.reason);
             getTokenButton.disabled = true;
             errorAlert.style.display = "block";
@@ -261,10 +256,6 @@ function getToken(tokenCallBack) {
             tokenCallBack(result);
         }
     });
-}
-function tokenCreated(flexToken, cardDetails){
-    // document.getElementById('paymentDetailsSection').style.display = "none";
-
 }
 function fieldsValid() {
     // Check PAN and CVN both Populated and valid
@@ -288,7 +279,4 @@ function getPayload(jwt) {
     payload = JSON.parse(payloadJ);
 //    console.log(payload);
     return payload;
-}
-function flipCvvOnly(cvvOnlyFlag, type){
-    createCardInput("progressSpinner", "payButton", cvvOnlyFlag, false, type );
 }

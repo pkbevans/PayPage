@@ -17,7 +17,6 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/payPage/css/styles.css"/>
     <title>Payment Page</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
@@ -298,18 +297,19 @@ window.onpopstate = function () {
     window.history.go(1);
 };
 function showCards(){
-    $.ajax({
-        type: "POST",
-        url: "cardSelection.php",
-        data: JSON.stringify({
-            "customerId": orderDetails.customerId
-        }),
-        success: function (result) {
-            document.getElementById('paymentSection').innerHTML = result;
-            createCardInput("","payButton", false, false,"");
-            onGooglePayLoaded();
-        }
-    });
+    return fetch("/payPage/cardSelection.php", {
+      method: "post",
+      body: JSON.stringify({
+        "customerId": orderDetails.customerId
+      })
+    })
+    .then((result) => result.text())
+    .then(result =>{
+        document.getElementById('paymentSection').innerHTML = result;
+        createCardInput("","payButton", false, false,"");
+        onGooglePayLoaded();
+    })
+    .catch((error) => console.log("showCards ERROR:"+error))
 }
 var myOffcanvas = document.getElementById('manageDataOffCanvas');
 function showManageIframe(type){
@@ -337,16 +337,15 @@ function onStoredDataUpdated(type, action){
     }
 }
 function showAddresses(){
-    $.ajax({
-        type: "POST",
-        url: "addressSelection.php",
-        data: JSON.stringify({
-            "customerId": orderDetails.customerId
-        }),
-        success: function (result) {
-            document.getElementById('addressSelection').innerHTML = result;
-        }
-    });
+    return fetch("/payPage/addressSelection.php", {
+      method: "post",
+      body: JSON.stringify({
+        "customerId": orderDetails.customerId
+      })
+    })
+    .then((result) => result.text())
+    .then((result) => document.getElementById('addressSelection').innerHTML = result)
+    .catch((error) => console.log("showAddresses ERROR:"+error))
 }
 function cancel() {
     window.open('index.php', '_parent');
@@ -513,11 +512,11 @@ function setNewShippingDetails(){
 }
 function usePaymentInstrument(id){
     console.log("Payment Instrument: "+ id);
+    cardType="";
     if(id === "NEW"){
         orderDetails.paymentInstrumentId = "";
         document.getElementById("sameAddressCheck").style.display = "block";
         document.getElementById('billToText').innerHTML = "";
-        flipCvvOnly(false);
     }else{
         orderDetails.paymentInstrumentId = id;
         document.getElementById('billingForm').style.display = "none";
@@ -527,11 +526,14 @@ function usePaymentInstrument(id){
         orderDetails.maskedPan = pi._embedded.instrumentIdentifier.card.number;
         document.getElementById('billToText').innerHTML = stylePaymentInstrument(pi.card,pi._embedded.instrumentIdentifier.card.number,pi.billTo);
         cardType = pi.card.type;
-        flipCvvOnly(true, cardType);
         document.getElementById("summary_billTo").style.display = "block";
     }
     document.getElementById("cardSelectionSection").style.display = "none";
-    document.getElementById("paymentDetailsSection").style.display = "block";
+    createCardInput("progressSpinner", "payButton", (id==="NEW"? false: true), false, cardType)
+    .then(result =>{
+        document.getElementById("paymentDetailsSection").style.display = "block";
+    })
+    .catch(error => console.log(error));
 }
 function onTokenCreated(tokenDetails){
     console.log(tokenDetails);

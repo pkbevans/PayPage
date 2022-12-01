@@ -162,7 +162,6 @@ try {
     $requestBody = json_encode($request);
 
     $result = ProcessRequest(MID, API_PAYMENTS, METHOD_POST, $requestBody, CHILD_MID, AUTH_TYPE_SIGNATURE );
-
     try{
         // Update DB
         $dbResult=insertPayment2("PAYMENT", $incoming->order, $result);
@@ -184,6 +183,7 @@ try {
         echo json_encode($result->response);
     }else{
         header('HTTP/1.1 ' . $result->responseCode . ' ERROR');
+        echo json_encode($result);
     }
 } catch (Exception $exception) {
     // echo(json_encode($exception));

@@ -8,6 +8,9 @@ function insertPayment2($type, $orderDetails, $request){
     $requestId="";
     $cardType="";
     $captured=0;
+    if(property_exists($request->response, "id")){
+        $requestId = $request->response->id;
+    }
     if($request->response->status === "AUTHORIZED"){
         $authCode = $request->response->processorInformation->approvalCode;
         if($orderDetails->capture){
@@ -15,7 +18,6 @@ function insertPayment2($type, $orderDetails, $request){
         }
     }
     if($request->responseCode === 201){
-        $requestId = $request->response->id;
         if($type == "PAYMENT" && property_exists($request->response->paymentInformation, "card")){
           $cardType = $request->response->paymentInformation->card->type;
         }else{
