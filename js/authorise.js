@@ -132,6 +132,7 @@ function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentC
     document.getElementById('inputSection').style.display = "none";
     document.getElementById('confirmSection').style.display = "none";
     let finish = {
+        "orderId": orderDetails.orderId,
         "referenceNumber": orderDetails.referenceNumber,
         "amount": orderDetails.amount,
         "apiCalled": apiCalled,

@@ -17,7 +17,6 @@ function getCookie($name){
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <title>View Basket</title>
     </head>
     <body>
@@ -95,26 +94,24 @@ function getCookie($name){
         }
     }
     function writeOrder(){
-        $.ajax({
-            type: "POST",
-            url: "/payPage/db/insertOrder.php",
-            data: JSON.stringify({
-                "mrn": document.getElementById('reference_number').value,
+        return fetch("/payPage/db/insertOrder.php", {
+          method: "post",
+          body: JSON.stringify({
+            "mrn": document.getElementById('reference_number').value,
                 "customerId": document.getElementById('customerToken').value,
                 "amount": document.getElementById('amount').value,
                 "currency": document.getElementById('currency').value,
                 "email": document.getElementById('email').value
-            }),
-            success: function (result) {
-                console.log("\nOrder written:\n" + result);
-                res = JSON.parse(result);
-
-                if(res.status==="OK"){
-                    document.getElementById('orderId').value = res.id;
-                    checkout_form.submit();
-                }
+          })
+        })
+        .then((result) => result.json())
+        .then((result) =>{
+            if(result.status==="OK"){
+                document.getElementById('orderId').value = result.id;
+                checkout_form.submit();
             }
-        });
+        })
+        .catch(error => console.error("ERROR writing order:"+error))
     }
     </script>
     </body>

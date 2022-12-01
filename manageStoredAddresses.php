@@ -33,8 +33,6 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/payPage/css/styles.css"/>
     <title>Manage Addresses</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class="container">
@@ -224,12 +222,19 @@ try {
                 </div>
             </div>
         </div>
+        <div id="errorAlert" class="alert alert-danger fade show" role="alert" style="display:none">
+            <strong><span id="alertText">Somethin went wrong. Please try again.</span></strong>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script>
 var customerId = "<?php echo $_REQUEST['customerId'];?>";
+var errorAlert;
+document.addEventListener("DOMContentLoaded", function (e) {
+    errorAlert = document.getElementById("errorAlert");
+});
 function newAddress(){
     console.log("New Address");
     document.getElementById("newAddressSection").style.display = "block";
@@ -271,10 +276,9 @@ function updateAddress(id, setDefaultOnly){
     postalCode = document.getElementById(id+"_postalCode").value;
     country = document.getElementById(id+"_country").value;
 
-    $.ajax({
-        type: "POST",
-        url: "/payPage/api/updateCustomerShippingAddress.php",
-        data: JSON.stringify({
+    return fetch("/payPage/api/updateCustomerShippingAddress.php", {
+        method: "post",
+        body: JSON.stringify({
             "setDefaultOnly": setDefaultOnly,
             "customerId": customerId,
             "shippingAddressId": id,
@@ -288,48 +292,47 @@ function updateAddress(id, setDefaultOnly){
             "postalCode": postalCode,
             "country": country,
             "phoneNumber": ""
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\nUpdate:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            if (httpCode === 200) {
-                // Successfull response - reload this page and notify parent
-                location.reload();
-                parent.onStoredDataUpdated("ADDRESS", "UPDATE");
-            } else {
-                // 500 System error or anything else
-            }
-        }
-    });
+        })
+    })
+    .then((result) => {
+        if (result.ok) {
+            // Successfull response - reload this page and notify parent
+            location.reload();
+            parent.onStoredDataUpdated("ADDRESS", "UPDATE");
+        } else {
+            // 500 System error or anything else
+            document.getElementById("alertText").innerHTML = "Update Failed.  Please check your internet connection and try again";
+            errorAlert.style.display = "block";
+            throw "Unable to update Address. "  + result.status + ":" + result.statusText;
+        }        
+    })
+    .catch(error => console.error(error))
 }
-function makeDefault(id){
-    console.log("makeDefault: "+id);
-}
+// function makeDefault(id){
+    // console.log("makeDefault: "+id);
+// }
 function deleteAddress(id){
     console.log("\nDeleting Shipping Address: "+id);
-    $.ajax({
-        type: "POST",
-        url: "/payPage/api/deleteCustomerShippingAddress.php",
-        data: JSON.stringify({
+    return fetch("/payPage/api/deleteCustomerShippingAddress.php", {
+        method: "post",
+        body: JSON.stringify({
             "customerId": customerId,
             "shippingAddressId": id
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\nDelete:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            if (httpCode === 204) {
-                // Successfull response - reload this page and notify parent
-                location.reload();
-                parent.onStoredDataUpdated("ADDRESS", "DELETE");
-            } else {
-                // 500 System error or anything else - TODO
-            }
-        }
-    });
+        })
+    })
+    .then((result) => {
+        if (result.ok) {
+            // Successfull response - reload this page and notify parent
+            location.reload();
+            parent.onStoredDataUpdated("ADDRESS", "DELETE");
+        } else {
+            // 500 System error or anything else
+            document.getElementById("alertText").innerHTML = "Delete Failed.  Please check your internet connection and try again";
+            errorAlert.style.display = "block";
+            throw "Unable to update Address. "  + result.status + ":" + result.statusText;
+        }        
+    })
+    .catch(error => console.error(error))
 }
 function addAddress(){
     console.log("\nAdding Shipping Address");
@@ -352,10 +355,9 @@ function addAddress(){
     postalCode = document.getElementById("ship_to_postalCode").value;
     country = document.getElementById("ship_to_country").value;
 
-    $.ajax({
-        type: "POST",
-        url: "/payPage/api/addCustomerShippingAddress.php",
-        data: JSON.stringify({
+    return fetch("/payPage/api/addCustomerShippingAddress.php", {
+        method: "post",
+        body: JSON.stringify({
             "customerId": customerId,
             "default": defaultAddress,
             "firstName": firstName,
@@ -367,22 +369,21 @@ function addAddress(){
             "postalCode": postalCode,
             "country": country,
             "phoneNumber": ""
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\Add:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            let status = res.response.status;
-            if (httpCode === 201) {
-                // Successfull response - reload this page and notify parent
-                location.reload();
-                parent.onStoredDataUpdated("ADDRESS", "ADD");
-            } else {
-                // 500 System error or anything else
-            }
-        }
-    });
+        })
+    })
+    .then((result) => {
+        if (result.ok) {
+            // Successfull response - reload this page and notify parent
+            location.reload();
+            parent.onStoredDataUpdated("ADDRESS", "ADD");
+        } else {
+            // 500 System error or anything else
+            document.getElementById("alertText").innerHTML = "Add Failed.  Please check your internet connection and try again";
+            errorAlert.style.display = "block";
+            throw "Unable to update Address. "  + result.status + ":" + result.statusText;
+        }        
+    })
+    .catch(error => console.error(error))
 }
 function validateForm(form){
     if (!form.checkValidity()) {
