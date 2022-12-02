@@ -33,7 +33,6 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/payPage/css/styles.css"/>
     <title>Manage Cards</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
@@ -302,6 +301,9 @@ foreach ($countries as $key => $value) {
                 </div>
             </div>
         </div>
+        <div id="errorAlert" class="alert alert-danger fade show" role="alert" style="display:none">
+            <strong><span id="alertText">Somethin went wrong. Please try again.</span></strong>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
@@ -309,6 +311,10 @@ foreach ($countries as $key => $value) {
 <script src="/payPage/js/cardInput.js"></script>
 <script>
 var customerId = "<?php echo $_REQUEST['customerId'];?>";
+var errorAlert;
+document.addEventListener("DOMContentLoaded", function (e) {
+    errorAlert = document.getElementById("errorAlert");
+});
 function validateForm(form){
     if (!form.checkValidity()) {
         event.preventDefault();
@@ -385,10 +391,9 @@ function updateCard(id, setDefaultOnly){
     postalCode = document.getElementById(id+"_postalCode").value;
     country = document.getElementById(id+"_country").value;
 
-    $.ajax({
-        type: "POST",
-        url: "/payPage/api/updateCustomerPaymentInstrument.php",
-        data: JSON.stringify({
+    return fetch("/payPage/api/updateCustomerPaymentInstrument.php", {
+        method: "post",
+        body: JSON.stringify({
             "setDefaultOnly": setDefaultOnly,
             "customerId": customerId,
             "paymentInstrumentId": id,
@@ -402,21 +407,21 @@ function updateCard(id, setDefaultOnly){
             "postalCode": postalCode,
             "country": country,
             "phoneNumber": ""
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\nUpdate:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            if (httpCode === 200) {
-                // Successfull response
-                location.reload();
-                parent.onStoredDataUpdated("CARD", "UPDATE");
-            } else {
-                // 500 System error or anything else
-            }
-        }
-    });
+        })
+    })
+    .then((result) => {
+        if (result.ok) {
+            // Successfull response - reload this page and notify parent
+            location.reload();
+            parent.onStoredDataUpdated("CARD", "UPDATE");
+        } else {
+            // 500 System error or anything else
+            document.getElementById("alertText").innerHTML = "Update Failed.  Please check your internet connection and try again";
+            errorAlert.style.display = "block";
+            throw "Unable to update Card details. "  + result.status + ":" + result.statusText;
+        }        
+    })
+    .catch(error => console.error(error))
 }
 function storeCard(){
     form = document.getElementById('billingForm');
@@ -470,9 +475,13 @@ function addCard(){
             location.reload();
             parent.onStoredDataUpdated("CARD", "ADD");
         } else {
-            // TODO - let user know that it failed
+            // Let user know that it failed
+            document.getElementById("alertText").innerHTML = "Add Failed.  Please check your internet connection and try again";
+            errorAlert.style.display = "block";
+            throw "Unable to Add new Card. "  + result.status + ":" + result.statusText;
         }
-    });
+    })
+    .catch(error => console.error(error))
 }
 
 function onAuthError(status, httpCode, reason, message){
@@ -480,27 +489,26 @@ function onAuthError(status, httpCode, reason, message){
 }
 function deleteCard(id){
     console.log("\nDeleting Card: "+id);
-    $.ajax({
-        type: "POST",
-        url: "/payPage/api/deleteCustomerPaymentInstrument.php",
-        data: JSON.stringify({
+    return fetch("/payPage/api/deleteCustomerPaymentInstrument.php", {
+        method: "post",
+        body: JSON.stringify({
             "customerId": customerId,
             "paymentInstrumentId": id
-        }),
-        success: function (result) {
-            // Response is a json string - turn it into a javascript object
-            let res = JSON.parse(result);
-            console.log("\nDelete:\n" + JSON.stringify(res, undefined, 2));
-            let httpCode = res.responseCode;
-            if (httpCode === 204) {
-                // Successfull response
-                location.reload();
-                parent.onStoredDataUpdated("CARD", "DELETE");
-            } else {
-                // 500 System error or anything else - TODO
-            }
-        }
-    });
+        })
+    })
+    .then((result) => {
+        if (result.ok) {
+            // Successfull response - reload this page and notify parent
+            location.reload();
+            parent.onStoredDataUpdated("CARD", "DELETE");
+        } else {
+            // 500 System error or anything else
+            document.getElementById("alertText").innerHTML = "Delete Failed.  Please check your internet connection and try again";
+            errorAlert.style.display = "block";
+            throw "Unable to update Address. "  + result.status + ":" + result.statusText;
+        }        
+    })
+    .catch(error => console.error(error))
 }
 function cancelEdit(id){
     document.getElementById(id+"_form").style.display = "none";
