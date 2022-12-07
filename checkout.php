@@ -4,8 +4,9 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
 $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     $defaultEmail = $_REQUEST['email'];
-}else{
-    $defaultEmail = $defaultPaymentInstrument->billTo->email;
+}else if(isset($_REQUEST['customerToken']) && !empty($_REQUEST['customerToken'])) {
+    include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/getDefaultEmail.php';
+    $defaultEmail = getDefaultEmail($_REQUEST['customerToken']);
 }
 ?>
 <!doctype html>
@@ -45,25 +46,25 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                                 <h5>Email:</h5>
                             </div>
                             <div class="col-9">
-                                <div id="emailSection">
-                                    <div id="emailText"><?php echo $defaultEmail;?></div>
-                                    <button id="summaryEmailButton" type="button" class="btn btn-link p-0" onclick="editEmail()">Edit</button>
-                                </div>
-                                <form id="emailForm" class="needs-validation" novalidate style="display:none">
-                                    <div class="row">
-                                        <div class="col-9">
+                                <div id="emailText"><?php echo $defaultEmail;?></div>
+                                <div id="emailSection" style="display:<?php echo ($defaultEmail == ''?'block':'none');?>">
+                                    <form id="emailForm" class="needs-validation" novalidate>
+                                        <div class="row">
                                             <div class="form-group mb-3">
-                                                <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Enter email" required>
+                                                <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <button type="button" class="btn btn-primary" onclick="updateEmail(true)">Update</button>
-                                            <button type="button" class="btn btn-secondary" onclick="updateEmail(false)">Cancel</button>
+                                        <div class="row">
+                                            <button id="updateEmailButton" type="button" class="btn btn-primary" onclick="nextButton('email')">Next</button>
                                         </div>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-2">
+                                    <button id="editEmailButton" type="button" class="btn btn-link p-0" onclick="editEmail()" style="display:<?php echo ($defaultEmail == ''?'none':'block');?>">Edit</button>
+                                </div>
                             </div>
                         </div>
                         <div id="summary_delivery" style="display:none">
@@ -81,13 +82,12 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                             <hr class="solid">
                             <h5 class="card-title">Payment Card</h5>
                             <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
-
                         </div>
                     </div>
                 </div>
             </div>
-            <BR>
-            <div id="addressSection">
+            <div id="addressSection" style="display:<?php echo ($defaultEmail == ''?'none':'block');?>">
+                <BR>
                 <div class="row">
                     <div class="col-12"><h5>Tell us where to deliver your stuff:</h5></div>
                 </div>
@@ -176,61 +176,44 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <script>
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
-        referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
-        orderId: "<?php echo $_REQUEST['orderId'];?>",
-        amount: "<?php echo $_REQUEST['amount'];?>",
-        currency: "<?php echo $_REQUEST['currency'];?>",
-        shippingAddressRequired: true,
-        useShippingAsBilling: true,
-        customerId: "<?php echo isset($_REQUEST['customerToken'])?$_REQUEST['customerToken']:"";?>", // TODO
-        paymentInstrumentId: "",
-        shippingAddressId: "",
-        flexToken: "",
-        googlePayToken: "",
-        maskedPan: "",
-        storeCard: false,
-        storeAddress: false,
-        buyNow: <?php echo isset($_REQUEST['buyNow']) && $_REQUEST['buyNow'] === "true"?"true":"false";?>,
-        capture: <?php echo isset($_REQUEST['autoCapture']) && $_REQUEST['autoCapture'] === "true"?"true":"false";?>,
-        ship_to: {
-            firstName: "",
-            lastName: "",
-            address1: "",
-            address2: "",
-            locality: "",
-            administrativeArea: "",
-            postalCode: "",
-            country: ""
-        },
-        bill_to: {
-            firstName: "",
-            lastName: "",
-            email: '<?php echo $defaultEmail;?>',
-            address1: "",
-            address2: "",
-            locality: "",
-            administrativeArea: "",
-            postalCode: "",
-            country: ""
-        }
-    };
-// custom styles that will be applied to each field we create using Microform
-var myStyles = {
-    'input': {
-        'font-family': '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
-        'font-size': '1rem',
-        'line-height': '1.5',
-        'color': '#495057'
+    referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
+    orderId: "<?php echo $_REQUEST['orderId'];?>",
+    amount: "<?php echo $_REQUEST['amount'];?>",
+    currency: "<?php echo $_REQUEST['currency'];?>",
+    shippingAddressRequired: true,
+    useShippingAsBilling: true,
+    customerId: "<?php echo isset($_REQUEST['customerToken'])?$_REQUEST['customerToken']:"";?>", // TODO
+    paymentInstrumentId: "",
+    shippingAddressId: "",
+    flexToken: "",
+    googlePayToken: "",
+    maskedPan: "",
+    storeCard: false,
+    storeAddress: false,
+    buyNow: <?php echo isset($_REQUEST['buyNow']) && $_REQUEST['buyNow'] === "true"?"true":"false";?>,
+    capture: <?php echo isset($_REQUEST['autoCapture']) && $_REQUEST['autoCapture'] === "true"?"true":"false";?>,
+    ship_to: {
+        firstName: "",
+        lastName: "",
+        address1: "",
+        address2: "",
+        locality: "",
+        administrativeArea: "",
+        postalCode: "",
+        country: ""
     },
-    '::placeholder': {'color': 'grey'},
-    ':focus': {'color': 'blue'},
-    ':hover': {'font-style': 'italic'},
-    ':disabled': {'cursor': 'not-allowed'},
-    'valid': {'color': 'green'},
-    'invalid': {'color': 'red'}
-};
-var number;
-var payButton;
+    bill_to: {
+        firstName: "",
+        lastName: "",
+        email: '<?php echo $defaultEmail;?>',
+        address1: "",
+        address2: "",
+        locality: "",
+        administrativeArea: "",
+        postalCode: "",
+        country: ""
+    }
+ };
 
 document.addEventListener("DOMContentLoaded", function (e) {
     start();
@@ -367,19 +350,37 @@ function shipAsBill(){
     return false;
 }
 function editEmail(){
-    document.getElementById('emailForm').style.display = "block";
-    document.getElementById('emailSection').style.display = "none";
+    document.getElementById('editEmailButton').style.display = "none";
+    document.getElementById('emailText').style.display = "none";
+    document.getElementById('emailSection').style.display = "block";
+    document.getElementById('updateEmailButton').innerHTML = "Update";
 }
 function updateEmail(update){
     if(update){
-        orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
-        document.getElementById('emailText').innerHTML = orderDetails.bill_to.email;
+        if(validateForm(document.getElementById('emailForm'))){
+            orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
+            document.getElementById('emailText').innerHTML = orderDetails.bill_to.email;
+        }else{
+            return;
+        }
     }
-    document.getElementById('emailForm').style.display = "none";
-    document.getElementById('emailSection').style.display = "block";
+    // document.getElementById('emailForm').style.display = "none";
+    document.getElementById('emailSection').style.display = "none";
+    document.getElementById('addressSection').style.display = "block";
 }
 function nextButton(form){
     switch(form){
+        case "email":
+            if(!validateForm(document.getElementById('emailForm'))){
+                break;
+            }
+            orderDetails.bill_to.email = document.getElementById('bill_to_email').value;
+            document.getElementById('emailText').innerHTML = orderDetails.bill_to.email;
+            document.getElementById('emailText').style.display = "block";
+            document.getElementById('emailSection').style.display = "none";
+            document.getElementById("editEmailButton").style.display = "block";
+            document.getElementById('addressSection').style.display = "block";
+            break;
         case "pay":
             orderDetails.useShippingAsBilling = shipAsBill();
             // Pay Button clicked
@@ -416,7 +417,7 @@ function backButton(form){
             // Back to Address Selection or entry
             document.getElementById("paymentSection").style.display = "none";
             document.getElementById("addressSection").style.display = "block";
-            document.getElementById("summaryEmailButton").style.display = "block";
+            document.getElementById("editEmailButton").style.display = "block";
             document.getElementById("summary_delivery").style.display = "none";
             document.getElementById("summary_billTo").style.display = "none";
             break;
@@ -430,7 +431,7 @@ function backButton(form){
             // New customer with No Payment Instruments => Back to PAN entry
             document.getElementById("paymentSection").style.display = "none";
             document.getElementById("addressSection").style.display = "block";
-            document.getElementById("summaryEmailButton").style.display = "block";
+            document.getElementById("editEmailButton").style.display = "block";
             document.getElementById("summary_delivery").style.display = "none";
             document.getElementById("summary_billTo").style.display = "none";
             break;
@@ -461,9 +462,9 @@ function useShippingAddress(id){
             document.getElementById("summary_delivery").style.display = "block";
             document.getElementById("paymentSection").style.display = "block";
             document.getElementById("addressSection").style.display = "none";
-            document.getElementById("summaryEmailButton").style.display = "none";
+            document.getElementById("editEmailButton").style.display = "none";
             document.getElementById("cardSelectionSection").style.display = "block";
-            // Dont show the storeAddress? question if it's a brand new custome - just ask if they want to
+            // Dont show the storeAddress? question if it's a brand new customer - just ask if they want to
             // store all details
             if(orderDetails.customerId != ""){
                 document.getElementById("storeAddressSection").style.display = "block";
@@ -478,7 +479,7 @@ function useShippingAddress(id){
         document.getElementById("cardSelectionSection").style.display = "block";
         document.getElementById("paymentSection").style.display = "block";
         document.getElementById("addressSection").style.display = "none";
-        document.getElementById("summaryEmailButton").style.display = "none";
+        document.getElementById("editEmailButton").style.display = "none";
         document.getElementById("storeAddressSection").style.display = "none";
         document.getElementById('shipToText').innerHTML = formatNameAddress(address.shipTo);
     }

@@ -26,7 +26,7 @@
                     <form class="needs-validation" id="findForm" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
                         <label for="orderId" class="form-label">Order Id</label><input id="orderId" class="form-control" type="text" name="orderId" value="" />
                         <label for="referenceNumber" class="form-label">Order Reference</label><input id="referenceNumber" class="form-control" type="text" name="findForm" value="" />
-                        <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="pkbevans@gmail.com" />
+                        <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
                         <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>
                         <BR>
                         <button id="findButton" type="button" class="btn btn-primary" onclick="validateForm()">Find Orders</button>
@@ -192,6 +192,27 @@
     function showRequest(id){
         document.getElementById('requestModalLabel').innerHTML = "Request Details";
         return fetch("/payPage/view/viewGatewayRequest.php", {
+            method: "post",
+            body: JSON.stringify({
+                "requestId": id
+            })
+        })
+        .then((result) => {
+            // console.log(result);
+            return result.text()
+        })
+        .then(res => {
+            document.getElementById('requestSection').innerHTML = res;
+            var myModal = new bootstrap.Modal(document.getElementById('requestModal'), {keyboard: false});
+            myModal.show();
+        })
+        .catch(error => {
+            console.log("ERROR: "+error)
+        })
+    }
+    function showShipping(id){
+        document.getElementById('requestModalLabel').innerHTML = "Shipping Details";
+        return fetch("/payPage/view/viewShippingAddress.php", {
             method: "post",
             body: JSON.stringify({
                 "requestId": id

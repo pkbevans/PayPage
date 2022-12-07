@@ -2,10 +2,16 @@
 $logFilePath = $_SERVER['DOCUMENT_ROOT'] . "/payPage/logs/";
 $incoming = json_decode(file_get_contents('php://input'));
 $referenceNumber = $incoming->referenceNumber; 
-
+$prettyLog = "";
 try {
     $fileName = $logFilePath . $referenceNumber . ".log";
-    $fp = fopen($fileName, 'r'); //opens file in read mode  
+    if ( !file_exists($fileName) ) {
+        throw new Exception("Unable to open file: ". $fileName);
+      }
+    $fp = fopen($fileName, 'r'); //opens file in read mode
+    if(!$fp){
+        throw new Exception("Unable to open file: ". $fileName);
+    }  
     // $log = fread($fp, filesize($fileName));
     $json = "{";
     $x=1;
@@ -21,11 +27,10 @@ try {
     fclose($fp); 
     $logs = new stdClass();
     $logs = json_decode($json);
-    $pretty = json_encode($logs, JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR);
+    $prettyLog = json_encode($logs, JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR);
     if(json_last_error()){
-        $pretty = $json;
+        $prettyLog = $json;
     }
 } catch (Exception $ex) {
-    echo "<BR>HELLO6";
-    echo "FAILED TO OPEN FILE: " . $fileName;
+    $prettyLog = "ERROR: " . $ex->getMessage();
 }

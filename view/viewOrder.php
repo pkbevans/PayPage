@@ -66,7 +66,7 @@
         <div class="card-body" style="width: 90vw">
             <h5 class="card-title">Payments</h5>
             <table class="table">
-                <thead><tr><th>Id</th><th>Type</th><th>Amount</th><th>Card Number</th><th>Card Type</th><th>Status</th><th>Captured</th><th>Auth Code</th><th>Request ID</th><th>Timestamp</th></tr></thead>
+                <thead><tr><th>Id</th><th>Type</th><th>Amount</th><th>Card Number</th><th>Card Type</th><th>Status</th><th>Captured</th><th>Auth Code</th><th>Request ID</th><th>Shipping</th><th>Timestamp</th></tr></thead>
                 <tbody>
 <?php foreach($payments as $payment): ?>
                     <tr>
@@ -78,7 +78,8 @@
                         <td><?php echo $payment['status'];?></td>
                         <td><?php echo ($payment['captured']? "&#10004;":"");?></td>
                         <td><?php echo $payment['authCode'];?></td>
-                        <td><button type="button" class="btn btn-link" onclick="showRequest('<?php echo $payment['gatewayRequestId'];?>')"><?php echo $payment['gatewayRequestId'];?></button></td>
+                        <td><button type="button" class="btn btn-link px-0" onclick="showRequest('<?php echo $payment['gatewayRequestId'];?>')"><?php echo $payment['gatewayRequestId'];?></button></td>
+                        <td><button type="button" class="btn btn-link px-0" onclick="showShipping('<?php echo $payment['gatewayRequestId'];?>')">Address</button></td>
                         <td><?php echo $payment['datetime'];?></td>
     <?php if($order['status'] == "AUTHORIZED" && $payment['status'] == "AUTHORIZED" ): ?>
         <?php if($payment['captured'] == 1):?>

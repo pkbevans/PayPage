@@ -19,5 +19,4 @@ if($result->responseCode == 200){
 }else{
     header('HTTP/1.1 ' . $result->responseCode . ' ERROR');
 }
-
 ?>

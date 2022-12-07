@@ -18,7 +18,7 @@
             </div>
             <div class="row">
                 <div class="col-9">
-                    <PRE><?php echo $pretty;?></PRE>
+                    <PRE><?php echo $prettyLog;?></PRE>
                 </div>
             </div>
         </div>
