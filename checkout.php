@@ -289,7 +289,6 @@ function showCards(){
     .then((result) => result.text())
     .then(result =>{
         document.getElementById('paymentSection').innerHTML = result;
-        createCardInput("","payButton", false, false,"");
         onGooglePayLoaded();
     })
     .catch((error) => console.log("showCards ERROR:"+error))
@@ -464,10 +463,14 @@ function useShippingAddress(id){
             document.getElementById("addressSection").style.display = "none";
             document.getElementById("editEmailButton").style.display = "none";
             document.getElementById("cardSelectionSection").style.display = "block";
-            // Dont show the storeAddress? question if it's a brand new customer - just ask if they want to
-            // store all details
-            if(orderDetails.customerId != ""){
-                document.getElementById("storeAddressSection").style.display = "block";
+            if(orderDetails.customerId === ""){
+                // New customer - setup Card input  
+                createCardInput("","payButton", false, false,"");
+            }
+            else{
+            // Dont show the storeAddress? question if it's a brand new customer - 
+            // just ask if they want to store all details
+            document.getElementById("storeAddressSection").style.display = "block";
             }
             document.getElementById('shipToText').innerHTML = formatNameAddress(orderDetails.ship_to);
         }

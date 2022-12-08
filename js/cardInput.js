@@ -47,6 +47,7 @@ function createCardInput(progressName, buttonName, cvvOnlyFlag=false, panOnlyFla
     return getCaptureContext();
 }
 function getCaptureContext(){
+    console.log("getCaptureContext");
     return fetch("/payPage/api/getCaptureContext.php", {
       method: "post"
     })
@@ -229,6 +230,7 @@ function dateKeyDown(event){
 }
 var callBackFunction;
 function getToken(tokenCallBack) {
+    console.log("getToken");
     callBackFunction = tokenCallBack;
     errorAlert.style.display = "none";
     var options = {};

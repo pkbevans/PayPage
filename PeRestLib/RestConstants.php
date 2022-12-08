@@ -2,16 +2,15 @@
 const KEYS_PATH =  "/ppSecure/";   // Replace with path to the PeRestLibKeys file.
 include_once $_SERVER["DOCUMENT_ROOT"] . KEYS_PATH. "PeRestLibKeys.php";
 // You need a PeRestLibKeys.php file in this format, with REST keys matching the MID value
+//////////////// DONT FORGET TO UPDATE googlePay.js with MID/CHILD_MID IF YOU CHANGE IT HERE!!!!/////////////////////////
+// const MID = "<<TRANSACTING MID>>";   // Replace with Transacting MID (Or Can be PORTFOLIO or Account-level if using META KEY)
+// const CHILD_MID = "";                // Normally blank (or Transacting MID if using PORTFOLIO or Account-level mid in MID)
 // $keys = [
-//    "pemid03" => [
-//        'key_id' => "fa4143be-1234-436d-aa5c-f8fbbb4b6bfd",
-//        'secret_key'=> "rzabWA0SFyDXlVY/dTEA123456shJm/5IaNElBachZk="
+//    "<<TRANSACTING MID>>" => [
+//        'key_id' => "<<REST KEY ID>>",
+//        'secret_key'=> "<<REST SECRET KEY>>"
 //    ]
 // ];
-
-//////////////// DONT FORGET TO UPDATE googlePay.js with MID/CHILD_MID IF YOU CHANGE IT HERE!!!!/////////////////////////
-const MID = "barclayssitt00";      // Replace with MID (Can be PORTFOLIO or Account-level)
-const CHILD_MID = "paulspants45011";       // Replace with Transacting MID if using PORTFOLIO or Account-level mid in MID
 
 const PRODUCTION_TARGET_ORIGIN =  "bondevans.com";  // Replace with Production URL for non-localhost testing
 const LOCALHOST_TARGET_ORIGIN =  "site.test";   // Replace with your localhost HTTPS alias.  MUST BE HTTPS
