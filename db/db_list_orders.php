@@ -1,5 +1,5 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
+require_once('../v1/controller/db.php');
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">
@@ -15,8 +15,8 @@ include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
             <h3>Orders</h3>
 <?php
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
-    $stmtOrders = $conn->query("select id, merchantReference, amount, currency, customerId, customerEmail, status, dateTime from orders order by id desc;"); 
+    $conn = DB::connectReadDB();
+    $stmtOrders = $conn->query('select id, merchantReference, amount, currency, customerId, customerEmail, status, dateTime from orders order by id desc;'); 
     $orders = $stmtOrders->fetchAll(PDO::FETCH_ASSOC);
     // iterate over rows
     foreach($orders as $order) {

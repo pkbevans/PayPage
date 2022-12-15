@@ -1,9 +1,8 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
+require_once('../v1/controller/db.php');
 
 function insertPayment($type, $orderId, $amount, $captured, $currency,
                     $cardNumber, $cardType, $authCode, $requestId, $status){
-    global $servername,$username,$password,$dbName;
 
     $paymentSql = "INSERT INTO payments ("
                 . "orderId, "
@@ -30,7 +29,7 @@ function insertPayment($type, $orderId, $amount, $captured, $currency,
 
     $result = "OK";
     try{
-        $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
+        $conn = DB::connectWriteDB();
         $conn->exec($paymentSql);
         unset($conn);
     } catch(PDOException $e){
@@ -40,7 +39,6 @@ function insertPayment($type, $orderId, $amount, $captured, $currency,
 }
 
 function updateOrder($id, $status){
-    global $servername,$username,$password,$dbName;
 
     $orderSql = "UPDATE orders set " .
         "status = '" . $status . "' " .
@@ -48,7 +46,7 @@ function updateOrder($id, $status){
 
     $result = "OK";
     try{
-        $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
+        $conn = DB::connectWriteDB();
         $conn->exec($orderSql);
         unset($conn);
     } catch(PDOException $e){
@@ -57,7 +55,6 @@ function updateOrder($id, $status){
     return $result;
 }
 function insertApiLog($orderId, $type, $status, $payload){
-    global $servername,$username,$password,$dbName;
 
     $logSql = "INSERT INTO apilogs ("
                 . "orderId, "
@@ -74,7 +71,7 @@ function insertApiLog($orderId, $type, $status, $payload){
     echo $logSql;
     $result->sql = $logSql;
     try{
-        $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
+        $conn = DB::connectWriteDB();
         $conn->exec($logSql);
         $result->status = "OK";
         unset($conn);

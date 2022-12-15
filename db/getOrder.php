@@ -1,9 +1,9 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
+require_once('../v1/controller/db.php');
 $incoming = json_decode(file_get_contents('php://input'));
 
 try {
-    $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
+    $conn = DB::connectReadDB();
     $where = " where id=\"" . $incoming->orderId . "\" ";
 
     $stmt = "select * from orders " . $where . ";";

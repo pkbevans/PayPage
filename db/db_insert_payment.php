@@ -1,8 +1,7 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
+require_once('../v1/controller/db.php');
 
 function insertPayment2($type, $orderDetails, $request){
-    global $servername,$username,$password,$dbName;
 
     $authCode="";
     $requestId="";
@@ -62,7 +61,7 @@ function insertPayment2($type, $orderDetails, $request){
         $result->orderSql=$orderSql;
     }
     try{
-        $conn = new PDO("mysql:host=$servername;dbname=".$dbName, $username, $password);
+        $conn = DB::connectReadDB();
         $conn->exec($paymentSql);
         $result->id=$conn->lastInsertId();
         if($type == "PAYMENT"){

@@ -1,22 +1,28 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT']."/ppSecure/Credentials.php");
-
-function insertOrder($mrn, $amount, $currency, $customerToken, $email, $status){
-    global $servername,$username,$password, $dbName;
-
-    $sql = "INSERT INTO orders (merchantReference, amount, currency, customerId, customerEmail, status)" .
-            " VALUES ('" . $mrn . "'," . $amount . ",'" . $currency . "','" . $customerToken . "','" . $email . "','" . $status ."')";
+require_once('../v1/controller/db.php');
+function insertOrder($mrn, $amount, $currency, $customerId, $email, $status){
 
     $result= new stdClass();
     try{
-        $conn = new PDO("mysql:host=$servername;dbname=". $dbName, $username, $password);
-        $conn->exec($sql);
+        $conn = DB::connectWriteDB();
+        $query = $conn->prepare('INSERT INTO orders (merchantReference, amount, currency, customerId, customerEmail, status) ' .
+            'VALUES (:mrn, :amount, :currency, :customerId, :email, :status)');
+
+        $query->bindParam(':mrn', $mrn, PDO::PARAM_STR);
+        $query->bindParam(':amount', $amount, PDO::PARAM_STR);
+        $query->bindParam(':currency', $currency, PDO::PARAM_STR);
+        $query->bindParam(':customerId', $customerId, PDO::PARAM_STR);
+        $query->bindParam(':email', $email, PDO::PARAM_STR);
+        $query->bindParam(':status', $status, PDO::PARAM_STR);
+        $query->execute();
+
         $result->id=$conn->lastInsertId();
         $result->status="OK";
         unset($conn);
-    } catch(PDOException $e){
+    }
+    catch(PDOException $e){
         $result->status = "ERROR";
-        $result->message = "Could not able to execute $sql. " . $e->getMessage();
+        $result->message = "Unable to insert order: " . $e->getMessage();
     }
     return $result;
 }
