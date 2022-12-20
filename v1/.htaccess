@@ -8,3 +8,6 @@ RewriteCond %{REQUEST_FILENAME} !=f
 RewriteRule ^users/?$ controller/users.php [L]
 RewriteRule ^sessions/([0-9]+)$ controller/sessions.php?sessionid=$1 [L]
 RewriteRule ^sessions/?$ controller/sessions.php [L]
+RewriteRule ^orders/?$ controller/orders.php [L]
+RewriteRule ^orders/([0-9]+)$ controller/orders.php?orderId=$1 [L]
+RewriteRule ^orders/filter$ controller/orders.php?filter=$1 [L]

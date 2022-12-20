@@ -20,16 +20,25 @@
                     <li class="nav-item"><a href="index.php" class="nav-link">Checkout</a></li>
                 </ul>
             </header>
+            <div id=loginSection>
+            <h1>Login</h1>
+                    <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
+                        <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
+                        <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
+                        <button type="button" class="btn btn-primary" onclick="login()">Log in</button>
+                    </form>
+            </div>
             <div class="row">
-                <div id="formSection">
+                <div id="formSection" style="display: none">
                     <h1>Find Order</h1>
-                    <form class="needs-validation" id="findForm" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
+                    <form class="needs-validation" id="findForm" name="checkout" method="" target="" action="" novalidate >
                         <label for="orderId" class="form-label">Order Id</label><input id="orderId" class="form-control" type="text" name="orderId" value="" />
                         <label for="referenceNumber" class="form-label">Order Reference</label><input id="referenceNumber" class="form-control" type="text" name="findForm" value="" />
                         <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
                         <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>
+                        <label for="status" class="form-label">Status</label><input id="status" class="form-control" type="text" name="status" value=""/>
                         <BR>
-                        <button id="findButton" type="button" class="btn btn-primary" onclick="validateForm()">Find Orders</button>
+                        <button type="button" class="btn btn-primary" onclick="validateForm()">Find Orders</button>
                     </form>
                 </div>
             </div>
@@ -66,6 +75,45 @@
     let back=0;
     let selectedOrderId=0;
 
+    function login(){
+        var form = document.getElementById('loginForm');
+
+        if(!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            form.classList.add('was-validated');
+        }else{
+            return fetch("/payPage/v1/sessions", {
+            headers: {
+                  'Content-Type': 'application/json'
+            },
+            method: "post",
+            body: JSON.stringify({
+                "userName": document.getElementById('userName').value,
+                "password": document.getElementById('password').value,
+            })
+        })
+        .then((result) => {
+            console.log(result);
+            if(result.ok){
+                return result.json()
+            }else{
+                throw "unauthorised"
+            }
+        })
+        .then((result)=>{
+            console.log(result);
+            document.cookie = "tokenExpires=" + result.data.accessTokenExpiresIn+';expires=;path=/';
+            document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
+            document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
+            document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
+            document.getElementById("loginSection").style.display="none"
+            document.getElementById("formSection").style.display="block"
+        })
+        .catch(error => {
+            console.log("ERROR: "+error)
+        })}
+    }
     function buttonClicked(){
         ++back;
         document.getElementById('formSection').style.display="none";
@@ -86,13 +134,14 @@
         document.getElementById('backButton').style.display = "block";
         document.getElementById('ordersSection').style.display = "block";
         return fetch("/payPage/view/listOrders.php", {
-          method: "post",
-          body: JSON.stringify({
-              "orderId":    document.getElementById('orderId').value,
-              "mrn":        document.getElementById('referenceNumber').value,
-              "customerId": document.getElementById('customerToken').value,
-              "email":      document.getElementById('email').value
-          })
+            method: "post",
+            body: JSON.stringify({
+                "orderId":    document.getElementById('orderId').value,
+                "mrn":        document.getElementById('referenceNumber').value,
+                "customerId": document.getElementById('customerToken').value,
+                "email":      document.getElementById('email').value,
+                "status":     document.getElementById('status').value
+            })
         })
         .then((result) => result.text())
         .then(res => {

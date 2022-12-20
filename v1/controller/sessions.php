@@ -56,7 +56,7 @@ if(array_key_exists("sessionid",$_GET)){
         // SUCCESS
         $returnData = array();
         $returnData['sessionId'] = intval($sessionId);
-        $response = new Response(200, true, "HELLO", $returnData);
+        $response = new Response(200, true, null, $returnData);
         $response->send();
         exit;
     }elseif($_SERVER['REQUEST_METHOD'] === 'PATCH'){
@@ -92,9 +92,9 @@ if(array_key_exists("sessionid",$_GET)){
             $query->execute();
 
             $rowCount = $query->rowCount();
-            
             if($rowCount === 0){
-                $response = new Response(401, false, "Access token or refresh token is incorrect for session id", "" );
+                $response = new Response(401, false, "Access token or refresh token is incorrect for session id", null );
+                $response->addMessage("SessionId:".$sessionId);
                 $response->addMessage("Access token:".$accessToken);
                 $response->addMessage("refresh token:".$refreshToken);
                 $response->send();
@@ -248,7 +248,7 @@ if(array_key_exists("sessionid",$_GET)){
         }
 
         if(!password_verify($password, $returned_password)){
-            $query = $writeDB->prepare("update users set loginAttempts = loginAttempts+1 where id = :id loginAttempts from users where userName = :userName");
+            $query = $writeDB->prepare("update users set loginAttempts = loginAttempts+1 where id = :id");
             $query->bindParam(':id', $returned_id, PDO::PARAM_INT);
             $query->execute();
 
@@ -263,6 +263,7 @@ if(array_key_exists("sessionid",$_GET)){
         $refreshTokenExpirySecs = 1209600;    // 14 Days
         // Successfull login at this point
     }catch(PDOException $ex){
+        error_log($ex->getMessage());
         $response = new Response(500, false, "Error logging in", null);
         $response->send();
         exit;
