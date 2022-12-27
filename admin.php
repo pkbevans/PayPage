@@ -222,7 +222,7 @@
         document.getElementById('ordersSection').style.display = "none";
         document.getElementById('orderSection').style.display = "block";
         // console.log("GOT ID: "+id)
-        return fetch("/payPage/view/viewOrder.php", {
+        return fetch("/payPage/db/getOrder.php", {
             method: "post",
             body: JSON.stringify({
                 "orderId":    id

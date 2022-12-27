@@ -54,18 +54,25 @@ if (array_key_exists("sessionid", $_GET)) {
         $response->send();
         exit;
     }
+    loginSession($writeDB);
+}else{
+    $response = new Response(404, false, "Endpoint not found", null);
+    $response->send();
+    exit;   
+}
+function loginSession($db){
     // Login request (Create session)
     sleep(1);   // Deliberate slow down - anti brute force attack 
     if($_SERVER['CONTENT_TYPE'] !== "application/json"){
         $response = new Response(400, false, "Content Type header not set to JSON", null);
         $response->send();
-        exit;
+        return;
     }
     $rawPostData = file_get_contents('php://input');
     if(!$jsonData = json_decode($rawPostData)){
         $response = new Response(400, false, "Request body is not valid JSON", null);
         $response->send();
-        exit;
+        return;
     }    
 
     if(!isset($jsonData->userName) || !isset($jsonData->password)){
@@ -73,7 +80,7 @@ if (array_key_exists("sessionid", $_GET)) {
         (!isset($jsonData->userName) ? $response->addMessage("userName not supplied"):false);
         (!isset($jsonData->password) ? $response->addMessage("password not supplied"):false);
         $response->send();
-        exit;
+        return;
     }
     if(strlen($jsonData->userName) < 1 || strlen($jsonData->userName)>255 ||
             strlen($jsonData->password) < 1 || strlen($jsonData->password)>255){
@@ -83,14 +90,14 @@ if (array_key_exists("sessionid", $_GET)) {
         (strlen($jsonData->userName) > 255 ? $response->addMessage("User name too long"):false);
         (strlen($jsonData->password) > 255 ? $response->addMessage("Password too long"):false);
         $response->send();
-        exit;
+        return;
     }
 
     try{
         $userName = trim($jsonData->userName);
         $password = $jsonData->password;
 
-        $query = $writeDB->prepare("select id, firstName, lastName, userName, email, password, userActive, loginAttempts from users where userName = :userName");
+        $query = $db->prepare("select id, firstName, lastName, userName, email, password, userActive, loginAttempts from users where userName = :userName");
         $query->bindParam(':userName', $userName, PDO::PARAM_STR);
         $query->execute();
 
@@ -98,7 +105,7 @@ if (array_key_exists("sessionid", $_GET)) {
         if($rowCount === 0){
             $response = new Response(401, false, "userName or password is incorrect", null);
             $response->send();
-            exit;
+            return;
         }
 
         $row = $query->fetch(PDO::FETCH_ASSOC);
@@ -114,22 +121,22 @@ if (array_key_exists("sessionid", $_GET)) {
         if($returned_userActive != 'Y'){
             $response = new Response(401, false, "User account not active", null);
             $response->send();
-            exit;
+            return;
         }
         if($returned_loginAttempts>= MAX_LOGIN_ATTEMPTS){
             $response = new Response(401, false, "User account is currently locked out", null);
             $response->send();
-            exit;
+            return;
         }
 
         if(!password_verify($password, $returned_password)){
-            $query = $writeDB->prepare("update users set loginAttempts = loginAttempts+1 where id = :id");
+            $query = $db->prepare("update users set loginAttempts = loginAttempts+1 where id = :id");
             $query->bindParam(':id', $returned_id, PDO::PARAM_INT);
             $query->execute();
 
             $response = new Response(401, false, "userName or password is incorrect", null);
             $response->send();
-            exit;            
+            return;            
         }
 
         $accessToken = base64_encode(bin2hex(openssl_random_pseudo_bytes(24))).time();
@@ -141,17 +148,17 @@ if (array_key_exists("sessionid", $_GET)) {
         error_log($ex->getMessage());
         $response = new Response(500, false, "Error logging in", null);
         $response->send();
-        exit;
+        return;
     }
 
     try{
-        $writeDB->beginTransaction();
+        $db->beginTransaction();
 
-        $query = $writeDB->prepare("update users set loginAttempts = 0 where id = :id");
+        $query = $db->prepare("update users set loginAttempts = 0 where id = :id");
         $query->bindParam(':id', $returned_id, PDO::PARAM_INT);
         $query->execute();
 
-        $query = $writeDB->prepare("insert into sessions (userid, accessToken, accessTokenexpiry, refreshToken, refreshTokenexpiry) values(:userid, :accessToken, date_add(NOW(), INTERVAL :accessTokenExpirySecs SECOND), :refreshToken, date_add(NOW(), INTERVAL :refreshTokenExpirySecs SECOND))");
+        $query = $db->prepare("insert into sessions (userid, accessToken, accessTokenexpiry, refreshToken, refreshTokenexpiry) values(:userid, :accessToken, date_add(NOW(), INTERVAL :accessTokenExpirySecs SECOND), :refreshToken, date_add(NOW(), INTERVAL :refreshTokenExpirySecs SECOND))");
         $query->bindParam(':userid', $returned_id, PDO::PARAM_INT);
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
         $query->bindParam(':accessTokenExpirySecs', $accessTokenExpirySecs, PDO::PARAM_INT);
@@ -159,9 +166,9 @@ if (array_key_exists("sessionid", $_GET)) {
         $query->bindParam(':refreshTokenExpirySecs', $refreshTokenExpirySecs, PDO::PARAM_INT);
         $query->execute();
 
-        $lastSessionId = $writeDB->lastInsertId();
+        $lastSessionId = $db->lastInsertId();
 
-        $writeDB->commit();
+        $db->commit();
         $returnData = array();
         $returnData['userName'] = $returned_userName;
         $returnData['firstName'] = $returned_firstName;
@@ -174,20 +181,15 @@ if (array_key_exists("sessionid", $_GET)) {
 
         $response = new Response(201, true, null, $returnData);
         $response->send();
-        exit;
+        return;
     
     }catch(PDOException $ex){
-        $writeDB->rollBack();
+        $db->rollBack();
         $response = new Response(500, false, "There was an issue loggin in - please try again", null);
         $response->send();
-        exit;   
-    }
-}else{
-    $response = new Response(404, false, "Endpoint not found", null);
-    $response->send();
-    exit;   
+        return;   
+    }    
 }
-
 function logoutSession($db, $sessionId, $accessToken){
     try {
         $query = $db->prepare("delete from sessions where id = :id and accessToken = :accessToken");
