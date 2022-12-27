@@ -8,6 +8,7 @@ try{
 }catch(PDOException $ex){
     error_log("Database query error - ". $ex, 0);
     $response = new Response(500, false, "Database connection error", null);
+    $response->addMessage($ex->getMessage());
     $response->send();
     exit();
 }

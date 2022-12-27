@@ -10,27 +10,41 @@
     </head>
     <body>
         <div class="container-fluid justify-content-center">
-            <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                    <span class="fs-4">Admin Portal</span>
-                </a>
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="/payPage/" class="nav-link active" aria-current="page">Home</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">About</a></li>
-                    <li class="nav-item"><a href="index.php" class="nav-link">Checkout</a></li>
-                </ul>
-            </header>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">Admin Portal</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/payPage/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="index.php">Checkout</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" id="username" href="#" tabindex="-1" aria-disabled="true"></a>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+            </nav>
             <div id=loginSection>
-            <h1>Login</h1>
-                    <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
-                        <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
-                        <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
-                        <button type="button" class="btn btn-primary" onclick="login()">Log in</button>
-                    </form>
+                <h3>Login</h3>
+                <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
+                    <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
+                    <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
+                    <button type="button" class="btn btn-primary" onclick="login()">Log in</button>
+                </form>
             </div>
             <div class="row">
                 <div id="formSection" style="display: none">
-                    <h1>Find Order</h1>
+                    <h3>Find Order</h3>
                     <form class="needs-validation" id="findForm" name="checkout" method="" target="" action="" novalidate >
                         <label for="orderId" class="form-label">Order Id</label><input id="orderId" class="form-control" type="text" name="orderId" value="" />
                         <label for="referenceNumber" class="form-label">Order Reference</label><input id="referenceNumber" class="form-control" type="text" name="findForm" value="" />
@@ -75,6 +89,48 @@
     let back=0;
     let selectedOrderId=0;
 
+    document.addEventListener("DOMContentLoaded", function (e) {
+        // Check whether we already have an open session
+        // Either: 
+        // 1. No cookie at all - login screen
+        // 2. Got cookie. Refresh Token expired - login screen
+        // 3. Got cookie. Refresh token not expired but access token expired - refresh access token, then show search form
+        // 4. Got cookie. access token not expired - show search form
+        let accessTokenExpires = getCookie("accessTokenExpires");
+        if(accessTokenExpires){
+            var now = new Date();
+            var d1 = Date.parse(accessTokenExpires);
+            var d2 = Date.parse(now);
+            if (d1 > d2) {
+                // Access token still valid - No log in
+                document.getElementById("loginSection").style.display="none"
+                document.getElementById("formSection").style.display="block"
+            }else{
+                let refreshTokenExpires = getCookie("refreshTokenExpires");
+                d1 = Date.parse(refreshTokenExpires);
+                if (d1 > d2) {
+                    // Refresh token still valid - Refresh access token
+                }
+            }
+        }
+        // Else show log in 
+    });
+    function getCookie(name) {
+        // Split cookie string and get all individual name=value pairs in an array
+        var cookieArr = document.cookie.split(";");
+        // Loop through the array elements
+        for(var i = 0; i < cookieArr.length; i++) {
+            var cookiePair = cookieArr[i].split("=");
+            /* Removing whitespace at the beginning of the cookie name
+            and compare it with the given string */
+            if(name == cookiePair[0].trim()) {
+                // Decode the cookie value and return
+                return decodeURIComponent(cookiePair[1]);
+            }
+        }
+        // Return null if not found
+        return null;
+    }
     function login(){
         var form = document.getElementById('loginForm');
 
@@ -83,36 +139,45 @@
             event.stopPropagation();
             form.classList.add('was-validated');
         }else{
-            return fetch("/payPage/v1/sessions", {
-            headers: {
-                  'Content-Type': 'application/json'
-            },
-            method: "post",
-            body: JSON.stringify({
-                "userName": document.getElementById('userName').value,
-                "password": document.getElementById('password').value,
+            return fetch("/payPage/v1/controller/sessions.php", {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: "post",
+                body: JSON.stringify({
+                    "userName": document.getElementById('userName').value,
+                    "password": document.getElementById('password').value,
+                })
             })
-        })
-        .then((result) => {
-            console.log(result);
-            if(result.ok){
-                return result.json()
-            }else{
-                throw "unauthorised"
-            }
-        })
-        .then((result)=>{
-            console.log(result);
-            document.cookie = "tokenExpires=" + result.data.accessTokenExpiresIn+';expires=;path=/';
-            document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
-            document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
-            document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
-            document.getElementById("loginSection").style.display="none"
-            document.getElementById("formSection").style.display="block"
-        })
-        .catch(error => {
-            console.log("ERROR: "+error)
-        })}
+            .then((result) => {
+                console.log(result);
+                if(result.ok){
+                    return result.json()
+                }else{
+                    throw "unauthorised"
+                }
+            })
+            .then((result)=>{
+                console.log(result);
+                var t = new Date();
+                t.setSeconds(t.getSeconds() + result.data.accessTokenExpiresIn);
+                document.cookie = "accessTokenExpires=" + t+';expires=;path=/';
+                t = new Date();
+                t.setSeconds(t.getSeconds() + result.data.refreshTokenExpiresIn);
+                document.cookie = "refreshTokenExpires=" + t+';expires=;path=/';
+                document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
+                document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
+                document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
+                fullName = result.data.firstName + " " + result.data.lastName;
+                document.getElementById("username").innerHTML=fullName;
+                document.getElementById("loginSection").style.display="none"
+                document.getElementById("formSection").style.display="block"
+            })
+            .catch(error => {
+                console.log("ERROR: "+error);
+                // TODO - show error to screen
+            })
+        }
     }
     function buttonClicked(){
         ++back;
@@ -133,7 +198,7 @@
     function getOrders(){
         document.getElementById('backButton').style.display = "block";
         document.getElementById('ordersSection').style.display = "block";
-        return fetch("/payPage/view/listOrders.php", {
+        return fetch("/payPage/db/getOrders.php", {
             method: "post",
             body: JSON.stringify({
                 "orderId":    document.getElementById('orderId').value,

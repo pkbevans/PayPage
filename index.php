@@ -24,18 +24,33 @@ function getCookie($name){
 
         </div>
         <div class="container-fluid justify-content-center">
-            <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-                <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
-                    <span class="fs-4">Paul's Pants Checkout</span>
-                </a>
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="/payPage/" class="nav-link active" aria-current="page">Home</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">About</a></li>
-                    <li class="nav-item"><a href="admin.php" class="nav-link">Admin portal...</a></li>
-                </ul>
-            </header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">Checkout</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/payPage/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="admin.php">Admin Portal</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" id="username" href="#" tabindex="-1" aria-disabled="true"></a>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+            </nav>
             <!-- <small>5200000000001047, 5200000000000007, 371449111020228, 340000000001007</small> -->
             <div class="row">
+                <h3>Checkout</h3>
                 <div id="formSection">
                 <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
                     <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
