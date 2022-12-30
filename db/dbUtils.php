@@ -14,25 +14,15 @@ function refreshAccessToken()
     if(!$response){
         return false;
     }
-    if(!$jsonData = json_decode($response)) {
-        echo $response;
-        return false;
-    }
-    if ($jsonData->statusCode == 200) {
         // Update session cookie
-        $accessToken = $jsonData->data->accessToken;
-        $refreshToken = $jsonData->data->refreshToken;
-        setcookie('accessToken', $accessToken, 0, '/');
-        setcookie('refreshToken', $refreshToken, 0, '/');
-        $time = date("D M d Y H:i:s", time() + $jsonData->data->accessTokenExpiresIn);
-        setcookie ('accessTokenExpires', $time, 0, '/');
-        $time = date("D M d Y H:i:s", time() + $jsonData->data->refreshTokenExpiresIn);
-        setcookie ('refreshTokenExpires', $time, 0, '/');
-    }
-    else{
-        echo $response;
-        return false;
-    }
+    $accessToken = $response->accessToken;
+    $refreshToken = $response->refreshToken;
+    setcookie('accessToken', $accessToken, 0, '/');
+    setcookie('refreshToken', $refreshToken, 0, '/');
+    $time = date("D M d Y H:i:s", time() + $response->accessTokenExpiresIn);
+    setcookie ('accessTokenExpires', $time, 0, '/');
+    $time = date("D M d Y H:i:s", time() + $response->refreshTokenExpiresIn);
+    setcookie ('refreshTokenExpires', $time, 0, '/');
     return $accessToken;
 }
 function fetch($method, $url, $accessToken, $payload){
@@ -45,9 +35,17 @@ function fetch($method, $url, $accessToken, $payload){
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization:'. $accessToken, 'Content-type:application/json'));
     curl_setopt($curl, CURLOPT_HEADER, false);
-    $jsonData = curl_exec($curl);
+    $response = curl_exec($curl);
     curl_close($curl);
-    return $jsonData;
+    if(!$jsonData = json_decode($response)) {
+        echo $response;
+        return false;
+    }
+    if ($jsonData->statusCode !== 200 && $jsonData->statusCode !== 201) {
+        echo $response;
+        return false;
+    }
+    return $jsonData->data;
 }
 function getCookie($name){
     if(isset($_COOKIE[$name])){

@@ -12,15 +12,6 @@ if(!$response = fetch(METHOD_GET, $url, $accessToken, null)){
     echo "Error: Fetching orders<BR>";
     exit;
 }
-$jsonData = json_decode($response);
-if(!$jsonData = json_decode($response)) {
-    echo $response;
-    exit;
-}
 $orders = new stdClass();
-if($jsonData->statusCode == 200){
-    $orders = $jsonData->data->orders;
-    include '../view/listOrders.php';
-}else{
-    echo '<BR><pre>.' . json_encode($jsonData, JSON_PRETTY_PRINT) . '</pre>';
-}
+$orders = $response->orders;
+include '../view/listOrders.php';

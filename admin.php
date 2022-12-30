@@ -285,7 +285,6 @@
                 if(res.responseCode === 201){
                     document.getElementById('statusSection').innerHTML = "SUCCESS. The " + action + " has been submitted";
                     // Refresh the order list and the specific order
-                    getOrders();
                     getOrder(orderId);
                     --back;
                     backButton();
@@ -397,6 +396,7 @@
                 document.getElementById('backButton').style.display = "none";
                 break;
             case 2: // Order Detail
+                refresh();
                 document.getElementById('orderSection').style.display="none";
                 document.getElementById('ordersSection').style.display="block";
                 break;

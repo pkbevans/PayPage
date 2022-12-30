@@ -105,7 +105,7 @@ if (array_key_exists("orderId", $_GET)) {
 
     // if request is a GET, e.g. get order
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $response = getOrders($readDB, $orderId);
+        $response = getOrders($readDB, $orderId, null);
         $response->send();
     }     
     // else if request if a DELETE e.g. delete order
@@ -116,6 +116,9 @@ if (array_key_exists("orderId", $_GET)) {
     // handle updating order
     elseif ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
         // update order
+        updateOrder($writeDB, $orderId);
+    } elseif (array_key_exists("patch", $_GET) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Hack to get round PATCH not supported on one.com
         updateOrder($writeDB, $orderId);
     }
     // if any other request method apart from GET, PATCH, DELETE is used then return 405 method not allowed
@@ -266,7 +269,7 @@ elseif (empty($_GET)) {
 // if request is a GET e.g. get orders
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-    $response = getOrders($readDB);
+    $response = getOrders($readDB, null, null);
     $response->send();
 }
 // else if request is a POST e.g. create order
@@ -473,6 +476,9 @@ function getOrders($db, $id = null, $filter = null){
             }else{
                 $clauses['status'] = false;
             }
+            // newest first
+            $stmt .= "order by id desc";
+            // echo "STMT: " . $stmt;
             $query = $db->prepare($stmt);
             if($clauses['email']){
                 $query->bindParam(':email', $filter['email'], PDO::PARAM_STR);
@@ -491,7 +497,9 @@ function getOrders($db, $id = null, $filter = null){
             }
         }
         else{
-            // Get all orders
+            // Get all orders - newest first
+            $stmt .= "order by id desc";
+            // echo "STMT: " . $stmt;
             $query = $db->prepare($stmt);
         }
         $query->execute();

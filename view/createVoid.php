@@ -8,7 +8,7 @@
                     Original Amount
                 </div>
                 <div class="col-9">
-                    <span><?php echo $payment['currency'] . " " . $payment['amount'];?></span>
+                    <span><?php echo $payment->currency . " " . $payment->amount;?></span>
                 </div>
             </div>
             <div class="row">
@@ -16,17 +16,17 @@
                     Status
                 </div>
                 <div class="col-9">
-                    <span><?php echo $payment['status'];?></span>
+                    <span><?php echo $payment->status;?></span>
                 </div>
             </div>
             <form class="needs-validation" id="actionForm" name="checkout" method="POST" target="" action="" novalidate >
-                <input id="amount" type="hidden" name="amount" value="<?php echo $payment['amount'];?>" />
+                <input id="amount" type="hidden" name="amount" value="<?php echo $payment->amount;?>" />
                 <div class="row">
                     <div class="col-3">
                         <label for="reference" class="form-label">Reference</label>
                     </div>
                     <div class="col-3">
-                        <input id="reference" class="form-control" type="text" name="reference" value="<?php echo $order['merchantReference'];?>" required />
+                        <input id="reference" class="form-control" type="text" name="reference" value="<?php echo $order->merchantReference;?>" required />
                     </div>
                 </div>
                 <div class="row">
@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <button id="voidButton" type="button" class="btn btn-primary"
-                    onclick="submitAction('Void', '<?php echo $payment['orderId'];?>', '<?php echo $payment['gatewayRequestId'];?>', '<?php echo $payment['currency'];?>', <?php echo $payment['amount'];?>, '<?php echo $payment['cardNumber'];?>')">Void</button>
+                    onclick="submitAction('Void', '<?php echo $payment->orderId;?>', '<?php echo $payment->gatewayRequestId;?>', '<?php echo $payment->currency;?>', <?php echo $payment->amount;?>, '<?php echo $payment->cardNumber;?>')">Void</button>
             </form>
         </div>
     </div>

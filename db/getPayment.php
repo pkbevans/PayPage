@@ -1,22 +1,25 @@
 <?php
-require_once('../v1/controller/db.php');
+include_once 'dbUtils.php';
 $incoming = json_decode(file_get_contents('php://input'));
-
-try {
-    $conn = DB::connectReadDB();
-
-    $stmt = "select * from payments where id=" . $incoming->paymentId . ";";
-    // echo "STMT=" . $stmt . "<BR>";
-    $stmtPayment = $conn->query($stmt);
-    $payment = $stmtPayment->fetch(PDO::FETCH_ASSOC);
-    // Get the Order as well
-    $stmt = "select * from orders where id=" . $payment['orderId'] . ";" ;
-    // echo "STMT=" . $stmt . "<BR>";
-    $stmtOrder = $conn->query($stmt);
-    $order = $stmtOrder->fetch(PDO::FETCH_ASSOC);
-    // Close connection
-    unset($conn);
-} catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
+if (!$accessToken = refreshAccessToken()) {
+    echo "Error: Refreshing token<BR>";
+    // TODO - Login required
+    exit;
 }
-?>
+// Access token refreshed - now get the payment
+$url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/v1/controller/payments.php?paymentId=' . $incoming->paymentId;
+if(!$response = fetch(METHOD_GET, $url, $accessToken, null)){
+    echo "Error: Fetching payment<BR>";
+    exit;
+}
+$payment = new stdClass();
+$payment = $response->payments[0];
+// Get the order
+$url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/v1/controller/orders.php?orderId=' . $payment->orderId;
+if(!$response = fetch(METHOD_GET, $url, $accessToken, null)){
+    echo "Error: Fetching order<BR>";
+    exit;
+}
+// var_dump($response);
+$order = new stdClass();
+$order = $response->orders[0];

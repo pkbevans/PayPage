@@ -12,20 +12,11 @@ if(!$response = fetch(METHOD_GET, $url, $accessToken, null)){
     echo "Error: Fetching order<BR>";
     exit;
 }
-$jsonData = json_decode($response);
-if(!$jsonData = json_decode($response)) {
-    echo $response;
-    exit;
-}
 $order = new stdClass();
-if($jsonData->statusCode == 200){
-    $order = $jsonData->data->orders[0];
-    $payments = $jsonData->data->orders[0]->payments;
-    // var_dump($order);
-    include '../view/viewOrder.php';
-}else{
-    echo '<BR><pre>.' . json_encode($jsonData, JSON_PRETTY_PRINT) . '</pre>';
-}
+$order = $response->orders[0];
+$payments = $response->orders[0]->payments;
+// var_dump($order);
+include '../view/viewOrder.php';
 function isDateToday($dateString){
     $today = date('Y-m-d');
     if(strncmp($dateString, $today, 10)){

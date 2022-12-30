@@ -8,7 +8,7 @@
                     Original Amount
                 </div>
                 <div class="col-9">
-                    <span><?php echo $payment['currency'] . " " . $payment['amount'];?></span>
+                    <span><?php echo $payment->currency . " " . $payment->amount;?></span>
                 </div>
             </div>
             <div class="row">
@@ -16,7 +16,7 @@
                     Status
                 </div>
                 <div class="col-9">
-                    <span><?php echo $payment['status'];?></span>
+                    <span><?php echo $payment->status;?></span>
                 </div>
             </div>
             <form class="needs-validation" id="actionForm" name="checkout" method="POST" target="" action="" novalidate >
@@ -25,7 +25,7 @@
                         <label for="reference" class="form-label">Reference</label>
                     </div>
                     <div class="col-3">
-                        <input id="reference" class="form-control" type="text" name="reference" value="<?php echo $order['merchantReference'];?>" required />
+                        <input id="reference" class="form-control" type="text" name="reference" value="<?php echo $order->merchantReference;?>" required />
                     </div>
                 </div>
                 <div class="row">
@@ -41,11 +41,11 @@
                         <label for="amount" class="form-label">Refund Amount</label>
                     </div>
                     <div class="col-3">
-                        <input id="amount" class="form-control" type="number" name="amount" value="<?php echo $payment['amount'];?>" required step="0.01" min="1.00" max="<?php echo $payment['amount'];?>" />
+                        <input id="amount" class="form-control" type="number" name="amount" value="<?php echo $payment->amount;?>" required step="0.01" min="1.00" max="<?php echo $payment->amount;?>" />
                     </div>
                 </div>
                 <button id="refundButton" type="button" class="btn btn-primary"
-                    onclick="submitAction('Refund', '<?php echo $payment['orderId'];?>', '<?php echo $payment['gatewayRequestId'];?>','<?php echo $payment['currency'];?>',<?php echo $payment['amount'];?>, '<?php echo $payment['cardNumber'];?>')">Refund</button>
+                    onclick="submitAction('Refund', '<?php echo $payment->orderId;?>', '<?php echo $payment->gatewayRequestId;?>','<?php echo $payment->currency;?>',<?php echo $payment->amount;?>, '<?php echo $payment->cardNumber;?>')">Refund</button>
             </form>
         </div>
     </div>
