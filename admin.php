@@ -109,7 +109,11 @@
                 let refreshTokenExpires = getCookie("refreshTokenExpires");
                 d1 = Date.parse(refreshTokenExpires);
                 if (d1 > d2) {
+                    refreshToken = getCookie("refreshToken");
+                    accessToken = getCookie("accessToken");
+                    sessionId = getCookie("sessionId");
                     // Refresh token still valid - Refresh access token
+                    refreshAccessToken(sessionId, accessToken,refreshToken);
                 }
             }
         }
@@ -130,6 +134,48 @@
         }
         // Return null if not found
         return null;
+    }
+    function refreshAccessToken(sessionId, accessToken, refreshToken){
+        return fetch("/payPage/v1/controller/sessions.php?sessionid="+sessionId+'&patch=', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': accessToken
+                },
+                method: "post",
+                body: JSON.stringify({
+                    "refreshToken": refreshToken
+                })
+        })
+        .then((result) => {
+            console.log(result);
+            if(result.ok){
+                return result.json()
+            }else{
+                throw "unauthorised"
+            }
+        })
+        .then((result)=>{
+            console.log(result);
+            var t = new Date();
+            t.setSeconds(t.getSeconds() + result.data.accessTokenExpiresIn);
+            document.cookie = "accessTokenExpires=" + t+';expires=;path=/';
+            t = new Date();
+            t.setSeconds(t.getSeconds() + result.data.refreshTokenExpiresIn);
+            document.cookie = "refreshTokenExpires=" + t+';expires=;path=/';
+            document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
+            document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
+            document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
+            fullName = result.data.firstName + " " + result.data.lastName;
+            document.getElementById("username").innerHTML=fullName;
+            document.getElementById("loginSection").style.display="none"
+            document.getElementById("formSection").style.display="block"
+        })
+        .catch(error => {
+            console.log("ERROR: "+error);
+            // Show login screen
+            document.getElementById("loginSection").style.display="block"
+            document.getElementById("formSection").style.display="none"
+        })
     }
     function login(){
         var form = document.getElementById('loginForm');
@@ -179,11 +225,6 @@
             })
         }
     }
-    function buttonClicked(){
-        ++back;
-        document.getElementById('formSection').style.display="none";
-        getOrders();
-    }
     function validateForm(){
         var form = document.getElementById('findForm');
 
@@ -192,7 +233,9 @@
             event.stopPropagation();
             form.classList.add('was-validated');
         }else{
-            buttonClicked();
+            ++back;
+            document.getElementById('formSection').style.display="none";
+            getOrders();
         }
     }
     function getOrders(){
