@@ -3,14 +3,6 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/PeRestLib/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/db/paymentUtils.php';
 $incoming = json_decode(file_get_contents('php://input'));
 
-$accessToken = "";
-if (!$accessToken = refreshAccessToken()) {
-    echo "Error: Refreshing token<BR>";
-    // TODO - Login required
-    exit;
-}
-// Access token refreshed 
-
 $result = new stdClass();
 try {
     $request = [

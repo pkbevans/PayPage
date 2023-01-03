@@ -42,8 +42,8 @@
                     <button type="button" class="btn btn-primary" onclick="login()">Log in</button>
                 </form>
             </div>
-            <div class="row">
-                <div id="formSection" style="display: none">
+            <div id=contentSection>
+                <div id="formSection">
                     <h3>Find Order</h3>
                     <form class="needs-validation" id="findForm" name="checkout" method="" target="" action="" novalidate >
                         <label for="orderId" class="form-label">Order Id</label><input id="orderId" class="form-control" type="text" name="orderId" value="" />
@@ -55,32 +55,32 @@
                         <button type="button" class="btn btn-primary" onclick="validateForm()">Find Orders</button>
                     </form>
                 </div>
-            </div>
-            <div id="ordersSection"></div>
-            <div id="orderSection">
-                <div id="orderDetailSection"></div>
-                <div id="actionSection"></div>
-                <div id="statusSection"></div>
-            </div>
-            <div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="requestModalLabel">Request Details</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                              <div id="requestSection"></div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div id="ordersSection"></div>
+                <div id="orderSection">
+                    <div id="orderDetailSection"></div>
+                    <div id="actionSection"></div>
+                    <div id="statusSection"></div>
+                </div>
+                <div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="requestModalLabel">Request Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="requestSection"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row" id="backButton" style="display: none">
-                <div class="col-12">
-                    <button type="button" class="btn btn-primary" onclick="backButton()">Back</button>
+                <div class="row" id="backButton" style="display: none">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-primary" onclick="backButton()">Back</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,12 +90,15 @@
     let selectedOrderId=0;
 
     document.addEventListener("DOMContentLoaded", function (e) {
+        authenticate();
+    });
+    function authenticate(){
         // Check whether we already have an open session
         // Either: 
-        // 1. No cookie at all - login screen
-        // 2. Got cookie. Refresh Token expired - login screen
+        // 1. No cookie at all - Show login screen
+        // 2. Got cookie. Refresh Token expired - Show login screen
         // 3. Got cookie. Refresh token not expired but access token expired - refresh access token, then show search form
-        // 4. Got cookie. access token not expired - show search form
+        // 4. Got cookie. access token not expired - Show search form
         let accessTokenExpires = getCookie("accessTokenExpires");
         if(accessTokenExpires){
             var now = new Date();
@@ -104,21 +107,28 @@
             if (d1 > d2) {
                 // Access token still valid - No log in
                 document.getElementById("loginSection").style.display="none"
-                document.getElementById("formSection").style.display="block"
+                document.getElementById("contentSection").style.display="block"
             }else{
                 let refreshTokenExpires = getCookie("refreshTokenExpires");
                 d1 = Date.parse(refreshTokenExpires);
                 if (d1 > d2) {
+                    // Refresh token still valid - Refresh access token
                     refreshToken = getCookie("refreshToken");
                     accessToken = getCookie("accessToken");
                     sessionId = getCookie("sessionId");
-                    // Refresh token still valid - Refresh access token
                     refreshAccessToken(sessionId, accessToken,refreshToken);
+                }else{
+                    // Else show log in 
+                    document.getElementById("loginSection").style.display="block"
+                    document.getElementById("contentSection").style.display="none"
                 }
             }
+        }else{
+            // Else show log in 
+            document.getElementById("loginSection").style.display="block"
+            document.getElementById("contentSection").style.display="none"
         }
-        // Else show log in 
-    });
+    }
     function getCookie(name) {
         // Split cookie string and get all individual name=value pairs in an array
         var cookieArr = document.cookie.split(";");
@@ -168,13 +178,13 @@
             fullName = result.data.firstName + " " + result.data.lastName;
             document.getElementById("username").innerHTML=fullName;
             document.getElementById("loginSection").style.display="none"
-            document.getElementById("formSection").style.display="block"
+            document.getElementById("contentSection").style.display="block"
         })
         .catch(error => {
             console.log("ERROR: "+error);
             // Show login screen
             document.getElementById("loginSection").style.display="block"
-            document.getElementById("formSection").style.display="none"
+            document.getElementById("contentSection").style.display="none"
         })
     }
     function login(){
@@ -217,7 +227,7 @@
                 fullName = result.data.firstName + " " + result.data.lastName;
                 document.getElementById("username").innerHTML=fullName;
                 document.getElementById("loginSection").style.display="none"
-                document.getElementById("formSection").style.display="block"
+                document.getElementById("contentSection").style.display="block"
             })
             .catch(error => {
                 console.log("ERROR: "+error);
@@ -239,6 +249,7 @@
         }
     }
     function getOrders(){
+        authenticate();
         document.getElementById('backButton').style.display = "block";
         document.getElementById('ordersSection').style.display = "block";
         return fetch("/payPage/db/getOrders.php", {
@@ -260,6 +271,7 @@
         })
     }
     function getOrder(id){
+        authenticate();
         selectedOrderId = id;
         ++back;
         document.getElementById('ordersSection').style.display = "none";
@@ -280,6 +292,7 @@
         })
     }
     function showActionPage(paymentId, action){
+        authenticate();
         // console.log("showRefundPage: "+paymentId)
         ++back;
         document.getElementById('actionSection').style.display = "block";
@@ -298,6 +311,7 @@
         })
     }
     function submitAction(action, orderId, requestId, currency, originalAmount, cardNumber){
+        authenticate();
         reason = document.getElementById('reason').value;
         reference = document.getElementById('reference').value;
         amount = Number(document.getElementById('amount').value);
@@ -346,6 +360,7 @@
         }
     }
     function showRequest(id){
+        authenticate();
         document.getElementById('requestModalLabel').innerHTML = "Request Details";
         return fetch("/payPage/view/viewGatewayRequest.php", {
             method: "post",
@@ -367,6 +382,7 @@
         })
     }
     function showShipping(id){
+        authenticate();
         document.getElementById('requestModalLabel').innerHTML = "Shipping Details";
         return fetch("/payPage/view/viewShippingAddress.php", {
             method: "post",
@@ -388,6 +404,7 @@
         })
     }
     function showCustomer(customerId){
+        authenticate();
         document.getElementById('requestModalLabel').innerHTML = "Customer Details";
         return fetch("/payPage/view/viewGatewayCustomer.php", {
             method: "post",
@@ -410,6 +427,7 @@
         })
     }
     function showLog(referenceNumber){
+        authenticate();
         document.getElementById('requestModalLabel').innerHTML = "Order Logs";
         return fetch("/payPage/view/viewGatewayLog.php", {
             method: "post",

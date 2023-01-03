@@ -10,8 +10,8 @@ function refreshAccessToken()
     $payload->refreshToken = $refreshToken;
     $url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/v1/controller/sessions.php?sessionid=' . $sessionId . '&patch=';
     // echo $url;
-    $response = fetch(METHOD_POST, $url, $accessToken, json_encode($payload));
-    if(!$response){
+    [$responseCode, $response] = fetch(METHOD_POST, $url, json_encode($payload));
+    if($responseCode != 200){
         return false;
     }
         // Update session cookie
@@ -25,7 +25,8 @@ function refreshAccessToken()
     setcookie ('refreshTokenExpires', $time, 0, '/');
     return $accessToken;
 }
-function fetch($method, $url, $accessToken, $payload){
+function fetch($method, $url, $payload){
+    $accessToken = getCookie('accessToken');
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
     if($method == METHOD_POST || $method == METHOD_PATCH || $method == METHOD_PUT ) {
@@ -36,16 +37,18 @@ function fetch($method, $url, $accessToken, $payload){
     curl_setopt($curl, CURLOPT_HTTPHEADER, array('Authorization:'. $accessToken, 'Content-type:application/json'));
     curl_setopt($curl, CURLOPT_HEADER, false);
     $response = curl_exec($curl);
+    $response_info = curl_getinfo($curl);
+
     curl_close($curl);
+
+    if ($response_info['http_code'] !== 200 && $response_info['http_code'] !== 201) {
+        return array($response_info['http_code'], $response);
+    }
     if(!$jsonData = json_decode($response)) {
-        echo $response;
-        return false;
+        return array($response_info['http_code'], $response);
     }
-    if ($jsonData->statusCode !== 200 && $jsonData->statusCode !== 201) {
-        echo $response;
-        return false;
-    }
-    return $jsonData->data;
+    
+    return array($response_info['http_code'], $jsonData->data);
 }
 function getCookie($name){
     if(isset($_COOKIE[$name])){
