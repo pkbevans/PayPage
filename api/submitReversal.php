@@ -23,14 +23,14 @@ try {
     $result = ProcessRequest(MID, $api , METHOD_POST, $requestBody, CHILD_MID, AUTH_TYPE_SIGNATURE );
     $dbError = "";
     if($result->responseCode == 201){
-        if( !$dbResult = insertPayment($accessToken, "REVERSAL", $incoming->orderId, $incoming->amount, 0, $incoming->currency,
+        if( !$dbResult = insertPayment($incoming->accessToken, "REVERSAL", $incoming->orderId, $incoming->amount, 0, $incoming->currency,
             $incoming->cardNumber,"n/a","n/a", $result->response->id, "SUBMITTED")){
             $dbError .= "DBError inserting Payment. ";
             $result->dberror = $dbError;
         }else{
             $result->insertPayment = $dbResult;
         }
-        if( !$dbResult = updateOrder($accessToken, $incoming->orderId, "REVERSED")){
+        if( !$dbResult = updateOrder($incoming->accessToken, $incoming->orderId, "REVERSED")){
             $dbError .= "DBError updating Order";
             $result->dberror = $dbError;
         }else{

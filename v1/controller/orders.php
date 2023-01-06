@@ -76,8 +76,9 @@ try {
     // check if access token has expired
     if (strtotime($returned_accessTokenExpiry) < time()) {
         $response = new Response(401, false, null, null);
-        $response->addMessage("expiry:" . $returned_accessTokenExpiry);
-        $response->addMessage("time now:" . date('y/m/D H:i', time()));
+        $response->addMessage("accessToken: " . $accessToken);
+        $response->addMessage("expiry: " . $returned_accessTokenExpiry);
+        $response->addMessage("time now: " . date('Y-m-d H:i:s', time()));
         $response->addMessage("expiry:" . strtotime($returned_accessTokenExpiry) . " now:" . time());
         $response->addMessage("Access token has expired");
         $response->send();
@@ -153,7 +154,7 @@ elseif (array_key_exists("id", $_GET) || array_key_exists("mrn", $_GET) ||
         exit;
     }
 }
-// handle getting all orders page of 20 at a time
+// handle getting all orders page at a time
 elseif (array_key_exists("page", $_GET)) {
     // if request is a GET e.g. get orders
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -166,18 +167,26 @@ elseif (array_key_exists("page", $_GET)) {
             $response->send();
             exit;
         }
+        // See if the rows-per-page is set, else default is 20
+        $rowsPerPage = 20;
+        if (array_key_exists("rows", $_GET)) {
+            $rowsPerPage = $_GET['rows'];
 
-        // set limit to 20 per page
-        $limitPerPage = 20;
+            //check to see if page id in query string is not empty and is number, if not return json error
+            if ($rowsPerPage == '' || !is_numeric($rowsPerPage)) {
+                $response = new Response(400, false, "Rows cannot be blank and must be numeric", null);
+                $response->send();
+                exit;
+            }
+        }
 
         // attempt to query the database
         try {
             // ADD AUTH TO QUERY
 
-            // get total number of orders for user
+            // get total number of orders 
             // create db query
-            $query = $readDB->prepare('SELECT count(id) as totalNoOfOrders from orders where userId = :userId');
-            $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
+            $query = $readDB->prepare('SELECT count(id) as totalNoOfOrders from orders');
             $query->execute();
 
             // get row for count total
@@ -186,7 +195,7 @@ elseif (array_key_exists("page", $_GET)) {
             $ordersCount = intval($row['totalNoOfOrders']);
 
             // get number of pages required for total results use ceil to round up
-            $numOfPages = ceil($ordersCount / $limitPerPage);
+            $numOfPages = ceil($ordersCount / $rowsPerPage);
 
             // if no rows returned then always allow page 1 to show a successful response with 0 orders
             if ($numOfPages == 0) {
@@ -201,14 +210,13 @@ elseif (array_key_exists("page", $_GET)) {
             }
 
             // set offset based on current page, e.g. page 1 = offset 0, page 2 = offset 20
-            $offset = ($page == 1 ?  0 : (20 * ($page - 1)));
+            $offset = ($page == 1 ?  0 : ($rowsPerPage * ($page - 1)));
 
             // ADD AUTH TO QUERY
             // get rows for page
             // create db query
-            $query = $readDB->prepare('SELECT id, title, description, DATE_FORMAT(deadline, "%d/%m/%Y %H:%i") as deadline, filter from orders where userId = :userId limit :pglimit OFFSET :offset');
-            $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
-            $query->bindParam(':pglimit', $limitPerPage, PDO::PARAM_INT);
+            $query = $readDB->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders limit :pglimit OFFSET :offset');
+            $query->bindParam(':pglimit', $rowsPerPage, PDO::PARAM_INT);
             $query->bindParam(':offset', $offset, PDO::PARAM_INT);
             $query->execute();
 
@@ -244,16 +252,17 @@ elseif (array_key_exists("page", $_GET)) {
             $response->send();
             exit;
         }
-        // if error with sql query return a json error
-        catch (OrderException $ex) {
-        $response = new Response(500, false, $ex->getMessage(), null);
-        $response->send();
-        exit;
+            // if error with sql query return a json error
+            catch (OrderException $ex) {
+            $response = new Response(500, false, $ex->getMessage(), null);
+            $response->send();
+            exit;
         } catch (PDOException $ex) {
-        error_log("Database Query Error: " . $ex, 0);
-        $response = new Response(500, false, "Failed to get orders", null);
-        $response->send();
-        exit;
+            error_log("Database Query Error: " . $ex, 0);
+            $response = new Response(500, false, "Failed to get orders", null);
+            $response->addMessage($ex->getMessage());
+            $response->send();
+            exit;
         }
     }
     // if any other request method apart from GET is used then return 405 method not allowed
@@ -265,167 +274,159 @@ elseif (array_key_exists("page", $_GET)) {
 }
 // handle getting all orders or creating a new one
 elseif (empty($_GET)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        // if request is a GET e.g. get ALL orders
+        $response = getOrders($readDB, null, null);
+        $response->send();
+    }
+    // else if request is a POST e.g. create order
+    elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // create order
+        try {
+            // check request's content type header is JSON
+            if ($_SERVER['CONTENT_TYPE'] !== 'application/json') {
+                // set up response for unsuccessful request
+                $response = new Response(400, false, "Content Type header not set to JSON", null);
+                $response->send();
+                exit;
+            }
 
-// if request is a GET e.g. get orders
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            // get POST request body as the POSTed data will be JSON format
+            $rawPostData = file_get_contents('php://input');
 
-    $response = getOrders($readDB, null, null);
-    $response->send();
-}
-// else if request is a POST e.g. create order
-elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // create order
-    try {
-    // check request's content type header is JSON
-    if ($_SERVER['CONTENT_TYPE'] !== 'application/json') {
-        // set up response for unsuccessful request
-        $response = new Response(400, false, "Content Type header not set to JSON", null);
+            if (!$jsonData = json_decode($rawPostData)) {
+                // set up response for unsuccessful request
+                $response = new Response(400, false, "Request body is not valid JSON", null);
+                $response->send();
+                exit;
+            }
+
+            // TODO - data validation
+            if (!isset($jsonData->merchantReference)) {
+                $response = new Response(400, false, "merchantReference not set", null);
+                $response->send();
+                exit;
+            }
+            if (!isset($jsonData->amount)) {
+                $response = new Response(400, false, "amount not set", null);
+                $response->send();
+                exit;
+            }
+            if (!isset($jsonData->refundAmount)) {
+                $response = new Response(400, false, "refundAmount not set", null);
+                $response->send();
+                exit;
+            }
+            if (!isset($jsonData->currency)) {
+                $response = new Response(400, false, "currency not set", null);
+                $response->send();
+                exit;
+            }
+            if (!isset($jsonData->customerId)) {
+                $response = new Response(400, false, "customerId not set", null);
+                $response->send();
+                exit;
+            }
+            if (!isset($jsonData->customerEmail)) {
+                $response = new Response(400, false, "customerEmail not set", null);
+                $response->send();
+                exit;
+            }
+            if (!isset($jsonData->status)) {
+                $response = new Response(400, false, "status not set", null);
+                $response->send();
+                exit;
+            }
+            // create new order with data, if non mandatory fields not provided then set to null
+            $newOrder = new Order(null, $jsonData->merchantReference, $jsonData->amount, $jsonData->refundAmount, $jsonData->currency, $jsonData->customerId, $jsonData->customerEmail, $jsonData->status, null);
+            // get title, description, deadline, filter and store them in variables
+
+            // create db query
+            $query = $writeDB->prepare('insert into orders (merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, datetime) ' .
+                'values (:merchantReference, :amount, :refundAmount, :currency, :customerId, :customerEmail, :status, NOW())');
+            $query->bindParam(':merchantReference', $jsonData->merchantReference, PDO::PARAM_STR);
+            $query->bindParam(':amount', $jsonData->amount, PDO::PARAM_STR);
+            $query->bindParam(':refundAmount', $jsonData->refundAmount, PDO::PARAM_STR);
+            $query->bindParam(':currency', $jsonData->currency, PDO::PARAM_STR);
+            $query->bindParam(':customerId', $jsonData->customerId, PDO::PARAM_STR);
+            $query->bindParam(':customerEmail', $jsonData->customerEmail, PDO::PARAM_STR);
+            $query->bindParam(':status', $jsonData->status, PDO::PARAM_STR);
+            $query->execute();
+
+            // get row count
+            $rowCount = $query->rowCount();
+
+            // check if row was actually inserted, PDO exception should have caught it if not.
+            if ($rowCount === 0) {
+                // set up response for unsuccessful return
+                $response = new Response(500, false, "Failed to create order", null);
+                $response->send();
+                exit;
+            }
+
+            // get last order id so we can return the Order in the json
+            $lastorderId = $writeDB->lastInsertId();
+            // create db query to get newly created order - get from master db not read slave as replication may be too slow for successful read
+            $query = $writeDB->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+            $query->bindParam(':orderId', $lastorderId, PDO::PARAM_INT);
+            $query->execute();
+
+            // get row count
+            $rowCount = $query->rowCount();
+            // make sure that the new order was returned
+            if ($rowCount === 0) {
+                // set up response for unsuccessful return
+                $response = new Response(500, false, "Failed to retrieve order after creation", null);
+                $response->send();
+                exit;
+            }
+
+            // create empty array to store orders
+            $orderArray = array();
+
+            // for each row returned - should be just one
+            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+                // create new order object
+                $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerEmail'], $row['status'], $row['datetime']);
+
+                // create order and store in array for return in json data
+                $orderArray[] = $order->returnOrderAsArray();
+            }
+            // bundle orders and rows returned into an array to return in the json data
+            $returnData = array();
+            $returnData['rows_returned'] = $rowCount;
+            $returnData['orders'] = $orderArray;
+
+            //set up response for successful return
+            $response = new Response(201, true, "Order created", $returnData);
+            $response->send();
+            exit;
+        }
+        // if order fails to create due to data types, missing fields or invalid data then send error json
+        catch (OrderException $ex) {
+            $response = new Response(400, false, $ex->getMessage(), null);
+            $response->send();
+            exit;
+        }
+        // if error with sql query return a json error
+        catch (PDOException $ex) {
+            error_log("Database Query Error: " . $ex, 0);
+            $response = new Response(500, false, "Failed to insert order into database - check submitted data for errors", null);
+            $response->send();
+            exit;
+        }
+    }else{
+        // if any other request method apart from GET or POST is used then return 405 method not allowed
+        $response = new Response(405, false, "Request method not allowed", null);
         $response->send();
         exit;
     }
-
-    // get POST request body as the POSTed data will be JSON format
-    $rawPostData = file_get_contents('php://input');
-
-    if (!$jsonData = json_decode($rawPostData)) {
-        // set up response for unsuccessful request
-        $response = new Response(400, false, "Request body is not valid JSON", null);
-        $response->send();
-        exit;
-    }
-
-    // TODO - data validation
-    if (!isset($jsonData->merchantReference)) {
-        $response = new Response(400, false, "merchantReference not set", null);
-        $response->send();
-        exit;
-    }
-    if (!isset($jsonData->amount)) {
-        $response = new Response(400, false, "amount not set", null);
-        $response->send();
-        exit;
-    }
-    if (!isset($jsonData->refundAmount)) {
-        $response = new Response(400, false, "refundAmount not set", null);
-        $response->send();
-        exit;
-    }
-    if (!isset($jsonData->currency)) {
-        $response = new Response(400, false, "currency not set", null);
-        $response->send();
-        exit;
-    }
-    if (!isset($jsonData->customerId)) {
-        $response = new Response(400, false, "customerId not set", null);
-        $response->send();
-        exit;
-    }
-    if (!isset($jsonData->customerEmail)) {
-        $response = new Response(400, false, "customerEmail not set", null);
-        $response->send();
-        exit;
-    }
-    if (!isset($jsonData->status)) {
-        $response = new Response(400, false, "status not set", null);
-        $response->send();
-        exit;
-    }
-    //  id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, datetime      
-
-    // create new order with data, if non mandatory fields not provided then set to null
-    $newOrder = new Order(null, $jsonData->merchantReference, $jsonData->amount, $jsonData->refundAmount, $jsonData->currency, $jsonData->customerId, $jsonData->customerEmail, $jsonData->status, null);
-    // get title, description, deadline, filter and store them in variables
-
-    // ADD AUTH TO QUERY
-    // create db query
-    $query = $writeDB->prepare('insert into orders (merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, datetime) ' .
-        'values (:merchantReference, :amount, :refundAmount, :currency, :customerId, :customerEmail, :status, NOW())');
-    $query->bindParam(':merchantReference', $jsonData->merchantReference, PDO::PARAM_STR);
-    $query->bindParam(':amount', $jsonData->amount, PDO::PARAM_STR);
-    $query->bindParam(':refundAmount', $jsonData->refundAmount, PDO::PARAM_STR);
-    $query->bindParam(':currency', $jsonData->currency, PDO::PARAM_STR);
-    $query->bindParam(':customerId', $jsonData->customerId, PDO::PARAM_STR);
-    $query->bindParam(':customerEmail', $jsonData->customerEmail, PDO::PARAM_STR);
-    $query->bindParam(':status', $jsonData->status, PDO::PARAM_STR);
-    $query->execute();
-
-    // get row count
-    $rowCount = $query->rowCount();
-
-    // check if row was actually inserted, PDO exception should have caught it if not.
-    if ($rowCount === 0) {
-        // set up response for unsuccessful return
-        $response = new Response(500, false, "Failed to create order", null);
-        $response->send();
-        exit;
-    }
-
-    // get last order id so we can return the Order in the json
-    $lastorderId = $writeDB->lastInsertId();
-    // ADD AUTH TO QUERY
-    // create db query to get newly created order - get from master db not read slave as replication may be too slow for successful read
-    $query = $writeDB->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
-    $query->bindParam(':orderId', $lastorderId, PDO::PARAM_INT);
-    // $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
-    $query->execute();
-
-    // get row count
-    $rowCount = $query->rowCount();
-    // make sure that the new order was returned
-    if ($rowCount === 0) {
-        // set up response for unsuccessful return
-        $response = new Response(500, false, "Failed to retrieve order after creation", null);
-        $response->send();
-        exit;
-    }
-
-    // create empty array to store orders
-    $orderArray = array();
-
-    // for each row returned - should be just one
-    while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
-        // create new order object
-        $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerEmail'], $row['status'], $row['datetime']);
-
-        // create order and store in array for return in json data
-        $orderArray[] = $order->returnOrderAsArray();
-    }
-    // bundle orders and rows returned into an array to return in the json data
-    $returnData = array();
-    $returnData['rows_returned'] = $rowCount;
-    $returnData['orders'] = $orderArray;
-
-    //set up response for successful return
-    $response = new Response(201, true, "Order created", $returnData);
-    $response->send();
-    exit;
-    }
-    // if order fails to create due to data types, missing fields or invalid data then send error json
-    catch (OrderException $ex) {
-    $response = new Response(400, false, $ex->getMessage(), null);
-    $response->send();
-    exit;
-    }
-    // if error with sql query return a json error
-    catch (PDOException $ex) {
-    error_log("Database Query Error: " . $ex, 0);
-    $response = new Response(500, false, "Failed to insert order into database - check submitted data for errors", null);
-    $response->send();
-    exit;
-    }
-}
-// if any other request method apart from GET or POST is used then return 405 method not allowed
-else {
-    $response = new Response(405, false, "Request method not allowed", null);
-    $response->send();
-    exit;
-}
 }
 // return 404 error if endpoint not available
 else {
-$response = new Response(404, false, "Endpoint not found", null);
-$response->send();
-exit;
+    $response = new Response(404, false, "Endpoint not found", null);
+    $response->send();
+    exit;
 }
 
 function getOrders($db, $id = null, $filter = null){
@@ -561,7 +562,6 @@ function deleteOrder($db, $id){
         // create db query
         $query = $db->prepare('delete from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
-        // $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
         $query->execute();
 
         // get row count
@@ -654,7 +654,6 @@ function updateOrder($db, $id){
         // create db query to get order from database to update - use master db
         $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
-        // $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
         $query->execute();
 
         // get row count
@@ -741,7 +740,6 @@ function updateOrder($db, $id){
         // create db query to return the newly edited order - connect to master database
         $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
-        // $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
         $query->execute();
 
         // get row count

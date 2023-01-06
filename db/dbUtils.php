@@ -1,6 +1,6 @@
 <?php
 include_once '../PeRestLib/RestConstants.php';
-function refreshAccessToken()
+function refreshAccessTokenDeprecated()
 {
     // Refresh Access token
     $accessToken = getCookie('accessToken');
@@ -10,7 +10,7 @@ function refreshAccessToken()
     $payload->refreshToken = $refreshToken;
     $url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/v1/controller/sessions.php?sessionid=' . $sessionId . '&patch=';
     // echo $url;
-    [$responseCode, $response] = fetch(METHOD_POST, $url, json_encode($payload));
+    [$responseCode, $response] = fetch($accessToken, METHOD_POST, $url, json_encode($payload));
     if($responseCode != 200){
         return false;
     }
@@ -25,8 +25,7 @@ function refreshAccessToken()
     setcookie ('refreshTokenExpires', $time, 0, '/');
     return $accessToken;
 }
-function fetch($method, $url, $payload){
-    $accessToken = getCookie('accessToken');
+function fetch($accessToken, $method, $url, $payload){
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
     if($method == METHOD_POST || $method == METHOD_PATCH || $method == METHOD_PUT ) {

@@ -2,8 +2,8 @@
 require_once('db.php');
 require_once('../model/Response.php');
 const MAX_LOGIN_ATTEMPTS = 3;
-const ACCESS_TOKEN_EXPIRY_SECS = 1200;
-const REFRESH_TOKEN_EXPIRY_SECS = 2400;
+const ACCESS_TOKEN_EXPIRY_SECS = 180;
+const REFRESH_TOKEN_EXPIRY_SECS = 1200;
 
 try{
     $writeDB = DB::connectWriteDB();
@@ -240,7 +240,8 @@ function refreshAccessToken($db, $sessionId, $accessToken){
 
     try {
         $refreshToken = $jsonData->refreshToken;
-        $query = $db->prepare('select sessions.id as sessionid, sessions.userid as userid, accessToken, refreshToken, userActive, loginAttempts, accessTokenexpiry, refreshTokenexpiry from sessions, users where users.id = sessions.userid and sessions.id = :sessionid and sessions.accessToken = :accessToken and sessions.refreshToken = :refreshToken');
+        $stmt ='select sessions.id as sessionid, sessions.userid as userid, accessToken, refreshToken, userActive, loginAttempts, accessTokenexpiry, refreshTokenexpiry from sessions, users where users.id = sessions.userid and sessions.id = :sessionid and sessions.accessToken = :accessToken and sessions.refreshToken = :refreshToken';
+        $query = $db->prepare($stmt);
         $query->bindParam(':sessionid', $sessionId, PDO::PARAM_INT);
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
         $query->bindParam(':refreshToken', $refreshToken, PDO::PARAM_STR);
@@ -249,6 +250,7 @@ function refreshAccessToken($db, $sessionId, $accessToken){
         $rowCount = $query->rowCount();
         if ($rowCount === 0) {
             $response = new Response(401, false, "Access token or refresh token is incorrect for session id", null);
+            $response->addMessage("stmt:" . $stmt);
             $response->addMessage("SessionId:" . $sessionId);
             $response->addMessage("Access token:" . $accessToken);
             $response->addMessage("refresh token:" . $refreshToken);

@@ -2,10 +2,10 @@
 include_once 'dbUtils.php';
 $incoming = json_decode(file_get_contents('php://input'));
 $url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/v1/controller/orders.php?orderId=' . $incoming->orderId ;
-[$responseCode, $response] = fetch(METHOD_GET, $url, null);
+[$responseCode, $response] = fetch($incoming->accessToken, METHOD_GET, $url, null);
 if($responseCode != 200){
     http_response_code($responseCode);
-    echo "Error: Fetching order<BR>";
+    echo "Error: ". $response;
     exit;
 }
 $order = new stdClass();

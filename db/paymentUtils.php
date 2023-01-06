@@ -17,8 +17,10 @@ function insertPayment($accessToken, $type, $orderId, $amount, $captured, $curre
     $payload->status = $status;
 
     $url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/v1/controller/payments.php';
-    if(!$response = fetch(METHOD_POST, $url, $accessToken, json_encode($payload))){
-        echo "Error: inserting payment<BR>";
+    [$responseCode, $response] = fetch($accessToken, METHOD_POST, $url, json_encode($payload));
+    if($responseCode != 201){
+        http_response_code($responseCode);
+        echo "Error: ". $response;
         exit;
     }
     return $response;
@@ -28,35 +30,11 @@ function updateOrder($accessToken, $id, $status){
     $payload->status = $status;
 
     $url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/v1/controller/orders.php?orderId='.$id.'&patch=';
-    if(!$response = fetch(METHOD_POST, $url, $accessToken, json_encode($payload))){
-        echo "Error: updating order<BR>";
+    [$responseCode, $response] = fetch($accessToken, METHOD_POST, $url, json_encode($payload));
+    if($responseCode != 200){
+        http_response_code($responseCode);
+        echo "Error: ". $response;
         exit;
     }    
     return $response;
-}    
-function insertApiLog($orderId, $type, $status, $payload){
-
-    $logSql = "INSERT INTO apilogs ("
-                . "orderId, "
-                . "type, "
-                . "status, "
-                . "payload) " .
-            "VALUES (" .
-                $orderId . ",'" .
-                $type . "','" .
-                $status . "','" .
-                $payload . "')";
-
-    $result = new stdClass();
-    echo $logSql;
-    $result->sql = $logSql;
-    try{
-        $conn = DB::connectWriteDB();
-        $conn->exec($logSql);
-        $result->status = "OK";
-        unset($conn);
-    } catch(PDOException $e){
-        $result->status = "ERROR";
-    }
-    return $result;
 }
