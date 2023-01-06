@@ -87,7 +87,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script src="js/authenticate.js"></script>
     <script>
-    let back=0;
+    let back="none";
     let selectedOrderId=0;
 
     document.addEventListener("DOMContentLoaded", function (e) {
@@ -103,7 +103,6 @@
             event.stopPropagation();
             form.classList.add('was-validated');
         }else{
-            ++back;
             document.getElementById('formSection').style.display="none";
             getOrders();
         }
@@ -112,6 +111,7 @@
         authenticate()
         .then(accessToken=>{
             console.log("getOrders: "+accessToken);
+            back = "ORDERLIST";
             document.getElementById('backButton').style.display = "block";
             document.getElementById('ordersSection').style.display = "block";
             return fetch("/payPage/db/getOrders.php", {
@@ -139,8 +139,8 @@
         authenticate()
         .then(accessToken=>{
             console.log("getOrder "+id);
+            back = "ORDER";
             selectedOrderId = id;
-            ++back;
             document.getElementById('ordersSection').style.display = "none";
             document.getElementById('orderSection').style.display = "block";
             // console.log("GOT ID: "+id)
@@ -165,7 +165,7 @@
         authenticate()
         .then(accessToken=>{
             // console.log("showRefundPage: "+paymentId)
-            ++back;
+            back = "SHOWACTION";
             document.getElementById('actionSection').style.display = "block";
             return fetch("/payPage/view/create"+action+".php", {
                 method: "post",
@@ -186,6 +186,7 @@
     function submitAction(action, orderId, requestId, currency, originalAmount, cardNumber){
         authenticate()
         .then(accessToken=>{
+            back = "SUBMITACTION";
             reason = document.getElementById('reason').value;
             reference = document.getElementById('reference').value;
             amount = Number(document.getElementById('amount').value);
@@ -216,9 +217,8 @@
                     // console.log(res);
                     if(res.responseCode === 201){
                         document.getElementById('statusSection').innerHTML = "SUCCESS. The " + action + " has been submitted";
-                        // Refresh the order list and the specific order
+                        // Refresh the specific order details
                         getOrder(orderId);
-                        --back;
                         backButton();
                     }else{
                         $errMessage = "";
@@ -335,26 +335,28 @@
     function backButton() {
         document.getElementById('statusSection').innerHTML = "";
         switch (back){
-            case 1: // Orders
+            case "ORDERLIST": // Orders
                 document.getElementById('formSection').style.display="block";
                 document.getElementById('ordersSection').style.display="none";
                 document.getElementById('backButton').style.display = "none";
                 break;
-            case 2: // Order Detail
+            case "ORDER": // Order Detail
                 refresh();
                 document.getElementById('orderSection').style.display="none";
                 document.getElementById('ordersSection').style.display="block";
+                back="ORDERLIST";
                 break;
-            case 3: //  Refund/Reversal Screen
+            case "SHOWACTION": //  Refund/Reversal Screen
                 document.getElementById('actionSection').style.display="none";
                 document.getElementById('orderSection').style.display="block";
+                back="ORDER";
                 break;
-            case 4: // Refund submitted
+            case "SUBMITACTION": // Refund submitted
                 document.getElementById('actionSection').style.display="none";
                 document.getElementById('orderSection').style.display="block";
+                back="ORDER";
                 break;
         }
-        --back;
     }
     function refresh(){
         getOrders();

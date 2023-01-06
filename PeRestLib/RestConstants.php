@@ -11,6 +11,9 @@ include_once $_SERVER["DOCUMENT_ROOT"] . KEYS_PATH. "PeRestLibKeys.php";
 //        'secret_key'=> "<<REST SECRET KEY>>"
 //    ]
 // ];
+//////////////// DONT FORGET TO UPDATE googlePay.js with MID/CHILD_MID IF YOU CHANGE IT HERE!!!!/////////////////////////
+const MID = "barclayssitt00";      // Replace with MID (Can be PORTFOLIO or Account-level)
+const CHILD_MID = "paulspants45011";       // Replace with Transacting MID if using PORTFOLIO or Account-level mid in MID
 
 const PRODUCTION_TARGET_ORIGIN =  "bondevans.com";  // Replace with Production URL for non-localhost testing
 const LOCALHOST_TARGET_ORIGIN =  "site.test";   // Replace with your localhost HTTPS alias.  MUST BE HTTPS
