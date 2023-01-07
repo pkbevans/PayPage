@@ -6,7 +6,7 @@ This is a Payment Page Example built against the Cybersource Gateway.
 
 It demonstrates the following Cybersource components:
 - Flex Microform
-- RESP API
+- REST API
 - Tokenization (TMS)
 
 Its written in PHP and Javascript.
@@ -30,6 +30,5 @@ $keys = [
    - CHILD_MID = "";                            // Can be left blank
    - PRODUCTION_TARGET_ORIGIN =  "";            // Replace with Production URL for non-localhost testing
    - LOCALHOST_TARGET_ORIGIN =  "site.test";    // Replace with your localhost HTTPS alias.  MUST BE HTTPS
-
     
 There is a demo of this code at https://bondevans.com/payPage
