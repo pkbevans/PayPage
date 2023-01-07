@@ -2,7 +2,7 @@
 require_once('db.php');
 require_once('../model/Response.php');
 const MAX_LOGIN_ATTEMPTS = 3;
-const ACCESS_TOKEN_EXPIRY_SECS = 180;
+const ACCESS_TOKEN_EXPIRY_SECS = 900;
 const REFRESH_TOKEN_EXPIRY_SECS = 1200;
 
 try{

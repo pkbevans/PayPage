@@ -104,10 +104,10 @@
             form.classList.add('was-validated');
         }else{
             document.getElementById('formSection').style.display="none";
-            getOrders();
+            getOrders(1);
         }
     }
-    function getOrders(){
+    function getOrders(page){
         authenticate()
         .then(accessToken=>{
             console.log("getOrders: "+accessToken);
@@ -117,6 +117,8 @@
             return fetch("/payPage/db/getOrders.php", {
                 method: "post",
                 body: JSON.stringify({
+                    "page":    page,
+                    "rows":    8,
                     "accessToken":    accessToken,
                     "orderId":    document.getElementById('orderId').value,
                     "mrn":        document.getElementById('referenceNumber').value,
@@ -359,7 +361,7 @@
         }
     }
     function refresh(){
-        getOrders();
+        getOrders(1);
     }
     </script>
     </body>

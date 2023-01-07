@@ -33,6 +33,19 @@
 <?php endforeach; ?>
         </tbody>
     </table>
+    <nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item <?php echo ($hasPrev ? '' : ' disabled');?>"><a class="page-link" <?php echo ($hasPrev ? 'onclick="getOrders('.($currentPage-1).')"' : 'tabindex="-1" aria-disabled="true"');?>>Previous</a></li>
+<?php
+$x = 1;
+while($x < ($currentPage+15) && $x <= $totalPages){
+    echo '<li class="page-item'. ($x==$currentPage?' active':'').'"><a class="page-link" onclick="getOrders('.$x.')">'.$x.'</a></li>';
+    ++$x;
+}
+?>
+        <li class="page-item <?php echo ($hasNext ? '' : ' disabled');?>"><a class="page-link" <?php echo ($hasNext ? 'onclick="getOrders('.($currentPage+1).')"' : 'tabindex="-1" aria-disabled="true"');?>>Next</a></li>
+    </ul>
+    </nav>
 <?php if (!$orders): ?>
     THERE ARE NO ORDERS THAT MATCH YOUR SEARCH CRITERIA
 <?php endif?>

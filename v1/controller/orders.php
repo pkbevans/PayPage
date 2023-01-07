@@ -106,7 +106,7 @@ if (array_key_exists("orderId", $_GET)) {
 
     // if request is a GET, e.g. get order
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $response = getOrders($readDB, $orderId, null);
+        $response = getOrders($readDB, $orderId, null, 0, 0);
         $response->send();
     }     
     // else if request if a DELETE e.g. delete order
@@ -142,22 +142,9 @@ elseif (array_key_exists("id", $_GET) || array_key_exists("mrn", $_GET) ||
         exit;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $response = getOrders($readDB, null, $_GET);
-        $response->send();
-        exit;
-    }
-    // if any other request method apart from GET is used then return 405 method not allowed
-    else {
-        $response = new Response(405, false, "Request method not allowed", null);
-        $response->send();
-        exit;
-    }
-}
-// handle getting all orders page at a time
-elseif (array_key_exists("page", $_GET)) {
-    // if request is a GET e.g. get orders
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $page = 0;
+    $rowsPerPage = 0;
+    if (array_key_exists("page", $_GET)) {
         // get page id from query string
         $page = $_GET['page'];
 
@@ -179,91 +166,11 @@ elseif (array_key_exists("page", $_GET)) {
                 exit;
             }
         }
-
-        // attempt to query the database
-        try {
-            // ADD AUTH TO QUERY
-
-            // get total number of orders 
-            // create db query
-            $query = $readDB->prepare('SELECT count(id) as totalNoOfOrders from orders');
-            $query->execute();
-
-            // get row for count total
-            $row = $query->fetch(PDO::FETCH_ASSOC);
-
-            $ordersCount = intval($row['totalNoOfOrders']);
-
-            // get number of pages required for total results use ceil to round up
-            $numOfPages = ceil($ordersCount / $rowsPerPage);
-
-            // if no rows returned then always allow page 1 to show a successful response with 0 orders
-            if ($numOfPages == 0) {
-                $numOfPages = 1;
-            }
-
-            // if passed in page number is greater than total number of pages available or page is 0 then 404 error - page not found
-            if ($page > $numOfPages || $page == 0) {
-                $response = new Response(404, false, "Page not found", null);
-                $response->send();
-                exit;
-            }
-
-            // set offset based on current page, e.g. page 1 = offset 0, page 2 = offset 20
-            $offset = ($page == 1 ?  0 : ($rowsPerPage * ($page - 1)));
-
-            // ADD AUTH TO QUERY
-            // get rows for page
-            // create db query
-            $query = $readDB->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders limit :pglimit OFFSET :offset');
-            $query->bindParam(':pglimit', $rowsPerPage, PDO::PARAM_INT);
-            $query->bindParam(':offset', $offset, PDO::PARAM_INT);
-            $query->execute();
-
-            // get row count
-            $rowCount = $query->rowCount();
-
-            // create order array to store returned orders
-            $orderArray = array();
-
-            // for each row returned
-            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
-                // create new order object for each row
-                $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerEmail'], $row['status'], $row['datetime']);
-
-                // create order and store in array for return in json data
-                $orderArray[] = $order->returnOrderAsArray();
-            }
-
-            // bundle orders and rows returned into an array to return in the json data
-            $returnData = array();
-            $returnData['rows_returned'] = $rowCount;
-            $returnData['total_rows'] = $ordersCount;
-            $returnData['total_pages'] = $numOfPages;
-            // if passed in page less than total pages then return true
-            ($page < $numOfPages ? $returnData['has_next_page'] = true : $returnData['has_next_page'] = false);
-            // if passed in page greater than 1 then return true
-            ($page > 1 ? $returnData['has_previous_page'] = true : $returnData['has_previous_page'] = false);
-            $returnData['orders'] = $orderArray;
-
-            // set up response for successful return
-            $response = new Response(200, true, null, $returnData);
-            $response->toCache(true);
-            $response->send();
-            exit;
-        }
-            // if error with sql query return a json error
-            catch (OrderException $ex) {
-            $response = new Response(500, false, $ex->getMessage(), null);
-            $response->send();
-            exit;
-        } catch (PDOException $ex) {
-            error_log("Database Query Error: " . $ex, 0);
-            $response = new Response(500, false, "Failed to get orders", null);
-            $response->addMessage($ex->getMessage());
-            $response->send();
-            exit;
-        }
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $response = getOrders($readDB, null, $_GET, $page, $rowsPerPage);
+        $response->send();
+        exit;
     }
     // if any other request method apart from GET is used then return 405 method not allowed
     else {
@@ -276,7 +183,7 @@ elseif (array_key_exists("page", $_GET)) {
 elseif (empty($_GET)) {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // if request is a GET e.g. get ALL orders
-        $response = getOrders($readDB, null, null);
+        $response = getOrders($readDB, null, null, 0, 0);
         $response->send();
     }
     // else if request is a POST e.g. create order
@@ -429,10 +336,9 @@ else {
     exit;
 }
 
-function getOrders($db, $id = null, $filter = null){
+function getOrders($db, $id = null, $filter = null, $page = 0, $rowsPerPage){
     // attempt to query the database
     try {
-        // ADD AUTH TO QUERY
         // create db query
         $stmt = 'SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime FROM orders ';
         if($id){
@@ -441,44 +347,95 @@ function getOrders($db, $id = null, $filter = null){
             $query = $db->prepare($stmt);
             $query->bindParam(':id', $id, PDO::PARAM_INT);
         }elseif($filter){
+            $where = "";
             $clauses = array();
             $count = 0;
             if(isset($filter['email']) && strlen($filter['email'])>1) {
-                $stmt .= 'where customerEmail= :email';
+                $where .= 'where customerEmail= :email';
                 $clauses['email'] = true;
                 ++$count;
             }else{
                 $clauses['email'] = false;
             }
             if(isset($filter['mrn']) && strlen($filter['mrn'])>1){
-                $stmt .= ($count?' and ':'where ').'merchantReference=:mrn';
+                $where .= ($count?' and ':'where ').'merchantReference=:mrn';
                 $clauses['mrn'] = true;
                 ++$count;
             }else{
                 $clauses['mrn'] = false;
             }
             if(isset($filter['customerId']) && strlen($filter['customerId'])>1){
-                $stmt .= ($count?' and ':'where ').'customerId=:customerId';
+                $where .= ($count?' and ':'where ').'customerId=:customerId';
                 $clauses['customerId'] = true;
                 ++$count;
             }else{
                 $clauses['customerId'] = false;
             }
             if(isset($filter['id']) && strlen($filter['id'])>1){
-                $stmt .= ($count?' and ':'where ').'id=:id';
+                $where .= ($count?' and ':'where ').'id=:id';
                 $clauses['id'] = true;
                 ++$count;
             }else{
                 $clauses['id'] = false;
             }
             if(isset($filter['status']) && strlen($filter['status'])>1){
-                $stmt .= ($count?' and ':'where ').'status=:status';
+                $where .= ($count?' and ':'where ').'status=:status';
                 $clauses['status'] = true;
             }else{
                 $clauses['status'] = false;
             }
-            // newest first
+            // If page>0 get total number of orders
+            $offsetLimit = '';
+            $offset = 0;
+            if($page>0){
+                // get total number of orders 
+                // create db query
+                $query = $db->prepare('SELECT count(id) as totalNoOfOrders from orders ' . $where);
+                if($clauses['email']){
+                    $query->bindParam(':email', $filter['email'], PDO::PARAM_STR);
+                }
+                if($clauses['mrn']){
+                    $query->bindParam(':mrn', $filter['mrn'], PDO::PARAM_STR);
+                }
+                if($clauses['customerId']){
+                    $query->bindParam(':customerId', $filter['customerId'], PDO::PARAM_INT);
+                }
+                if($clauses['id']){
+                    $query->bindParam(':id', $filter['id'], PDO::PARAM_INT);
+                }
+                if($clauses['status']){
+                    $query->bindParam(':status', $filter['status'], PDO::PARAM_STR);
+                }
+                $query->execute();
+    
+                // get row for count total
+                $row = $query->fetch(PDO::FETCH_ASSOC);
+    
+                $ordersCount = intval($row['totalNoOfOrders']);
+    
+                // get number of pages required for total results use ceil to round up
+                $numOfPages = ceil($ordersCount / $rowsPerPage);
+    
+                // if no rows returned then always allow page 1 to show a successful response with 0 orders
+                if ($numOfPages == 0) {
+                    $numOfPages = 1;
+                }
+    
+                // if passed in page number is greater than total number of pages available or page is 0 then 404 error - page not found
+                if ($page > $numOfPages || $page == 0) {
+                    $response = new Response(404, false, "Page not found", null);
+                    $response->send();
+                    exit;
+                }
+    
+                // set offset based on current page, e.g. page 1 = offset 0, page 2 = offset 20
+                $offset = ($page == 1 ?  0 : ($rowsPerPage * ($page - 1)));
+                $offsetLimit = ' limit :pglimit OFFSET :offset';
+            }
+            $stmt .= $where;
             $stmt .= " order by id desc";
+            $stmt .= $offsetLimit;
+            // newest first
             // echo "STMT: " . $stmt;
             $query = $db->prepare($stmt);
             if($clauses['email']){
@@ -495,6 +452,10 @@ function getOrders($db, $id = null, $filter = null){
             }
             if($clauses['status']){
                 $query->bindParam(':status', $filter['status'], PDO::PARAM_STR);
+            }
+            if($page>0){
+                $query->bindParam(':pglimit', $rowsPerPage, PDO::PARAM_STR);
+                $query->bindParam(':offset', $offset, PDO::PARAM_STR);
             }
         }
         else{
@@ -535,8 +496,16 @@ function getOrders($db, $id = null, $filter = null){
         // bundle orders and rows returned into an array to return in the json data
         $returnData = array();
         $returnData['rows_returned'] = $rowCount;
+        if($page>0){
+            $returnData['total_rows'] = $ordersCount;
+            $returnData['total_pages'] = $numOfPages;
+            // if passed in page less than total pages then return true
+            ($page < $numOfPages ? $returnData['has_next_page'] = true : $returnData['has_next_page'] = false);
+            // if passed in page greater than 1 then return true
+            ($page > 1 ? $returnData['has_prev_page'] = true : $returnData['has_prev_page'] = false);
+        }
         $returnData['orders'] = $orderArray;
-    
+        
         // set up response for successful return
         $response = new Response(200, true, null, $returnData);
         $response->toCache(true);
@@ -551,6 +520,8 @@ function getOrders($db, $id = null, $filter = null){
         error_log("Database Query Error: " . $ex->getMessage(), 0);
         $response = new Response(500, false, "Failed to get ".($id?'order':'orders'), null);
         $response->addMessage($stmt);
+        $response->addMessage($where);
+        $response->addMessage($offsetLimit);
         $response->addMessage($ex->getMessage());
         return $response;
     }    
