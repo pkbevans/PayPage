@@ -12,7 +12,7 @@ $result = ProcessRequest(MID, $api , METHOD_GET, "", CHILD_MID, AUTH_TYPE_SIGNAT
 if($result->responseCode == 200){
     header('HTTP/1.1 200 OK');
     if($echo){
-        echo(json_encode($result->response));
+        echo(json_encode($result->response, JSON_UNESCAPED_SLASHES));
     }else{
         $customer = $result->response;
     }

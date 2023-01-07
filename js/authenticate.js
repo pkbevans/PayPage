@@ -41,8 +41,6 @@ function authenticate(){
                         newRefreshToken = result.data.refreshToken;
                         document.cookie = "accessToken=" + newAccessToken+';expires=;path=/';
                         document.cookie = "refreshToken=" + newRefreshToken+';expires=;path=/';
-                        fullName = result.data.firstName + " " + result.data.lastName;
-                        document.getElementById("username").innerHTML=fullName;
                         document.getElementById("loginSection").style.display="none"
                         document.getElementById("contentSection").style.display="block"
                         console.log("authenticate: New Access Token:"+newAccessToken+":"+newRefreshToken);
@@ -146,7 +144,8 @@ function login(){
             document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
             document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
             fullName = result.data.firstName + " " + result.data.lastName;
-            document.getElementById("username").innerHTML=fullName;
+            document.cookie = "fullName=" + fullName+';expires=;path=/';
+            document.getElementById("userFullName").innerHTML=fullName;
             document.getElementById("loginSection").style.display="none"
             document.getElementById("contentSection").style.display="block"
         })

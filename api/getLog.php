@@ -19,7 +19,7 @@ try {
         $line = fgets($fp);
         // Ignore empty line
         if(!ctype_space($line) && $line != "") {
-            $json .=  ($x==1?"":",") ."\"log". $x."\":". $line;
+            $json .=  ($x==1?"":",") ."\"Msg". $x."\":". $line;
             ++$x;
         }
     }
@@ -27,7 +27,7 @@ try {
     fclose($fp); 
     $logs = new stdClass();
     $logs = json_decode($json);
-    $prettyLog = json_encode($logs, JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR);
+    $prettyLog = json_encode($logs, JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES);
     if(json_last_error()){
         $prettyLog = $json;
     }

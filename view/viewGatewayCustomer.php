@@ -18,7 +18,7 @@
             </div>
             <div class="row">
                 <div class="col-9">
-                    <PRE><?php echo json_encode($customer, JSON_PRETTY_PRINT);?></PRE>
+                    <PRE><?php echo json_encode($customer, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES);?></PRE>
                 </div>
             </div>
         </div>

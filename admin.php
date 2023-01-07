@@ -28,7 +28,7 @@
                         <a class="nav-link" href="index.php">Checkout</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" id="username" href="#" tabindex="-1" aria-disabled="true"></a>
+                            <a class="nav-link disabled" id="userFullName" href="#" tabindex="-1" aria-disabled="true"></a>
                         </li>
                     </ul>
                     </div>
@@ -92,7 +92,10 @@
 
     document.addEventListener("DOMContentLoaded", function (e) {
         authenticate()
-        .then(accessToken=>console.log("Authenticated"))
+        .then(accessToken=>{
+            console.log("Authenticated")
+            document.getElementById("userFullName").innerHTML=getCookie('fullName');
+        })
         .catch(error=>console.log(error));
     });
     function validateForm(){
