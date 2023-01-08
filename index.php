@@ -39,10 +39,10 @@ function getCookie($name){
                         <a class="nav-link" href="#">About</a>
                         </li>
                         <li class="nav-item">
-                        <a class="nav-link" href="admin.php">Admin Portal</a>
+                        <a class="nav-link" href="admin/admin.php">Admin Portal</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" id="username" href="#" tabindex="-1" aria-disabled="true"></a>
+                            <a class="nav-link disabled" id="userFullName" href="#" tabindex="-1" aria-disabled="true"></a>
                         </li>
                     </ul>
                     </div>
@@ -86,8 +86,8 @@ function getCookie($name){
             </div>
         </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-    <script src="js/authenticate.js"></script>
-    <script src="js/authorise.js"></script>
+    <script src="common/js/authenticate.js"></script>
+    <script src="checkout/js/authorise.js"></script>
     <script>
     document.addEventListener("DOMContentLoaded", function (e) {
         authenticate()
@@ -109,7 +109,7 @@ function getCookie($name){
         document.getElementById('checkoutIframe').style.display="block";
         var checkout_form = document.getElementById('checkout_form');
         if(checkout_form){
-            checkout_form.action = "checkout.php"
+            checkout_form.action = "checkout/checkout.php"
             writeOrder();
         }
     }
@@ -128,7 +128,7 @@ function getCookie($name){
         })
     }
     function writeOrderNEW(){
-        return fetch("/payPage/v1/controller/orders.php", {
+        return fetch("/payPage/common/v1/controller/orders.php", {
             headers: {
                     'Content-Type': 'application/json',
                     'Authorization': getCookie("accessToken")
@@ -156,7 +156,7 @@ function getCookie($name){
         .catch(error => console.error("ERROR writing order:"+error))
     }
     function writeOrder(){
-        return fetch("/payPage/db/insertOrder.php", {
+        return fetch("/payPage/common/db/insertOrder.php", {
           method: "post",
           body: JSON.stringify({
             "mrn": document.getElementById('reference_number').value,
