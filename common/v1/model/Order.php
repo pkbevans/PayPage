@@ -12,13 +12,15 @@ class Order {
     private $customerEmail;
     private $status;
     private $datetime;
-public function __construct( $id, $merchantReference, $amount, $refundAmount, $currency, $customerId, $customerEmail, $status, $datetime){
+    private $customerUserId;
+public function __construct( $id, $merchantReference, $amount, $refundAmount, $currency, $customerId, $customerUserId, $customerEmail, $status, $datetime){
     $this->id = $id;
     $this->merchantReference = $merchantReference;
     $this->amount = $amount;
     $this->refundAmount = $refundAmount;
     $this->currency = $currency;
     $this->customerId = $customerId;
+    $this->customerUserId = $customerUserId;
     $this->customerEmail = $customerEmail;
     $this->status = $status;
     $this->datetime = $datetime;
@@ -41,6 +43,9 @@ public function __construct( $id, $merchantReference, $amount, $refundAmount, $c
     }
     public function getCustomerId(){
         return $this->customerId;
+    }
+    public function getCustomerUserId(){
+        return $this->customerUserId;
     }
     public function getCustomerEmail(){
         return $this->customerEmail;
@@ -81,6 +86,9 @@ public function __construct( $id, $merchantReference, $amount, $refundAmount, $c
     public function setCustomerId($customerId){
         $this->customerId = $customerId;
     }
+    public function setCustomerUserId($customerUserId){
+        $this->customerUserId = $customerUserId;
+    }
     public function setCustomerEmail($customerEmail){
         $this->customerEmail = $customerEmail;
     }
@@ -99,6 +107,7 @@ public function __construct( $id, $merchantReference, $amount, $refundAmount, $c
         $Order['refundAmount'] = $this->getRefundAmount();
         $Order['currency'] = $this->getCurrency();
         $Order['customerId'] = $this->getCustomerId();
+        $Order['customerUserId'] = $this->getCustomerUserId();
         $Order['customerEmail'] = $this->getCustomerEmail();
         $Order['status'] = $this->getStatus();
         $Order['datetime'] = $this->getDatetime();

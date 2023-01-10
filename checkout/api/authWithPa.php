@@ -143,7 +143,7 @@ try {
         }else{
             $challengeCode = "01";
         }
-        $returnUrl = "https://" . (strstr($_SERVER['HTTP_HOST'],LOCALHOST_TARGET_ORIGIN)?LOCALHOST_TARGET_ORIGIN:PRODUCTION_TARGET_ORIGIN) . "/payPage/php/utils/redirect.php";
+        $returnUrl = "https://" . (strstr($_SERVER['HTTP_HOST'],LOCALHOST_TARGET_ORIGIN)?LOCALHOST_TARGET_ORIGIN:PRODUCTION_TARGET_ORIGIN) . "/payPage/checkout/php/utils/redirect.php";
         $consumerAuthenticationInformation = [
             "challengeCode"=> $challengeCode,
             "referenceId" => $incoming->referenceID,
@@ -165,9 +165,9 @@ try {
     try{
         // Update DB
         $dbResult=insertPayment2("PAYMENT", $incoming->order, $result);
-        $result->payment = $dbResult;
+        $result->response->payment = $dbResult;
     }catch(Exception $exception){
-        $result->payment = "DB ERROR";
+        $result->response->payment = "DB ERROR";
     }
 
     $json = json_encode($result);

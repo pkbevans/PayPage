@@ -106,7 +106,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <div id="confirmSection" style="display: none">
                 <div class="row" id="storeCardSection" style="display:none">
                     <div class="col-12">
-                        <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" value="1">
+                        <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" onchange="storeCardChanged()" value="1">
                         <label for="storeCard" class="form-check-label">Store these details for future use</label>
                     </div>
                 </div>                
@@ -121,6 +121,44 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                         <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
                     </div>
                 </div>
+            </div>
+            <div id="createAccountSection" style="display: none">
+                <form class="needs-validation" id="registerUserForm" name="" method="" target="" action="" novalidate >
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group form-floating mb-3">
+                                    <input id="firstName" class="form-control" autocomplete="given-name" type="text" name="firstName" value="" required/>
+                                    <label for="firstName" class="form-label">First name</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group form-floating mb-3">
+                                    <input id="lastName" class="form-control" autocomplete="family-name" type="text" name="lastName" value="" required/>
+                                    <label for="lastName" class="form-label">Last name</label>
+                                </div>
+                            </div>
+                        </div>                    
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group form-floating mb-3">
+                                    <input id="customerUserName" class="form-control" autocomplete="username" type="text" name="customerUserName" value="" required/>
+                                    <label for="customerUserName" class="form-label">Username</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group form-floating mb-3">
+                                <input id="customerPassword" class="form-control" type="password" name="customerPassword" value="" required/>
+                                    <label for="customerPassword" class="form-label">Password</label>
+                                </div>
+                            </div>
+                        </div>                    
+                    </div>
+                    <div class="col-12">
+                        <button type="button" class="btn btn-primary" onclick="registerUser()">Create Account</button>
+                        <button type="button" class="btn btn-link" onclick="cancelRegisterUser()">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
         <div class="offcanvas offcanvas-start" tabindex="-1" id="manageDataOffCanvas" aria-labelledby="offcanvasLabel">
@@ -168,6 +206,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script src="js/cardInput.js"></script>
 <script src="js/authorise.js"></script>
+<script src="../common/js/authenticate.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/googlePay.js"></script>
 <script async src="https://pay.google.com/gp/p/js/pay.js"></script>
@@ -182,6 +221,7 @@ let orderDetails = {
     currency: "<?php echo $_REQUEST['currency'];?>",
     shippingAddressRequired: true,
     useShippingAsBilling: true,
+    customerUserId: 0,
     customerId: "<?php echo isset($_REQUEST['customerToken'])?$_REQUEST['customerToken']:"";?>", // TODO
     paymentInstrumentId: "",
     shippingAddressId: "",
@@ -333,7 +373,7 @@ function cancel() {
     window.open('../index.php', '_parent');
 }
 function useSameAddressChanged() {
-    orderDetails.useShippingAsBilling = shipAsBill();
+    orderDetails.useShippingAsBilling = isChecked('useShipAsBill');
     if (orderDetails.useShippingAsBilling) {
         // Hide Billing fields
         document.getElementById('billingForm').style.display = "none";
@@ -341,8 +381,32 @@ function useSameAddressChanged() {
         document.getElementById('billingForm').style.display = "block";
     }
 }
-function shipAsBill(){
-    usb = document.querySelector('#useShipAsBill');
+function storeCardChanged(){
+    if(isChecked('storeCard') && !orderDetails.customerId){
+        // New Customer. Show Register account screen, create user, update OrderDetails. 
+        // Update User record with customerId after sucessfull Auth.
+        // Update Order with CustomerUserId
+        // If they cancel, then dont store cards
+        document.getElementById('customerUserName').value = orderDetails.bill_to.email;
+        document.getElementById('createAccountSection').style.display = "block";
+        document.getElementById('confirmSection').style.display = "none";
+    }else{
+        document.getElementById('createAccountSection').style.display = "none";
+        document.getElementById('confirmSection').style.display = "block";
+    }
+}
+function cancelRegisterUser(){
+    document.getElementById('createAccountSection').style.display = "none";
+    document.getElementById('confirmSection').style.display = "block";
+    document.querySelector('#storeCard').checked = false;
+}   
+function onAccountCreated(customerUserId){
+    document.getElementById("createAccountSection").style.display="none";
+    document.getElementById("confirmSection").style.display="block";
+    orderDetails.customerUserId = customerUserId;
+}
+function isChecked(id){
+    usb = document.querySelector('#'+id);
     if(usb){
         return usb.checked;
     }
@@ -381,7 +445,7 @@ function nextButton(form){
             document.getElementById('addressSection').style.display = "block";
             break;
         case "pay":
-            orderDetails.useShippingAsBilling = shipAsBill();
+            orderDetails.useShippingAsBilling = isChecked('useShipAsBill');
             // Pay Button clicked
             if(!orderDetails.useShippingAsBilling){
                 // Validate billing data form if neccessary

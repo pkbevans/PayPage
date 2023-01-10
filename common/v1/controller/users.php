@@ -82,7 +82,7 @@ try{
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $query = $writeDB->prepare("insert into users (firstName, lastname, userName, email, password) values(:firstName, :lastName, :userName, :email, :password)");
+    $query = $writeDB->prepare('insert into users (firstName, lastname, userName, email, password, customerId, type, admin) values(:firstName, :lastName, :userName, :email, :password, "", "CUSTOMER", "N")');
     $query->bindParam(':firstName', $firstName, PDO::PARAM_STR);
     $query->bindParam(':lastName', $lastName, PDO::PARAM_STR);
     $query->bindParam(':userName', $userName, PDO::PARAM_STR);
@@ -99,7 +99,7 @@ try{
     $lastUserID = $writeDB->lastInsertId();
 
     $returnData = array();
-    $returnData['user_id'] = $lastUserID;
+    $returnData['id'] = $lastUserID;
     $returnData['firstName'] = $firstName;
     $returnData['lastName'] = $lastName;
     $returnData['userName'] = $userName;

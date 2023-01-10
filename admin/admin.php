@@ -91,13 +91,34 @@
     let selectedOrderId=0;
 
     document.addEventListener("DOMContentLoaded", function (e) {
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             console.log("Authenticated")
             document.getElementById("userFullName").innerHTML=getCookie('fullName');
         })
         .catch(error=>console.log(error));
     });
+    function onSuccessfulLogin(result){
+        console.log(result);
+        var t = new Date();
+        t.setSeconds(t.getSeconds() + result.data.accessTokenExpiresIn);
+        document.cookie = "accessTokenExpires=" + t+';expires=;';
+        t = new Date();
+        t.setSeconds(t.getSeconds() + result.data.refreshTokenExpiresIn);
+        document.cookie = "refreshTokenExpires=" + t+';expires=; ';
+        document.cookie = "sessionId=" + result.data.sessionId+';expires=; ';
+        document.cookie = "accessToken=" + result.data.accessToken+';expires=;';
+        document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;';
+        // Special handling for Guest user
+        if(result.data.userName !== "guest"){
+            fullName = result.data.firstName + " " + result.data.lastName;
+            document.cookie = "fullName=" + fullName+';expires=; ';
+            document.cookie = "email=" + result.data.email+';expires=;';
+            document.getElementById("userFullName").innerHTML=fullName;
+        }
+        document.getElementById("loginSection").style.display="none"
+        document.getElementById("contentSection").style.display="block"
+    }
     function validateForm(){
         var form = document.getElementById('findForm');
 
@@ -111,7 +132,7 @@
         }
     }
     function getOrders(page){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             console.log("getOrders: "+accessToken);
             back = "ORDERLIST";
@@ -141,7 +162,7 @@
         .catch(error=>console.log("Authentication error: "+error));
     }
     function getOrder(id){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             console.log("getOrder "+id);
             back = "ORDER";
@@ -167,7 +188,7 @@
         .catch(error=>console.log("Authentication error: "+error));
     }
     function showActionPage(paymentId, action){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             // console.log("showRefundPage: "+paymentId)
             back = "SHOWACTION";
@@ -189,7 +210,7 @@
         })
     }
     function submitAction(action, orderId, requestId, currency, originalAmount, cardNumber){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             back = "SUBMITACTION";
             reason = document.getElementById('reason').value;
@@ -241,7 +262,7 @@
         })
     }
     function showRequest(id){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Request Details";
             return fetch("/payPage/admin/view/viewGatewayRequest.php", {
@@ -265,7 +286,7 @@
         })
     }
     function showShipping(id){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Shipping Details";
             return fetch("/payPage/admin/view/viewShippingAddress.php", {
@@ -289,7 +310,7 @@
         })
     }
     function showCustomer(customerId){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Customer Details";
             return fetch("/payPage/admin/view/viewGatewayCustomer.php", {
@@ -314,7 +335,7 @@
         })
     }
     function showLog(referenceNumber){
-        authenticate()
+        authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Order Logs";
             return fetch("/payPage/admin/view/viewGatewayLog.php", {

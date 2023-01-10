@@ -97,7 +97,7 @@ function loginSession($db){
         $userName = trim($jsonData->userName);
         $password = $jsonData->password;
 
-        $query = $db->prepare("select id, firstName, lastName, userName, email, password, userActive, loginAttempts from users where userName = :userName");
+        $query = $db->prepare("select id, firstName, lastName, userName, email, customerId, password, userActive, loginAttempts from users where userName = :userName");
         $query->bindParam(':userName', $userName, PDO::PARAM_STR);
         $query->execute();
 
@@ -114,6 +114,7 @@ function loginSession($db){
         $returned_lastName = $row['lastName'];
         $returned_userName = $row['userName'];
         $returned_email = $row['email'];
+        $returned_customerId = $row['customerId'];
         $returned_password = $row['password'];
         $returned_userActive = $row['userActive'];
         $returned_loginAttempts = $row['loginAttempts'];
@@ -173,6 +174,9 @@ function loginSession($db){
         $returnData['userName'] = $returned_userName;
         $returnData['firstName'] = $returned_firstName;
         $returnData['lastName'] = $returned_lastName;
+        $returnData['email'] = $returned_email;
+        $returnData['customerId'] = $returned_customerId;
+        $returnData['customerUserId'] = $returned_id;
         $returnData['sessionId'] = intval($lastSessionId);
         $returnData['accessToken'] = $accessToken;
         $returnData['accessTokenExpiresIn'] = $accessTokenExpirySecs;
@@ -265,7 +269,6 @@ function refreshAccessToken($db, $sessionId, $accessToken){
         $returned_refreshToken = $row['refreshToken'];
         $returned_userActive = $row['userActive'];
         $returned_loginAttempts = $row['loginAttempts'];
-        $returned_accessTokenexpiry = $row['accessTokenexpiry'];
         $returned_refreshTokenexpiry = $row['refreshTokenexpiry'];
 
         if ($returned_userActive !== 'Y') {

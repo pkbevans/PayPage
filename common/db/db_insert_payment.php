@@ -49,6 +49,7 @@ function insertPayment2($type, $orderDetails, $request){
     // Only update Order Status for Payments - not Refunds
     if($type == "PAYMENT"){
         $orderSql = "UPDATE orders set " .
+            "customerUserId = " . $orderDetails->customerUserId . "," .
             "customerId = '" . $orderDetails->customerId . "'," .
             "customerEmail = '" . $orderDetails->bill_to->email . "'," .
             "status = '" . $request->response->status . "' " .
@@ -66,6 +67,14 @@ function insertPayment2($type, $orderDetails, $request){
         $result->id=$conn->lastInsertId();
         if($type == "PAYMENT"){
             $conn->exec($orderSql);
+        }
+        // Update User with customerId if new customer token created for Guest user
+        if($type == "PAYMENT" && $request->response->status === "AUTHORIZED" && $orderDetails->storeCard && empty($orderDetails->customerId)){
+            $userSql = "UPDATE users set " .
+                "customerId = '" . $request->response->tokenInformation->customer->id . "' " .
+                "WHERE id = " . $orderDetails->customerUserId;
+                $result->userSql=$userSql;
+                $conn->exec($userSql);
         }
         $result->status="OK";
         unset($conn);

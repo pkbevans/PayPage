@@ -57,7 +57,7 @@ function getCookie($name){
                     <button type="button" class="btn btn-primary" onclick="login()">Log in</button>
                 </form>
             </div>
-            <div id=contentSection>
+            <div id=contentSection style="display: none">
                 <div class="row">
                     <h3>Checkout</h3>
                     <div id="formSection">
@@ -65,9 +65,7 @@ function getCookie($name){
                         <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
                         <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
                         <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
-                        <label for="customer_reference" class="form-label">Merchants Customer Reference</label><input id="customerRef" class="form-control" type="text" name="customerRef" value="" />
-                        <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value="<?php echo getCookie("customerId")?>"/>
-                        <!--<label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>-->
+                        <input id="customerToken" class="form-control" type="hidden" name="customerToken" value=""/>
                         <input id="currency" type="hidden" name="currency" value="GBP"/>
                         <input id="orderId" type="hidden" name="orderId" value=""/>
                         <label for="autoCapture" class="form-label">Auto Capture</label>
@@ -89,11 +87,34 @@ function getCookie($name){
     <script src="common/js/authenticate.js"></script>
     <script src="checkout/js/authorise.js"></script>
     <script>
+        var customerId;
+        var customerUserId;
     document.addEventListener("DOMContentLoaded", function (e) {
-        authenticate()
-        .then(accessToken=>console.log("Authenticated"))
-        .catch(error=>console.log(error));
     });
+    function onSuccessfulLogin(result){
+        console.log(result);
+        var t = new Date();
+        t.setSeconds(t.getSeconds() + result.data.accessTokenExpiresIn);
+        document.cookie = "accessTokenExpires=" + t+';expires=;path=/';
+        t = new Date();
+        t.setSeconds(t.getSeconds() + result.data.refreshTokenExpiresIn);
+        document.cookie = "refreshTokenExpires=" + t+';expires=;path=/';
+        document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
+        document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
+        document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
+        // Special handling for Guest user
+        if(result.data.userName !== "guest"){
+            fullName = result.data.firstName + " " + result.data.lastName;
+            document.cookie = "fullName=" + fullName+';expires=;path=/';
+            document.cookie = "email=" + result.data.email+';expires=;path=/';
+            document.getElementById("userFullName").innerHTML=fullName;
+        }
+        customerId=result.data.customerId;
+        customerUserId=result.data.customerUserId;
+        document.getElementById("customerToken").value=customerId
+        document.getElementById("loginSection").style.display="none"
+        document.getElementById("contentSection").style.display="block"
+    }
     function buyNowClicked(){
         console.log("Buy Now");
         id=document.getElementById('customerToken');
@@ -114,7 +135,7 @@ function getCookie($name){
         }
     }
     function validateForm(){
-        authenticate()
+        authenticate('/')
         .then(accessToken=>{
         var form = document.getElementById('checkout_form');
 
@@ -161,6 +182,7 @@ function getCookie($name){
           body: JSON.stringify({
             "mrn": document.getElementById('reference_number').value,
                 "customerId": document.getElementById('customerToken').value,
+                "customerUserId": customerUserId,
                 "amount": document.getElementById('amount').value,
                 "currency": document.getElementById('currency').value,
                 "email": document.getElementById('email').value

@@ -160,10 +160,6 @@ function onFinish2(apiCalled, status, requestId, newCustomer, paymentInstrumentC
     }
     document.getElementById("resultText").innerHTML = text;
     document.getElementById("resultSection").style.display = "block";
-    if(newCustomer && !orderDetails.paymentInstrumentId !== ""){
-        // Write new Customer Token to cookie
-        document.cookie = "customerId=" + orderDetails.customerId;
-    }
 }
 function successHTML(finish){
     template =

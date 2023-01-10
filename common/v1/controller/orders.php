@@ -234,6 +234,11 @@ elseif (empty($_GET)) {
                 $response->send();
                 exit;
             }
+            if (!isset($jsonData->customerUserId)) {
+                $response = new Response(400, false, "customerUserId not set", null);
+                $response->send();
+                exit;
+            }
             if (!isset($jsonData->customerEmail)) {
                 $response = new Response(400, false, "customerEmail not set", null);
                 $response->send();
@@ -245,17 +250,18 @@ elseif (empty($_GET)) {
                 exit;
             }
             // create new order with data, if non mandatory fields not provided then set to null
-            $newOrder = new Order(null, $jsonData->merchantReference, $jsonData->amount, $jsonData->refundAmount, $jsonData->currency, $jsonData->customerId, $jsonData->customerEmail, $jsonData->status, null);
+            $newOrder = new Order(null, $jsonData->merchantReference, $jsonData->amount, $jsonData->refundAmount, $jsonData->currency, $jsonData->customerId, $jsonData->customerUserId, $jsonData->customerEmail, $jsonData->status, null);
             // get title, description, deadline, filter and store them in variables
 
             // create db query
-            $query = $writeDB->prepare('insert into orders (merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, datetime) ' .
-                'values (:merchantReference, :amount, :refundAmount, :currency, :customerId, :customerEmail, :status, NOW())');
+            $query = $writeDB->prepare('insert into orders (merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, datetime) ' .
+                'values (:merchantReference, :amount, :refundAmount, :currency, :customerId, :customerUserId, :customerEmail, :status, NOW())');
             $query->bindParam(':merchantReference', $jsonData->merchantReference, PDO::PARAM_STR);
             $query->bindParam(':amount', $jsonData->amount, PDO::PARAM_STR);
             $query->bindParam(':refundAmount', $jsonData->refundAmount, PDO::PARAM_STR);
             $query->bindParam(':currency', $jsonData->currency, PDO::PARAM_STR);
             $query->bindParam(':customerId', $jsonData->customerId, PDO::PARAM_STR);
+            $query->bindParam(':customerUserId', $jsonData->customerUserId, PDO::PARAM_STR);
             $query->bindParam(':customerEmail', $jsonData->customerEmail, PDO::PARAM_STR);
             $query->bindParam(':status', $jsonData->status, PDO::PARAM_STR);
             $query->execute();
@@ -274,7 +280,7 @@ elseif (empty($_GET)) {
             // get last order id so we can return the Order in the json
             $lastorderId = $writeDB->lastInsertId();
             // create db query to get newly created order - get from master db not read slave as replication may be too slow for successful read
-            $query = $writeDB->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+            $query = $writeDB->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
             $query->bindParam(':orderId', $lastorderId, PDO::PARAM_INT);
             $query->execute();
 
@@ -294,7 +300,7 @@ elseif (empty($_GET)) {
             // for each row returned - should be just one
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
                 // create new order object
-                $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerEmail'], $row['status'], $row['datetime']);
+                $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
 
                 // create order and store in array for return in json data
                 $orderArray[] = $order->returnOrderAsArray();
@@ -340,7 +346,7 @@ function getOrders($db, $id = null, $filter = null, $page = 0, $rowsPerPage){
     // attempt to query the database
     try {
         // create db query
-        $stmt = 'SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime FROM orders ';
+        $stmt = 'SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime FROM orders ';
         if($id){
             // Get specified order
             $stmt .= 'where id = :id';
@@ -479,7 +485,7 @@ function getOrders($db, $id = null, $filter = null, $page = 0, $rowsPerPage){
         // for each row returned
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             // create new order object for each row
-            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerEmail'], $row['status'], $row['datetime']);
+            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
             // create order and store in array for return in json data
             $orderArray[] = $order->returnOrderAsArray();
             if($id){
@@ -578,11 +584,12 @@ function updateOrder($db, $id){
         // CAN'T UPDATE ID, MRN, AMOUNT, CURRENCY, DATE CREATED
         $refundAmount_updated = false;
         $customerId_updated = false;
+        $customerUserId_updated = false;
         $customerEmail_updated = false;
         $status_updated = false;
         // create blank query fields string to append each field to
         $queryFields = "";
-        //  id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, datetime      
+        //  id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, datetime      
         // check if refundAmount exists in PATCH
         if (isset($jsonData->refundAmount)) {
             // set refundAmount field updated to true
@@ -596,6 +603,13 @@ function updateOrder($db, $id){
             $customerId_updated = true;
             // add customerId field to query field string
             $queryFields .= "customerId = :customerId, ";
+        }
+        // check if customerUserId exists in PATCH
+        if (isset($jsonData->customerUserId)) {
+            // set customerUserId field updated to true
+            $customerUserId_updated = true;
+            // add customerUserId field to query field string
+            $queryFields .= "customerUserId = :customerUserId, ";
         }
         // check if customerEmail exists in PATCH
         if (isset($jsonData->customerEmail)) {
@@ -616,14 +630,14 @@ function updateOrder($db, $id){
         $queryFields = rtrim($queryFields, ", ");
 
         // check if any order fields supplied in JSON
-        if ($refundAmount_updated === false && $customerId_updated === false && $customerEmail_updated === false && $status_updated === false) {
+        if ($refundAmount_updated === false && $customerId_updated === false && $customerUserId_updated === false && $customerEmail_updated === false && $status_updated === false) {
             $response = new Response(400, false, "No order fields provided", null);
             $response->send();
             return;
         }
         // ADD AUTH TO QUERY
         // create db query to get order from database to update - use master db
-        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, custmerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
         $query->execute();
 
@@ -640,7 +654,7 @@ function updateOrder($db, $id){
         // for each row returned - should be just one
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             // create new order object
-            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerEmail'], $row['status'], $row['datetime']);
+            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
         }
         // ADD AUTH TO QUERY
         // create the query string including any query fields
@@ -680,6 +694,16 @@ function updateOrder($db, $id){
             // bind the parameter of the new value from the object to the query (prevents SQL injection)
             $query->bindParam(':customerId', $up_customerId, PDO::PARAM_STR);
         }
+        // if customerUserId has been provided
+        if ($customerUserId_updated === true) {
+            // set order object deadline to given value (checks for valid input)
+            $order->setCustomerUserId($jsonData->customerUserId);
+            // get the value back as the object could be handling the return of the value differently to
+            // what was provided
+            $up_customerUserId = $order->getCustomerUserId();
+            // bind the parameter of the new value from the object to the query (prevents SQL injection)
+            $query->bindParam(':customerUserId', $up_customerUserId, PDO::PARAM_STR);
+        }
 
         // if status has been provided
         if ($status_updated === true) {
@@ -709,7 +733,7 @@ function updateOrder($db, $id){
         }
         // ADD AUTH TO QUERY
         // create db query to return the newly edited order - connect to master database
-        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
         $query->execute();
 
@@ -729,7 +753,7 @@ function updateOrder($db, $id){
         // for each row returned
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             // create new order object for each row returned
-            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerEmail'], $row['status'], $row['datetime']);
+            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
 
             // create order and store in array for return in json data
             $orderArray[] = $order->returnOrderAsArray();

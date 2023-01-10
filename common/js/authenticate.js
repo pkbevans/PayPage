@@ -1,4 +1,4 @@
-function authenticate(){
+function authenticate(path){
     return new Promise(function(resolve, reject) {
         // Check whether we already have an open session
         // Either: 
@@ -32,15 +32,15 @@ function authenticate(){
                         console.log(result);
                         var t = new Date();
                         t.setSeconds(t.getSeconds() + result.data.accessTokenExpiresIn);
-                        document.cookie = "accessTokenExpires=" + t+';expires=;path=/';
+                        document.cookie = "accessTokenExpires=" + t+';expires=;path='+path;
                         t = new Date();
                         t.setSeconds(t.getSeconds() + result.data.refreshTokenExpiresIn);
-                        document.cookie = "refreshTokenExpires=" + t+';expires=;path=/';
-                        document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
+                        document.cookie = "refreshTokenExpires=" + t+';expires=;path='+path;
+                        document.cookie = "sessionId=" + result.data.sessionId+';expires=;path='+path;
                         newAccessToken = result.data.accessToken;
                         newRefreshToken = result.data.refreshToken;
-                        document.cookie = "accessToken=" + newAccessToken+';expires=;path=/';
-                        document.cookie = "refreshToken=" + newRefreshToken+';expires=;path=/';
+                        document.cookie = "accessToken=" + newAccessToken+';expires=;path='+path;
+                        document.cookie = "refreshToken=" + newRefreshToken+';expires=;path='+path;
                         document.getElementById("loginSection").style.display="none"
                         document.getElementById("contentSection").style.display="block"
                         console.log("authenticate: New Access Token:"+newAccessToken+":"+newRefreshToken);
@@ -133,21 +133,46 @@ function login(){
             }
         })
         .then((result)=>{
+            onSuccessfulLogin(result);
+        })
+        .catch(error => {
+            console.log("ERROR: "+error);
+            // TODO - show error to screen
+        })
+    }
+}
+function registerUser(){
+    var form = document.getElementById('registerUserForm');
+
+    if(!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+    }else{
+        return fetch("/payPage/common/v1/controller/users.php", {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "post",
+            body: JSON.stringify({
+                "firstName": document.getElementById('firstName').value,
+                "lastName": document.getElementById('lastName').value,
+                "email": document.getElementById('customerUserName').value,
+                "userName": document.getElementById('customerUserName').value,
+                "password": document.getElementById('customerPassword').value,
+            })
+        })
+        .then((result) => {
             console.log(result);
-            var t = new Date();
-            t.setSeconds(t.getSeconds() + result.data.accessTokenExpiresIn);
-            document.cookie = "accessTokenExpires=" + t+';expires=;path=/';
-            t = new Date();
-            t.setSeconds(t.getSeconds() + result.data.refreshTokenExpiresIn);
-            document.cookie = "refreshTokenExpires=" + t+';expires=;path=/';
-            document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
-            document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
-            document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
-            fullName = result.data.firstName + " " + result.data.lastName;
-            document.cookie = "fullName=" + fullName+';expires=;path=/';
-            document.getElementById("userFullName").innerHTML=fullName;
-            document.getElementById("loginSection").style.display="none"
-            document.getElementById("contentSection").style.display="block"
+            if(result.ok){
+                return result.json()
+            }else{
+                throw "unauthorised"
+            }
+        })
+        .then((json)=>{
+            console.log(json);
+            onAccountCreated(json.data.id)
         })
         .catch(error => {
             console.log("ERROR: "+error);
