@@ -221,8 +221,8 @@ let orderDetails = {
     currency: "<?php echo $_REQUEST['currency'];?>",
     shippingAddressRequired: true,
     useShippingAsBilling: true,
-    customerUserId: 0,  //TODO
-    customerId: "<?php echo isset($_REQUEST['customerToken'])?$_REQUEST['customerToken']:"";?>", // TODO
+    customerUserId: <?php echo isset($_REQUEST['customerUserId'])?$_REQUEST['customerUserId']:0;?>,
+    customerId: "<?php echo isset($_REQUEST['customerToken'])?$_REQUEST['customerToken']:"";?>",
     paymentInstrumentId: "",
     shippingAddressId: "",
     flexToken: "",

@@ -66,6 +66,7 @@ function getCookie($name){
                         <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
                         <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
                         <input id="customerToken" class="form-control" type="hidden" name="customerToken" value=""/>
+                        <input id="customerUserId" class="form-control" type="hidden" name="customerUserId" value=""/>
                         <input id="currency" type="hidden" name="currency" value="GBP"/>
                         <input id="orderId" type="hidden" name="orderId" value=""/>
                         <label for="autoCapture" class="form-label">Auto Capture</label>
@@ -112,6 +113,7 @@ function getCookie($name){
         customerId=result.data.customerId;
         customerUserId=result.data.customerUserId;
         document.getElementById("customerToken").value=customerId
+        document.getElementById("customerUserId").value=customerUserId
         document.getElementById("loginSection").style.display="none"
         document.getElementById("contentSection").style.display="block"
     }

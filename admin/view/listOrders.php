@@ -12,10 +12,11 @@
             <th>Timestamp</th>
             <th>Order Id</th>
             <th>Reference</th>
-            <th>Amount</th>
             <th>Currency</th>
-            <th>Customer</th>
-            <th>Email</th>
+            <th>Amount</th>
+            <th>Customer Email</th>
+            <th>User ID</th>
+            <th>Customer Token</th>
             <th>Status</th>
         </tr></thead>
         <tbody>
@@ -24,10 +25,11 @@
                     <td><?php echo $order->datetime;?></td>
                     <td><?php echo $order->id;?></td>
                     <td><button type="button" class="btn btn-link" onclick="getOrder(<?php echo $order->id;?>)"><?php echo $order->merchantReference;?></button></td>
-                    <td><?php echo $order->amount;?></td>
                     <td><?php echo $order->currency;?></td>
-                    <td><?php echo $order->customerId;?></td>
+                    <td><?php echo $order->amount;?></td>
                     <td><?php echo $order->customerEmail;?></td>
+                    <td><?php echo $order->customerUserId;?></td>
+                    <td><?php echo $order->customerId;?></td>
                     <td><?php echo $order->status;?></td>
                 </tr>
 <?php endforeach; ?>
