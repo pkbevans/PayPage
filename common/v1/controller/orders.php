@@ -637,7 +637,7 @@ function updateOrder($db, $id){
         }
         // ADD AUTH TO QUERY
         // create db query to get order from database to update - use master db
-        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, custmerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
         $query->execute();
 

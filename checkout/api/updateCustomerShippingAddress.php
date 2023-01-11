@@ -1,6 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/addresses.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/addresses.php';
 
 $incoming = json_decode(file_get_contents('php://input'));
 try {

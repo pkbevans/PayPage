@@ -1,8 +1,8 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/cards.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/addresses.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/countries.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/cards.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/addresses.php';
 $count=0;
 $shippingAddresses = new stdClass();
 try {
@@ -31,7 +31,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="/payPage/css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="/payPage/common/css/styles.css"/>
     <title>Manage Addresses</title>
 </head>
 <body>
@@ -276,7 +276,7 @@ function updateAddress(id, setDefaultOnly){
     postalCode = document.getElementById(id+"_postalCode").value;
     country = document.getElementById(id+"_country").value;
 
-    return fetch("/payPage/admin/api/updateCustomerShippingAddress.php", {
+    return fetch("/payPage/checkout/api/updateCustomerShippingAddress.php", {
         method: "post",
         body: JSON.stringify({
             "setDefaultOnly": setDefaultOnly,
@@ -313,7 +313,7 @@ function updateAddress(id, setDefaultOnly){
 // }
 function deleteAddress(id){
     console.log("\nDeleting Shipping Address: "+id);
-    return fetch("/payPage/admin/api/deleteCustomerShippingAddress.php", {
+    return fetch("/payPage/checkout/api/deleteCustomerShippingAddress.php", {
         method: "post",
         body: JSON.stringify({
             "customerId": customerId,
@@ -355,7 +355,7 @@ function addAddress(){
     postalCode = document.getElementById("ship_to_postalCode").value;
     country = document.getElementById("ship_to_country").value;
 
-    return fetch("/payPage/admin/api/addCustomerShippingAddress.php", {
+    return fetch("/payPage/checkout/api/addCustomerShippingAddress.php", {
         method: "post",
         body: JSON.stringify({
             "customerId": customerId,

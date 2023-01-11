@@ -164,7 +164,7 @@ try {
     $result = ProcessRequest(MID, API_PAYMENTS, METHOD_POST, $requestBody, CHILD_MID, AUTH_TYPE_SIGNATURE );
     try{
         // Update DB
-        $dbResult=insertPayment2("PAYMENT", $incoming->order, $result);
+        $dbResult=insertPayment2(($incoming->order->amount>0?"PAYMENT":"ZERO_AUTH"), $incoming->order, $result);
         $result->response->payment = $dbResult;
     }catch(Exception $exception){
         $result->response->payment = "DB ERROR";

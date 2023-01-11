@@ -1,8 +1,8 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/php/utils/cards.php';
-include_once $_SERVER['DOCUMENT_ROOT']. '/payPage/php/utils/addresses.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/countries.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/cards.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/addresses.php';
 $count=0;
 $paymentInstruments = new stdClass();
 try {
@@ -31,7 +31,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="/payPage/css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="/payPage/common/css/styles.css"/>
     <title>Manage Cards</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -308,7 +308,7 @@ foreach ($countries as $key => $value) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
-<script src="/payPage/js/cardInput.js"></script>
+<script src="/payPage/checkout/js/cardInput.js"></script>
 <script>
 var customerId = "<?php echo $_REQUEST['customerId'];?>";
 var errorAlert;
@@ -335,6 +335,7 @@ let orderDetails = {
     shippingAddressRequired: false,
     useShippingAsBilling: false,
     customerId: customerId,
+    customerUserId: 0,  //TODO
     paymentInstrumentId: "",
     shippingAddressId: "",
     flexToken: "",
@@ -391,7 +392,7 @@ function updateCard(id, setDefaultOnly){
     postalCode = document.getElementById(id+"_postalCode").value;
     country = document.getElementById(id+"_country").value;
 
-    return fetch("/payPage/admin/api/updateCustomerPaymentInstrument.php", {
+    return fetch("/payPage/checkout/api/updateCustomerPaymentInstrument.php", {
         method: "post",
         body: JSON.stringify({
             "setDefaultOnly": setDefaultOnly,
@@ -489,7 +490,7 @@ function onAuthError(status, httpCode, reason, message){
 }
 function deleteCard(id){
     console.log("\nDeleting Card: "+id);
-    return fetch("/payPage/admin/api/deleteCustomerPaymentInstrument.php", {
+    return fetch("/payPage/checkout/api/deleteCustomerPaymentInstrument.php", {
         method: "post",
         body: JSON.stringify({
             "customerId": customerId,

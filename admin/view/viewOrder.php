@@ -4,7 +4,7 @@
             <h3>Order Details</h3>
         </div>
     </div>
-    <div class="d-flex ">
+    <div class="d-flex">
         <div class="card">
             <div class="card-body" style="width: 95vw">
     <?php if($order): ?>
@@ -50,7 +50,15 @@
                 </div>
                 <div class="row">
                     <div class="col-3">
-                        <h5>Customer Id:</h5>
+                        <h5>Customer's User ID:</h5>
+                    </div>
+                    <div class="col-9">
+                        <span><?php echo $order->customerUserId;?></span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <h5>Customer Token ID:</h5>
                     </div>
                     <div class="col-9 px-0" >
                         <button type="button" class="btn btn-link" onclick="showCustomer('<?php echo $order->customerId;?>')"><?php echo $order->customerId;?></button>
@@ -67,7 +75,7 @@
             </div>
         </div>
     </div>
-    <div class="d-flex ">
+    <div class="d-flex">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Payments</h5>
@@ -87,7 +95,7 @@
                             <td><button type="button" class="btn btn-link px-0" onclick="showRequest('<?php echo $payment->gatewayRequestId;?>')"><?php echo $payment->gatewayRequestId;?></button></td>
                             <td><button type="button" class="btn btn-link px-0" onclick="showShipping('<?php echo $payment->gatewayRequestId;?>')">Address</button></td>
                             <td><?php echo $payment->datetime;?></td>
-        <?php if($order->status == "AUTHORIZED" && $payment->status == "AUTHORIZED" ): ?>
+        <?php if($order->status == "AUTHORIZED" && $payment->status == "AUTHORIZED" && $payment->type == "PAYMENT" ): ?>
             <?php if($payment->captured == 1):?>
                 <?php if(isDateToday($payment->datetime)):?>
                             <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment->id;?>', 'Void')">Void...</button></td>
@@ -97,7 +105,7 @@
             <?php else:?>
                             <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment->id;?>', 'Reversal')">Reverse...</button></td>
             <?php endif; ?>
-        <?php elseif($order->status == "VOIDED" && $payment->status == "AUTHORIZED" ): ?>
+        <?php elseif($order->status == "VOIDED" && $payment->status == "AUTHORIZED" && $payment->type == "PAYMENT" ): ?>
                             <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment->id;?>', 'Reversal')">Reverse...</button></td>
         <?php endif; ?>
                         </tr>
