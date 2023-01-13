@@ -33,6 +33,12 @@ class Response{
     public function toCache($toCache){
         $this->_toCache = $toCache;
     }
+    public function success(){
+        return $this->_success;
+    }
+    public function getData(){
+        return $this->_data;
+    }
     public function send(){
         header('Content-type: application/json;charset=utf-8');
 

@@ -131,9 +131,8 @@ elseif (array_key_exists("orderId", $_GET)) {
         $response = getPayments($readDB, null, $_GET);
         $response->send();
         exit;
-    }
-    // if any other request method apart from GET is used then return 405 method not allowed
-    else {
+    } else {
+        // if any other request method apart from GET is used then return 405 method not allowed
         $response = new Response(405, false, "Request method not allowed", null);
         $response->send();
         exit;

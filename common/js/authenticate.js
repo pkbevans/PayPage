@@ -106,41 +106,6 @@ function refreshAccessToken(sessionId, accessToken, refreshToken){
     })
 
 }
-function login(){
-    var form = document.getElementById('loginForm');
-
-    if(!form.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-        form.classList.add('was-validated');
-    }else{
-        return fetch("/payPage/common/v1/controller/sessions.php", {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: "post",
-            body: JSON.stringify({
-                "userName": document.getElementById('userName').value,
-                "password": document.getElementById('password').value,
-            })
-        })
-        .then((result) => {
-            console.log(result);
-            if(result.ok){
-                return result.json()
-            }else{
-                throw "unauthorised"
-            }
-        })
-        .then((result)=>{
-            onSuccessfulLogin(result);
-        })
-        .catch(error => {
-            console.log("ERROR: "+error);
-            // TODO - show error to screen
-        })
-    }
-}
 function registerUser(){
     var form = document.getElementById('registerUserForm');
 
@@ -179,4 +144,63 @@ function registerUser(){
             // TODO - show error to screen
         })
     }
+}
+function login(){
+    var form = document.getElementById('loginForm');
+
+    if(!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+    }else{
+        return fetch("/payPage/common/v1/controller/sessions.php", {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "post",
+            body: JSON.stringify({
+                "userName": document.getElementById('userName').value,
+                "password": document.getElementById('password').value,
+            })
+        })
+        .then((result) => {
+            console.log(result);
+            if(result.ok){
+                return result.json()
+            }else{
+                throw "unauthorised"
+            }
+        })
+        .then((result)=>{
+            onSuccessfulLogin(result);
+        })
+        .catch(error => {
+            console.log("ERROR: "+error);
+            // TODO - show error to screen
+        })
+    }
+}
+function logout(){
+    return fetch("/payPage/common/v1/controller/sessions.php?sessionid="+getCookie('sessionId'), {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': getCookie('accessToken')
+        },
+        method: "delete",
+    })
+    .then((result) => {
+        console.log(result);
+        if(result.ok){
+            return result.json()
+        }else{
+            throw "unauthorised"
+        }
+    })
+    .then((result)=>{
+        onSuccessfulLogout(result);
+    })
+    .catch(error => {
+        console.log("ERROR: "+error);
+        // TODO - show error to screen
+    })
 }

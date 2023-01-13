@@ -30,6 +30,9 @@
                         <li class="nav-item">
                             <a class="nav-link disabled" id="userFullName" href="#" tabindex="-1" aria-disabled="true"></a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="logout" href="#" onclick="logout()">Logout</a>
+                        </li>
                     </ul>
                     </div>
                 </div>
@@ -118,6 +121,13 @@
         }
         document.getElementById("loginSection").style.display="none"
         document.getElementById("contentSection").style.display="block"
+        document.getElementById("logout").style.display="block"
+    }
+    function onSuccessfulLogout(){
+        document.getElementById("userFullName").innerHTML='';
+        document.getElementById("logout").style.display="none"
+        document.getElementById("loginSection").style.display="block"
+        document.getElementById("contentSection").style.display="none"
     }
     function validateForm(){
         var form = document.getElementById('findForm');
@@ -190,14 +200,14 @@
     function showActionPage(paymentId, action){
         authenticate('/payPage/admin')
         .then(accessToken=>{
-            // console.log("showRefundPage: "+paymentId)
             back = "SHOWACTION";
             document.getElementById('actionSection').style.display = "block";
-            return fetch("/payPage/admin/view/create"+action+".php", {
+            return fetch("/payPage/admin/db/getPayment.php", {
                 method: "post",
                 body: JSON.stringify({
                     "accessToken" : accessToken,
-                    "paymentId": paymentId
+                    "paymentId": paymentId,
+                    "action": action
                 })
             })
             .then((result) => result.text())
@@ -241,16 +251,13 @@
                 .then(result => result.json())
                 .then(res => {
                     // console.log(res);
-                    if(res.responseCode === 201){
+                    if(res.success){
                         document.getElementById('statusSection').innerHTML = "SUCCESS. The " + action + " has been submitted";
                         // Refresh the specific order details
                         getOrder(orderId);
                         backButton();
                     }else{
-                        $errMessage = "";
-                        if(res.responseCode === 400){
-                            $errMessage = res.response.message;
-                        }
+                        $errMessage = res.messages[0];
                         document.getElementById('statusSection').innerHTML = "ERROR. The "+ action + " could not be submitted: " + $errMessage;
                     }
                     return "OK";

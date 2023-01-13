@@ -1,4 +1,3 @@
-<?php include "../db/getPayment.php"; ?>
 <div class="container">
     <div class="d-flex">
         <div class="card">

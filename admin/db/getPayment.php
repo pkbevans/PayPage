@@ -23,3 +23,4 @@ if($responseCode != 200){
 $order = new stdClass();
 $order = $response->orders[0];
 http_response_code($responseCode);
+include '../view/create' . $incoming->action. '.php';
