@@ -148,7 +148,7 @@
             back = "ORDERLIST";
             document.getElementById('backButton').style.display = "block";
             document.getElementById('ordersSection').style.display = "block";
-            return fetch("/payPage/admin/db/getOrders.php", {
+            return fetch("/payPage/admin/api/getOrders.php", {
                 method: "post",
                 body: JSON.stringify({
                     "page":    page,
@@ -180,7 +180,7 @@
             document.getElementById('ordersSection').style.display = "none";
             document.getElementById('orderSection').style.display = "block";
             // console.log("GOT ID: "+id)
-            return fetch("/payPage/admin/db/getOrder.php", {
+            return fetch("/payPage/admin/api/getOrder.php", {
                 method: "post",
                 body: JSON.stringify({
                     "accessToken" : accessToken,
@@ -202,7 +202,7 @@
         .then(accessToken=>{
             back = "SHOWACTION";
             document.getElementById('actionSection').style.display = "block";
-            return fetch("/payPage/admin/db/getPayment.php", {
+            return fetch("/payPage/admin/api/getPayment.php", {
                 method: "post",
                 body: JSON.stringify({
                     "accessToken" : accessToken,
