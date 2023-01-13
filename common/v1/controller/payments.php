@@ -149,163 +149,26 @@ elseif (empty($_GET)) {
     // else if request is a POST e.g. create payment
     elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // create payment
-        try {
-            // check request's content type header is JSON
-            if ($_SERVER['CONTENT_TYPE'] !== 'application/json') {
-                // set up response for unsuccessful request
-                $response = new Response(400, false, "Content Type header not set to JSON", null);
-                $response->send();
-                exit;
-            }
-            // get POST request body as the POSTed data will be JSON format
-            $rawPostData = file_get_contents('php://input');
-
-            if (!$jsonData = json_decode($rawPostData)) {
-                // set up response for unsuccessful request
-                $response = new Response(400, false, "Request body is not valid JSON", null);
-                $response->send();
-                exit;
-            }
-            // data validation
-            if (!isset($jsonData->orderId)) {
-                $response = new Response(400, false, "orderId not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->type)) {
-                $response = new Response(400, false, "type not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->amount)) {
-                $response = new Response(400, false, "amount not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->currency)) {
-                $response = new Response(400, false, "currency not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->cardNumber)) {
-                $response = new Response(400, false, "cardNumber not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->cardType)) {
-                $response = new Response(400, false, "cardType not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->authCode)) {
-                $response = new Response(400, false, "authCode not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->gatewayRequestId)) {
-                $response = new Response(400, false, "gatewayRequestId not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->status)) {
-                $response = new Response(400, false, "status not set", null);
-                $response->send();
-                exit;
-            }
-            if (!isset($jsonData->captured)) {
-                $response = new Response(400, false, "captured not set", null);
-                $response->send();
-                exit;
-            }
-            // create new payment with data, if non mandatory fields not provided then set to null
-            $newPayment = new Payment(null, $jsonData->orderId, $jsonData->type, $jsonData->amount, $jsonData->currency, $jsonData->cardNumber, $jsonData->cardType, $jsonData->authCode, $jsonData->gatewayRequestId, $jsonData->status,$jsonData->captured, null);
-            // get title, description, deadline, filter and store them in variables
-
-            // ADD AUTH TO QUERY
-            // create db query
-            $query = $writeDB->prepare(
-                'insert into payments (orderId, type, amount, currency, cardNumber, cardType, authCode, gatewayRequestId, status, captured, datetime) ' .
-                            'values (:orderId, :type, :amount, :currency, :cardNumber, :cardType, :authCode, :gatewayRequestId, :status, :captured, NOW())');
-            $query->bindParam(':orderId', $jsonData->orderId, PDO::PARAM_INT);
-            $query->bindParam(':type', $jsonData->type, PDO::PARAM_STR);
-            $query->bindParam(':amount', $jsonData->amount, PDO::PARAM_STR);
-            $query->bindParam(':currency', $jsonData->currency, PDO::PARAM_STR);
-            $query->bindParam(':cardNumber', $jsonData->cardNumber, PDO::PARAM_STR);
-            $query->bindParam(':cardType', $jsonData->cardType, PDO::PARAM_STR);
-            $query->bindParam(':authCode', $jsonData->authCode, PDO::PARAM_STR);
-            $query->bindParam(':gatewayRequestId', $jsonData->gatewayRequestId, PDO::PARAM_STR);
-            $query->bindParam(':status', $jsonData->status, PDO::PARAM_STR);
-            $query->bindParam(':captured', $jsonData->captured, PDO::PARAM_STR);
-            $query->execute();
-
-            // get row count
-            $rowCount = $query->rowCount();
-
-            // check if row was actually inserted, PDO exception should have caught it if not.
-            if ($rowCount === 0) {
-                // set up response for unsuccessful return
-                $response = new Response(500, false, "Failed to create payment", null);
-                $response->send();
-                exit;
-            }
-
-            // get last payment id so we can return the Payment in the json
-            $lastpaymentId = $writeDB->lastInsertId();
-            // ADD AUTH TO QUERY
-            // create db query to get newly created payment - get from master db not read slave as replication may be too slow for successful read
-            $query = $writeDB->prepare('SELECT id, orderId, type, amount, currency, cardNumber, cardType, authCode, gatewayRequestId, status, captured, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from payments where id = :paymentId');
-            $query->bindParam(':paymentId', $lastpaymentId, PDO::PARAM_INT);
-            // $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
-            $query->execute();
-
-            // get row count
-            $rowCount = $query->rowCount();
-            // make sure that the new payment was returned
-            if ($rowCount === 0) {
-                // set up response for unsuccessful return
-                $response = new Response(500, false, "Failed to retrieve payment after creation", null);
-                $response->send();
-                exit;
-            }
-
-            // create empty array to store payments
-            $paymentArray = array();
-
-            // for each row returned - should be just one
-            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
-                // create new payment object
-                $payment = new Payment($row['id'], $row['orderId'], $row['type'], $row['amount'], $row['currency'], $row['cardNumber'], $row['cardType'], $row['authCode'], $row['gatewayRequestId'], $row['status'], $row['captured'], $row['datetime']);
-
-                // create payment and store in array for return in json data
-                $paymentArray[] = $payment->returnPaymentAsArray();
-            }
-            // bundle payments and rows returned into an array to return in the json data
-            $returnData = array();
-            $returnData['rows_returned'] = $rowCount;
-            $returnData['payments'] = $paymentArray;
-
-            //set up response for successful return
-            $response = new Response(201, true, "Payment created", $returnData);
+        // check request's content type header is JSON
+        if ($_SERVER['CONTENT_TYPE'] !== 'application/json') {
+            // set up response for unsuccessful request
+            $response = new Response(400, false, "Content Type header not set to JSON", null);
             $response->send();
             exit;
         }
-        // if payment fails to create due to data types, missing fields or invalid data then send error json
-        catch (PaymentException $ex) {
-            $response = new Response(400, false, $ex->getMessage(), null);
+        // get POST request body as the POSTed data will be JSON format
+        $rawPostData = file_get_contents('php://input');
+
+        if (!$jsonData = json_decode($rawPostData)) {
+            // set up response for unsuccessful request
+            $response = new Response(400, false, "Request body is not valid JSON", null);
             $response->send();
             exit;
         }
-        // if error with sql query return a json error
-        catch (PDOException $ex) {
-            error_log("Database Query Error: " . $ex, 0);
-            $response = new Response(500, false, "Failed to insert payment into database - check submitted data for errors", null);
-            $response->addMessage($ex->getMessage());
-            $response->send();
-            exit;
-        }
-    }
-    // if any other request method apart from GET or POST is used then return 405 method not allowed
-    else {
+        $response = createPayment($writeDB, $jsonData);
+        $response->send();
+    } else {
+        // if any other request method apart from GET or POST is used then return 405 method not allowed
         $response = new Response(405, false, "Request method not allowed", null);
         $response->send();
         exit;
@@ -389,4 +252,129 @@ function getPayments($db, $id = null, $filter = null){
         $response = new Response(500, false, "Failed to get ".($id?'payment':'payments'), null);
         return $response;
     }    
+}
+function createPayment($db, $jsonData){
+    try {
+        // data validation
+        if (!isset($jsonData->orderId)) {
+            $response = new Response(400, false, "orderId not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->type)) {
+            $response = new Response(400, false, "type not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->amount)) {
+            $response = new Response(400, false, "amount not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->currency)) {
+            $response = new Response(400, false, "currency not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->cardNumber)) {
+            $response = new Response(400, false, "cardNumber not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->cardType)) {
+            $response = new Response(400, false, "cardType not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->authCode)) {
+            $response = new Response(400, false, "authCode not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->gatewayRequestId)) {
+            $response = new Response(400, false, "gatewayRequestId not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->status)) {
+            $response = new Response(400, false, "status not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->captured)) {
+            $response = new Response(400, false, "captured not set", null);
+            return $response;
+        }
+        // create new payment with data, if non mandatory fields not provided then set to null
+        $newPayment = new Payment(null, $jsonData->orderId, $jsonData->type, $jsonData->amount, $jsonData->currency, $jsonData->cardNumber, $jsonData->cardType, $jsonData->authCode, $jsonData->gatewayRequestId, $jsonData->status,$jsonData->captured, null);
+        // get title, description, deadline, filter and store them in variables
+
+        // ADD AUTH TO QUERY
+        // create db query
+        $query = $db->prepare(
+            'insert into payments (orderId, type, amount, currency, cardNumber, cardType, authCode, gatewayRequestId, status, captured, datetime) ' .
+                        'values (:orderId, :type, :amount, :currency, :cardNumber, :cardType, :authCode, :gatewayRequestId, :status, :captured, NOW())');
+        $query->bindParam(':orderId', $jsonData->orderId, PDO::PARAM_INT);
+        $query->bindParam(':type', $jsonData->type, PDO::PARAM_STR);
+        $query->bindParam(':amount', $jsonData->amount, PDO::PARAM_STR);
+        $query->bindParam(':currency', $jsonData->currency, PDO::PARAM_STR);
+        $query->bindParam(':cardNumber', $jsonData->cardNumber, PDO::PARAM_STR);
+        $query->bindParam(':cardType', $jsonData->cardType, PDO::PARAM_STR);
+        $query->bindParam(':authCode', $jsonData->authCode, PDO::PARAM_STR);
+        $query->bindParam(':gatewayRequestId', $jsonData->gatewayRequestId, PDO::PARAM_STR);
+        $query->bindParam(':status', $jsonData->status, PDO::PARAM_STR);
+        $query->bindParam(':captured', $jsonData->captured, PDO::PARAM_STR);
+        $query->execute();
+
+        // get row count
+        $rowCount = $query->rowCount();
+
+        // check if row was actually inserted, PDO exception should have caught it if not.
+        if ($rowCount === 0) {
+            // set up response for unsuccessful return
+            $response = new Response(500, false, "Failed to create payment", null);
+            return $response;
+        }
+
+        // get last payment id so we can return the Payment in the json
+        $lastpaymentId = $db->lastInsertId();
+        // ADD AUTH TO QUERY
+        // create db query to get newly created payment - get from master db not read slave as replication may be too slow for successful read
+        $query = $db->prepare('SELECT id, orderId, type, amount, currency, cardNumber, cardType, authCode, gatewayRequestId, status, captured, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from payments where id = :paymentId');
+        $query->bindParam(':paymentId', $lastpaymentId, PDO::PARAM_INT);
+        // $query->bindParam(':userId', $returned_userId, PDO::PARAM_INT);
+        $query->execute();
+
+        // get row count
+        $rowCount = $query->rowCount();
+        // make sure that the new payment was returned
+        if ($rowCount === 0) {
+            // set up response for unsuccessful return
+            $response = new Response(500, false, "Failed to retrieve payment after creation", null);
+            return $response;
+        }
+
+        // create empty array to store payments
+        $paymentArray = array();
+
+        // for each row returned - should be just one
+        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            // create new payment object
+            $payment = new Payment($row['id'], $row['orderId'], $row['type'], $row['amount'], $row['currency'], $row['cardNumber'], $row['cardType'], $row['authCode'], $row['gatewayRequestId'], $row['status'], $row['captured'], $row['datetime']);
+
+            // create payment and store in array for return in json data
+            $paymentArray[] = $payment->returnPaymentAsArray();
+        }
+        // bundle payments and rows returned into an array to return in the json data
+        $returnData = array();
+        $returnData['rows_returned'] = $rowCount;
+        $returnData['payments'] = $paymentArray;
+
+        //set up response for successful return
+        $response = new Response(201, true, "Payment created", $returnData);
+        return $response;
+    }
+    // if payment fails to create due to data types, missing fields or invalid data then send error json
+    catch (PaymentException $ex) {
+        $response = new Response(400, false, $ex->getMessage(), null);
+        return $response;
+    }
+    // if error with sql query return a json error
+    catch (PDOException $ex) {
+        error_log("Database Query Error: " . $ex, 0);
+        $response = new Response(500, false, "Failed to insert payment into database - check submitted data for errors", null);
+        $response->addMessage($ex->getMessage());
+        return $response;
+    }
 }

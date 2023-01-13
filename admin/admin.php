@@ -120,13 +120,18 @@
             document.getElementById("userFullName").innerHTML=fullName;
         }
         document.getElementById("loginSection").style.display="none"
+        document.getElementById("formSection").style.display="block"
         document.getElementById("contentSection").style.display="block"
         document.getElementById("logout").style.display="block"
     }
     function onSuccessfulLogout(){
         document.getElementById("userFullName").innerHTML='';
+        document.getElementById('ordersSection').innerHTML="";
+        document.getElementById('orderDetailSection').innerHTML="";
+
         document.getElementById("logout").style.display="none"
         document.getElementById("loginSection").style.display="block"
+        document.getElementById('backButton').style.display = "none";
         document.getElementById("contentSection").style.display="none"
     }
     function validateForm(){
@@ -370,16 +375,19 @@
         switch (back){
             case "ORDERLIST": // Orders
                 document.getElementById('formSection').style.display="block";
+                document.getElementById('ordersSection').innerHTML="";
                 document.getElementById('ordersSection').style.display="none";
                 document.getElementById('backButton').style.display = "none";
                 break;
             case "ORDER": // Order Detail
                 refresh();
+                document.getElementById('orderDetailSection').innerHTML="";
                 document.getElementById('orderSection').style.display="none";
                 document.getElementById('ordersSection').style.display="block";
                 back="ORDERLIST";
                 break;
             case "SHOWACTION": //  Refund/Reversal Screen
+                document.getElementById('actionSection').innerHTML="";
                 document.getElementById('actionSection').style.display="none";
                 document.getElementById('orderSection').style.display="block";
                 back="ORDER";

@@ -150,7 +150,7 @@ function getCookie($name){
             }
         })
     }
-    function writeOrderNEW(){
+    function writeOrder(){
         return fetch("/payPage/common/v1/controller/orders.php", {
             headers: {
                     'Content-Type': 'application/json',
@@ -159,7 +159,8 @@ function getCookie($name){
             method: "post",
             body: JSON.stringify({
                 "merchantReference": document.getElementById('reference_number').value,
-                "customerId": document.getElementById('customerToken').value,
+                "customerId": customerId,
+                "customerUserId": customerUserId,
                 "amount": document.getElementById('amount').value,
                 "refundAmount": 0,
                 "currency": document.getElementById('currency').value,
@@ -174,27 +175,6 @@ function getCookie($name){
                 checkout_form.submit();
             }else{
                 throw result.statusCode + " : " + result.messages[0];
-            }
-        })
-        .catch(error => console.error("ERROR writing order:"+error))
-    }
-    function writeOrder(){
-        return fetch("/payPage/common/db/insertOrder.php", {
-          method: "post",
-          body: JSON.stringify({
-            "mrn": document.getElementById('reference_number').value,
-                "customerId": document.getElementById('customerToken').value,
-                "customerUserId": customerUserId,
-                "amount": document.getElementById('amount').value,
-                "currency": document.getElementById('currency').value,
-                "email": document.getElementById('email').value
-          })
-        })
-        .then((result) => result.json())
-        .then((result) =>{
-            if(result.status==="OK"){
-                document.getElementById('orderId').value = result.id;
-                checkout_form.submit();
             }
         })
         .catch(error => console.error("ERROR writing order:"+error))
