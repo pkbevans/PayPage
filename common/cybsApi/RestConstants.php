@@ -1,7 +1,7 @@
 <?php
-const KEYS_PATH =  "/ppSecure/";   // Replace with path to the PeRestLibKeys file.
-include_once $_SERVER["DOCUMENT_ROOT"] . KEYS_PATH. "PeRestLibKeys.php";
-// You need a PeRestLibKeys.php file in this format, with REST keys matching the MID value
+const KEYS_PATH =  "/ppSecure/";   // Replace with path to the CybsApiKeys file.
+include_once $_SERVER["DOCUMENT_ROOT"] . KEYS_PATH. "CybsApiKeys.php";
+// You need a CybsApiKeys.php file in this format, with REST keys matching the MID value
 //////////////// DONT FORGET TO UPDATE googlePay.js with MID/CHILD_MID IF YOU CHANGE IT HERE!!!!/////////////////////////
 // const MID = "<<TRANSACTING MID>>";   // Replace with Transacting MID (Or Can be PORTFOLIO or Account-level if using META KEY)
 // const CHILD_MID = "";                // Normally blank (or Transacting MID if using PORTFOLIO or Account-level mid in MID)
