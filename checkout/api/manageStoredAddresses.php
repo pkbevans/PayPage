@@ -3,6 +3,20 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php'
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/addresses.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/model/Response.php';
+
+if(!isset($_COOKIE['accessToken'])|| !isset($_REQUEST['customerId'])){
+    $response = new Response(401, false, "Access denied", null);
+    $response->send();
+    exit;
+}
+$response = checkPermission($_COOKIE['accessToken'], USERTYPE_CUSTOMER, false, $_REQUEST['customerId']);
+if(!$response->success()){
+    $response->send();
+    exit;
+}
+
 $count=0;
 $shippingAddresses = new stdClass();
 try {

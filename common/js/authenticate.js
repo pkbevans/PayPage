@@ -145,7 +145,7 @@ function registerUser(){
         })
     }
 }
-function login(){
+function login(userName, password){
     var form = document.getElementById('loginForm');
 
     if(!form.checkValidity()) {
@@ -159,8 +159,8 @@ function login(){
             },
             method: "post",
             body: JSON.stringify({
-                "userName": document.getElementById('userName').value,
-                "password": document.getElementById('password').value,
+                "userName": userName,
+                "password": password,
             })
         })
         .then((result) => {
@@ -176,7 +176,9 @@ function login(){
         })
         .catch(error => {
             console.log("ERROR: "+error);
-            // TODO - show error to screen
+            // Show error to screen
+            document.getElementById("loginAlert").innerHTML='Login unsuccesful - Please try again';
+            document.getElementById("loginAlert").style.display='block';
         })
     }
 }

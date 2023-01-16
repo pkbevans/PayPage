@@ -4,7 +4,7 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/model/Response.php';
 const USERTYPE_INTERNAL = "INTERNAL";
 const USERTYPE_CUSTOMER = "CUSTOMER";
 
-function checkPermission($accessToken, $requiredType, $adminRequired)
+function checkPermission($accessToken, $requiredType, $adminRequired, $customerId = null)
 {
     // Validate that user has Admin permissions
     try {
@@ -14,7 +14,8 @@ function checkPermission($accessToken, $requiredType, $adminRequired)
             // User is logged in, now check that they have required permission
             $data = $response->getData();
             if (($adminRequired && $data['admin'] !== 'Y') || 
-                    $data['type'] !== $requiredType) {
+                    $data['type'] !== $requiredType ||
+                    (!empty($customerId) && $customerId !== $data['customerId'])) {
                 $response = new Response(405, false, "You are not authorised to perform this action", null);
                 return $response;
             }
@@ -30,7 +31,7 @@ function checkPermission($accessToken, $requiredType, $adminRequired)
 function validateAccessToken($db, $accessToken){
     try {
         // create db query to check access token is equal to the one provided
-        $query = $db->prepare('select userId, accessTokenExpiry, userActive, loginAttempts, type, admin from sessions, users where sessions.userId = users.id and accessToken = :accessToken');
+        $query = $db->prepare('select userId, accessTokenExpiry, userActive, loginAttempts, type, admin, customerId from sessions, users where sessions.userId = users.id and accessToken = :accessToken');
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
         $query->execute();
     
@@ -53,6 +54,7 @@ function validateAccessToken($db, $accessToken){
         $returned_loginAttempts = $row['loginAttempts'];
         $returned_type = $row['type'];
         $returned_admin = $row['admin'];
+        $returned_customerId = $row['customerId'];
     
         // check if account is active
         if ($returned_userActive != 'Y') {
@@ -84,6 +86,7 @@ function validateAccessToken($db, $accessToken){
         $data['loginAttempts'] = $returned_loginAttempts;
         $data['type'] = $returned_type;
         $data['admin'] = $returned_admin;
+        $data['customerId'] = $returned_customerId;
 
         $response = new Response(200, true, "", $data);
         return $response;

@@ -42,8 +42,9 @@
                 <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
                     <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
                     <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
-                    <button type="button" class="btn btn-primary" onclick="login()">Log in</button>
+                    <button type="button" class="btn btn-primary" onclick="logUserIn()">Log in</button>
                 </form>
+                <div id="loginAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
             </div>
             <div id=contentSection>
                 <div id="formSection">
@@ -101,6 +102,9 @@
         })
         .catch(error=>console.log(error));
     });
+    function logUserIn(){
+        login(document.getElementById('userName').value, document.getElementById('password').value)
+    }
     function onSuccessfulLogin(result){
         console.log(result);
         var t = new Date();
@@ -119,6 +123,7 @@
             document.cookie = "email=" + result.data.email+';expires=;';
             document.getElementById("userFullName").innerHTML=fullName;
         }
+        document.getElementById("loginAlert").style.display='none';
         document.getElementById("loginSection").style.display="none"
         document.getElementById("formSection").style.display="block"
         document.getElementById("contentSection").style.display="block"
@@ -334,8 +339,7 @@
                 method: "post",
                 body: JSON.stringify({
                     "accessToken": accessToken,
-                    "customerId": customerId,
-                    "noEcho": true
+                    "customerId": customerId
                 })
             })
             .then((result) => {

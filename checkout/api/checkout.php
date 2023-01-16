@@ -277,11 +277,8 @@ function start(){
 }
 function getCustomer(id){
     console.log("geCustomer: "+id);
-    return fetch("/payPage/checkout/api/getCustomer.php", {
-      method: "post",
-      body: JSON.stringify({
-          "customerId" : id
-      })
+    return fetch("/payPage/checkout/api/getCustomer.php?customerId="+id, {
+      method: "get"
     })
     .then(response =>{
         if (!response.ok) {
@@ -292,7 +289,7 @@ function getCustomer(id){
     .then(res => {
         try{
             // Need to check that customer has a saved card
-            return res._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
+            return res.data._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
         }catch(err){
             throw "No saved cards for customerId: "+id;
         }
