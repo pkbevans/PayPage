@@ -132,7 +132,7 @@ function getCookie($name){
         document.getElementById('checkoutIframe').style.display="block";
         var checkout_form = document.getElementById('checkout_form');
         if(checkout_form){
-            checkout_form.action = "checkout/checkout.php"
+            checkout_form.action = "checkout/api/checkout.php"
             writeOrder();
         }
     }

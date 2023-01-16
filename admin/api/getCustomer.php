@@ -1,6 +1,14 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
+
 $incoming = json_decode(file_get_contents('php://input'));
+$response = checkPermission($incoming->accessToken, USERTYPE_INTERNAL, true);
+if(!$response->success()){
+    $response->send();
+    exit;
+}
+
 $echo=true;
 if(property_exists($incoming, "noEcho")){
     $echo = false;
@@ -15,6 +23,7 @@ if($result->responseCode == 200){
         echo(json_encode($result->response, JSON_UNESCAPED_SLASHES));
     }else{
         $customer = $result->response;
+        include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/admin/view/viewGatewayCustomer.php';
     }
 }else{
     header('HTTP/1.1 ' . $result->responseCode . ' ERROR');

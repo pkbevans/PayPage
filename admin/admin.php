@@ -125,6 +125,7 @@
         document.getElementById("logout").style.display="block"
     }
     function onSuccessfulLogout(){
+        deleteCookies();
         document.getElementById("userFullName").innerHTML='';
         document.getElementById('ordersSection').innerHTML="";
         document.getElementById('orderDetailSection').innerHTML="";
@@ -243,7 +244,7 @@
                 return fetch("/payPage/admin/api/submit" + action + ".php", {
                     method: "post",
                     body: JSON.stringify({
-                        "accessToken": accessToken,
+                        // "accessToken": accessToken,
                         "orderId": orderId,
                         "referenceNumber": reference,
                         "reason": reason,
@@ -277,10 +278,12 @@
         authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Request Details";
-            return fetch("/payPage/admin/view/viewGatewayRequest.php", {
+            return fetch("/payPage/admin/api/getGatewayTxn.php", {
                 method: "post",
                 body: JSON.stringify({
-                    "requestId": id
+                    "accessToken": accessToken,
+                    "requestId": id,
+                    "view": "viewGatewayRequest.php"
                 })
             })
             .then((result) => {
@@ -301,10 +304,12 @@
         authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Shipping Details";
-            return fetch("/payPage/admin/view/viewShippingAddress.php", {
+            return fetch("/payPage/admin/api/getGatewayTxn.php", {
                 method: "post",
                 body: JSON.stringify({
-                    "requestId": id
+                    "accessToken": accessToken,
+                    "requestId": id,
+                    "view": "viewShippingAddress.php"
                 })
             })
             .then((result) => {
@@ -325,9 +330,10 @@
         authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Customer Details";
-            return fetch("/payPage/admin/view/viewGatewayCustomer.php", {
+            return fetch("/payPage/admin/api/getCustomer.php", {
                 method: "post",
                 body: JSON.stringify({
+                    "accessToken": accessToken,
                     "customerId": customerId,
                     "noEcho": true
                 })
@@ -350,9 +356,10 @@
         authenticate('/payPage/admin')
         .then(accessToken=>{
             document.getElementById('requestModalLabel').innerHTML = "Order Logs";
-            return fetch("/payPage/admin/view/viewGatewayLog.php", {
+            return fetch("/payPage/admin/api/getLog.php", {
                 method: "post",
                 body: JSON.stringify({
+                    "accessToken": accessToken,
                     "referenceNumber": referenceNumber
                 })
             })

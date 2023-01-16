@@ -1,7 +1,7 @@
 function setUpPayerAuth(){
     console.log("setUpPayerAuth");
     document.getElementById('authSpinner').style.display = "block";
-    return fetch("api/setupPayerAuth.php", {
+    return fetch("setupPayerAuth.php", {
         method: "post",
         body: JSON.stringify({
             "order" : orderDetails
@@ -55,7 +55,7 @@ window.addEventListener("message", (event) => {
 function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
     console.log("\nAuthorizing +" + paAction + " ...\n");
     let httpCode = 0;
-    return fetch("api/authWithPa.php", {
+    return fetch("authWithPa.php", {
         method: "post",
         body: JSON.stringify({
             "order": orderDetails,

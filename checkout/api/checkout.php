@@ -5,7 +5,7 @@ $defaultEmail="";
 if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     $defaultEmail = $_REQUEST['email'];
 }else if(isset($_REQUEST['customerToken']) && !empty($_REQUEST['customerToken'])) {
-    include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/getDefaultEmail.php';
+    include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
     $defaultEmail = getDefaultEmail($_REQUEST['customerToken']);
 }
 ?>
@@ -195,7 +195,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
             <div id="resultText"></div>
             <div class="row">
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary" onclick="window.open('../index.php', '_parent')">Continue shopping</button>
+                    <button type="button" class="btn btn-primary" onclick="window.open('/payPage/index.php', '_parent')">Continue shopping</button>
                     <button type="button" id="retryButton" class="btn btn-secondary" onclick="retry();">Try again</button>
                 </div>
             </div>
@@ -204,11 +204,11 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
-<script src="js/cardInput.js"></script>
-<script src="js/authorise.js"></script>
-<script src="../common/js/authenticate.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/googlePay.js"></script>
+<script src="../js/cardInput.js"></script>
+<script src="../js/authorise.js"></script>
+<script src="../../common/js/authenticate.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/googlePay.js"></script>
 <script async src="https://pay.google.com/gp/p/js/pay.js"></script>
 
 
@@ -320,7 +320,7 @@ window.onpopstate = function () {
     window.history.go(1);
 };
 function showCards(){
-    return fetch("/payPage/checkout/cardSelection.php", {
+    return fetch("/payPage/checkout/api/cardSelection.php", {
       method: "post",
       body: JSON.stringify({
         "customerId": orderDetails.customerId
@@ -339,9 +339,9 @@ function showManageIframe(type){
     var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
     var iframe = document.getElementById('manageIframe');
     if(type === "ADDRESS"){
-        src = "/payPage/checkout/manageStoredAddresses.php?customerId=" + orderDetails.customerId;
+        src = "/payPage/checkout/api/manageStoredAddresses.php?customerId=" + orderDetails.customerId;
     }else{
-        src = "/payPage/checkout/manageStoredCards.php?customerId=" + orderDetails.customerId
+        src = "/payPage/checkout/api/manageStoredCards.php?customerId=" + orderDetails.customerId
             +"&reference_number="+orderDetails.referenceNumber+
             "&orderId="+orderDetails.orderId+
             "&email="+orderDetails.bill_to.email+
@@ -359,7 +359,7 @@ function onStoredDataUpdated(type, action){
     }
 }
 function showAddresses(){
-    return fetch("/payPage/checkout/addressSelection.php", {
+    return fetch("/payPage/checkout/api/addressSelection.php", {
       method: "post",
       body: JSON.stringify({
         "customerId": orderDetails.customerId
@@ -370,7 +370,7 @@ function showAddresses(){
     .catch((error) => console.log("showAddresses ERROR:"+error))
 }
 function cancel() {
-    window.open('../index.php', '_parent');
+    window.open('/payPage/index.php', '_parent');
 }
 function useSameAddressChanged() {
     orderDetails.useShippingAsBilling = isChecked('useShipAsBill');
@@ -702,13 +702,13 @@ function stylePaymentInstrument(card, number, billTo){
     img = "";
     alt = "";
     if (card.type === "001" || card.type === "visa") {
-        img = "../common/images/Visa.svg";
+        img = "/payPage/common/images/Visa.svg";
         alt = "Visa card logo";
     } else if (card.type === "002" || card.type === "mastercard") {
-        img = "../common/images/Mastercard.svg";
+        img = "/payPage/common/images/Mastercard.svg";
         alt = "Mastercard logo";
     } else {
-        img = "../common/images/Amex.svg";
+        img = "/payPage/common/images/Amex.svg";
         alt = "Amex card logo";
     }
     html =

@@ -2,33 +2,17 @@
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/paymentUtils.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/db.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/ordersFunctions.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/model/Response.php';
 
-$incoming = json_decode(file_get_contents('php://input'));
-
-// Validate that user has Admin permissions
-try {
-    $readDB = DB::connectReadDB();
-    $response = validateAccessToken($readDB, $incoming->accessToken);
-    if($response->success()){
-        $data = $response->getData();
-        if( !($data['admin'] === 'Y' && $data['type'] === "INTERNAL")){
-            $response = new Response(405, false, "You are not authorised to perform this action", null);
-            $response->send();
-            exit;
-        }
-    }else{
-        $response->send();
-        exit;
-    }
-} catch (PDOException $ex) {
-    // log connection error for troubleshooting and return a json error response
-    error_log("Connection Error: " . $ex, 0);
-    $response = new Response(500, false, "Database connection error", null);
+$accessToken = $_COOKIE['accessToken'];
+$response = checkPermission($accessToken, USERTYPE_INTERNAL, true);
+if(!$response->success()){
     $response->send();
     exit;
 }
+
+$incoming = json_decode(file_get_contents('php://input'));
 
 $result = new stdClass();
 try {

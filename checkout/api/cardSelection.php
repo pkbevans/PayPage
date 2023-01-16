@@ -39,7 +39,7 @@ try {
                         Pay with:&nbsp;
                     </div>
                     <div class="col-3">
-                        <img src="../common/images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>">
+                        <img src="/payPage/common/images/<?php echo $cardTypes[$paymentInstrument->card->type]['image']?>" class="img-fluid" alt="<?php echo $cardTypes[$paymentInstrument->card->type]['alt'];?>">
                     </div>
                     <div class="col-6 text-start">
                         <strong><?php echo $paymentInstrument->_embedded->instrumentIdentifier->card->number; ?></strong>
