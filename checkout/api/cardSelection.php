@@ -1,8 +1,8 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/cards.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/addresses.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/addresses.php';
 $count=0;
 $incoming = json_decode(file_get_contents('php://input'));
 $paymentInstruments = new stdClass();

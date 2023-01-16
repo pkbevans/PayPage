@@ -1,7 +1,7 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/logApi.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/php/utils/addresses.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/logApi.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/addresses.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/db.php';
 
 $incoming = json_decode(file_get_contents('php://input'));
@@ -143,7 +143,7 @@ try {
         }else{
             $challengeCode = "01";
         }
-        $returnUrl = "https://" . (strstr($_SERVER['HTTP_HOST'],LOCALHOST_TARGET_ORIGIN)?LOCALHOST_TARGET_ORIGIN:PRODUCTION_TARGET_ORIGIN) . "/payPage/checkout/php/utils/redirect.php";
+        $returnUrl = "https://" . (strstr($_SERVER['HTTP_HOST'],LOCALHOST_TARGET_ORIGIN)?LOCALHOST_TARGET_ORIGIN:PRODUCTION_TARGET_ORIGIN) . "/payPage/checkout/utils/redirect.php";
         $consumerAuthenticationInformation = [
             "challengeCode"=> $challengeCode,
             "referenceId" => $incoming->referenceID,

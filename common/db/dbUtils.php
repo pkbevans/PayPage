@@ -1,5 +1,5 @@
 <?php
-include_once '../../common/PeRestLib/RestConstants.php';
+include_once '../../common/cybsApi/RestConstants.php';
 function fetch($accessToken, $method, $url, $payload){
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);

@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
 ///////////////////////////FUNCTIONS
 /////////////////////////END FUNCTIONS

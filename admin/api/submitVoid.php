@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/PeRestLib/RestRequest.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/paymentUtils.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/db.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
