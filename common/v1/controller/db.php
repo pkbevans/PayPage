@@ -1,5 +1,5 @@
 <?php
-require_once ($_SERVER['DOCUMENT_ROOT'].'/ppSecure/paypage.config.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/ppSecure/payPage.config.php');
 
 class DB {
     private static $writeDBConnection;
