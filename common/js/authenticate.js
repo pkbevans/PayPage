@@ -204,12 +204,12 @@ function logout(){
         // TODO - show error to screen
     })
 }
-function deleteCookies(){
-    document.cookie = "accessTokenExpires=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "refreshTokenExpires=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "fullName=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+function deleteCookies(path){
+    document.cookie = "accessTokenExpires=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path="+path+";";
+    document.cookie = "refreshTokenExpires=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path="+path+";";
+    document.cookie = "sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path="+path+";";
+    document.cookie = "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path="+path+";";
+    document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path="+path+";";
+    document.cookie = "fullName=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path="+path+";";
+    document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path="+path+";";
 }

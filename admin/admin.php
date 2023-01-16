@@ -125,7 +125,7 @@
         document.getElementById("logout").style.display="block"
     }
     function onSuccessfulLogout(){
-        deleteCookies();
+        deleteCookies('/payPage/admin');
         document.getElementById("userFullName").innerHTML='';
         document.getElementById('ordersSection').innerHTML="";
         document.getElementById('orderDetailSection').innerHTML="";

@@ -500,8 +500,12 @@ function backButton(form){
             break;
         case "confirm":
             document.getElementById("storeCardSection").style.display = "none";
-            document.getElementById("paymentDetailsSection").style.display = "block";
             document.getElementById("confirmSection").style.display = "none";
+            document.getElementById("paymentDetailsSection").style.display = "block";
+            if(orderDetails.customerId === ""){
+                document.getElementById("cardSelectionSection").style.display = "block";
+                document.getElementById("summary_billTo").style.display = "none";
+            }
             break;
     }
 }
