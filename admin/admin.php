@@ -178,9 +178,13 @@
             })
             .catch(error => {
                 console.log("ERROR: "+error)
+                document.getElementById('ordersSection').innerHTML = 'ERROR: '+error;
             })
         })
-        .catch(error=>console.log("Authentication error: "+error));
+        .catch(error=>{
+            console.log("Authentication error: "+error)
+            document.getElementById('ordersSection').innerHTML = 'ERROR: '+error
+        });
     }
     function getOrder(id){
         authenticate('/payPage/admin')
