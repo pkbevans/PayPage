@@ -264,9 +264,11 @@ document.addEventListener("DOMContentLoaded", function (e) {
 function start(){
     if(orderDetails.buyNow){
         getCustomer(orderDetails.customerId)
-        .then (pan=>{
-            // TODO - Get name and email for receipt
-            orderDetails.maskedPan = pan;
+        .then (pi=>{
+            // Get name and email for receipt
+            orderDetails.maskedPan = pi._embedded.instrumentIdentifier.card.number;
+            orderDetails.bill_to.firstName = pi.billTo.firstName;
+            orderDetails.bill_to.lastName = pi.billTo.lastName;
             authorise()
         })
         .catch(error => {
@@ -293,7 +295,7 @@ function getCustomer(id){
     .then(res => {
         try{
             // Need to check that customer has a saved card
-            return res.data._embedded.defaultPaymentInstrument._embedded.instrumentIdentifier.card.number;
+            return res.data._embedded.defaultPaymentInstrument;
         }catch(err){
             throw "No saved cards for customerId: "+id;
         }
@@ -603,6 +605,7 @@ function usePaymentInstrument(id){
         orderDetails.maskedPan = pi._embedded.instrumentIdentifier.card.number;
         orderDetails.bill_to.firstName = pi.billTo.firstName;
         orderDetails.bill_to.lastName = pi.billTo.lastName;
+        orderDetails.bill_to.email = pi.billTo.email;
         document.getElementById('billToText').innerHTML = stylePaymentInstrument(pi.card,pi._embedded.instrumentIdentifier.card.number,pi.billTo);
         cardType = pi.card.type;
         document.getElementById("summary_billTo").style.display = "block";
