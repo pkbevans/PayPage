@@ -2,6 +2,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/logApi.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/addresses.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/mail.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/db.php';
 
 $incoming = json_decode(file_get_contents('php://input'));
@@ -177,6 +178,12 @@ try {
             $incoming->order->amount,               // Amount
             $incoming->order->storeCard,            // Token created?
             $json);                                 // Complete request + response
+    // Send confirmation email to customer
+    ob_start();
+    include "../mail/templates/receipt.php";
+    $content = ob_get_contents();
+    ob_end_clean();
+    $result->response->email = sendCustomerMail($incoming->order->bill_to->email, "Thanks for your Order", $content, "");
 
     if($result->responseCode == 201 || $result->responseCode == 202) {
         header('HTTP/1.1 ' . $result->responseCode . ' OK');

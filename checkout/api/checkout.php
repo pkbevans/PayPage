@@ -158,6 +158,9 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                         <button type="button" class="btn btn-primary" onclick="registerUser()">Create Account</button>
                         <button type="button" class="btn btn-link" onclick="cancelRegisterUser()">Cancel</button>
                     </div>
+                    <div class="row">
+                        <div id="registerAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -262,6 +265,7 @@ function start(){
     if(orderDetails.buyNow){
         getCustomer(orderDetails.customerId)
         .then (pan=>{
+            // TODO - Get name and email for receipt
             orderDetails.maskedPan = pan;
             authorise()
         })
@@ -397,10 +401,14 @@ function cancelRegisterUser(){
     document.getElementById('confirmSection').style.display = "block";
     document.querySelector('#storeCard').checked = false;
 }   
-function onAccountCreated(customerUserId){
+function onFailedRegistration(response){
+    document.getElementById("registerAlert").innerHTML=response.messages[0];
+    document.getElementById("registerAlert").style.display='block';
+}
+function onUserRegistered(user){
     document.getElementById("createAccountSection").style.display="none";
     document.getElementById("confirmSection").style.display="block";
-    orderDetails.customerUserId = customerUserId;
+    orderDetails.customerUserId = user.id;
 }
 function isChecked(id){
     usb = document.querySelector('#'+id);
@@ -593,6 +601,8 @@ function usePaymentInstrument(id){
         document.getElementById("useShipAsBill").checked = true;
         pi=JSON.parse(document.getElementById("pi_"+id).value);
         orderDetails.maskedPan = pi._embedded.instrumentIdentifier.card.number;
+        orderDetails.bill_to.firstName = pi.billTo.firstName;
+        orderDetails.bill_to.lastName = pi.billTo.lastName;
         document.getElementById('billToText').innerHTML = stylePaymentInstrument(pi.card,pi._embedded.instrumentIdentifier.card.number,pi.billTo);
         cardType = pi.card.type;
         document.getElementById("summary_billTo").style.display = "block";

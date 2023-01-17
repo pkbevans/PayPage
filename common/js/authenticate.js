@@ -129,19 +129,19 @@ function registerUser(){
         })
         .then((result) => {
             console.log(result);
-            if(result.ok){
-                return result.json()
-            }else{
-                throw "unauthorised"
-            }
+            return result.json()
         })
         .then((json)=>{
             console.log(json);
-            onAccountCreated(json.data.id)
+            if(json.success){
+                onUserRegistered(json.data)
+            }else{
+                onFailedRegistration(json)
+            }
         })
         .catch(error => {
             console.log("ERROR: "+error);
-            // TODO - show error to screen
+            onFailedRegistration(error);
         })
     }
 }
