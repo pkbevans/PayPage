@@ -24,11 +24,9 @@ $keys = [
         'secret_key'=> "<<YOUR REST SECRET KEY>>"
     ]
 ];
-3. Update cybsApi/RestConstants.php:
+4. Update cybsApi/RestConstants.php:
    - Update KEYS_PATH =  "/ppSecure/";          // Replace with path to your CybsApiKeys file.
-   - Update MID = "<<YOUR CYBS MID>>";          // Replace with MID (Can be PORTFOLIO or Account-level)
-   - CHILD_MID = "";                            // Can be left blank
-   - PRODUCTION_TARGET_ORIGIN =  "";            // Replace with Production URL for non-localhost testing
-   - LOCALHOST_TARGET_ORIGIN =  "site.test";    // Replace with your localhost HTTPS alias.  MUST BE HTTPS
+   - Update MID = "<<YOUR CYBS MID>>";          // Replace with your MID
+   - CHILD_MID = "";                            // Leave blank
     
 There is a demo of this code at https://bondevans.com/payPage

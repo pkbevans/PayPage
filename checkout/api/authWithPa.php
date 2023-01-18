@@ -144,7 +144,7 @@ try {
         }else{
             $challengeCode = "01";
         }
-        $returnUrl = "https://" . (strstr($_SERVER['HTTP_HOST'],LOCALHOST_TARGET_ORIGIN)?LOCALHOST_TARGET_ORIGIN:PRODUCTION_TARGET_ORIGIN) . "/payPage/checkout/utils/redirect.php";
+        $returnUrl = "https://" . $_SERVER['HTTP_HOST'] . "/payPage/checkout/utils/redirect.php";
         $consumerAuthenticationInformation = [
             "challengeCode"=> $challengeCode,
             "referenceId" => $incoming->referenceID,

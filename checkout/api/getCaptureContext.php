@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
 $incoming = json_decode(file_get_contents('php://input'));
-$targetOrigin = "https://" . (strstr($_SERVER['HTTP_HOST'],LOCALHOST_TARGET_ORIGIN)?LOCALHOST_TARGET_ORIGIN:PRODUCTION_TARGET_ORIGIN);
+$targetOrigin = "https://" . $_SERVER['HTTP_HOST'];
 
 $request = [
     "targetOrigins" => [$targetOrigin]
