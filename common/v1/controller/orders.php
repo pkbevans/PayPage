@@ -47,6 +47,7 @@ if ($response->success()) {
     $returned_admin = $data['admin'];
 }else{
     $response->send();
+    exit;
 }
 
 // END OF AUTH SCRIPT

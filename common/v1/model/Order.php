@@ -111,6 +111,12 @@ public function __construct( $id, $merchantReference, $amount, $refundAmount, $c
         $Order['customerEmail'] = $this->getCustomerEmail();
         $Order['status'] = $this->getStatus();
         $Order['datetime'] = $this->getDatetime();
+        $Order['hash'] = $this->signOrderData();
         return $Order;
+    }
+    private function signOrderData(){
+        $secretKey = '3c78b516c4d94f15b8a522fd0c22c471c776d53abd1e4feb91b24d1b10cd0545f063f4eb72e34d8ba06236c8eb221974ac8fb2ece8134feea0021d60f992205a379a5737bb6349b6b14bcc4557d4e8130b98569235d24202a5432941332af81bb3de2a7afb7c4d02b6bfb731a2610a6ed59a0b32a8e64a08b5a0c5b46a81915b';
+        $data=$this->id.$this->merchantReference.$this->amount.$this->refundAmount.$this->currency.$this->customerId.$this->customerEmail.$this->status.$this->datetime.$this->customerUserId;
+        return base64_encode(hash_hmac('sha256', $data, $secretKey, true));
     }
 }

@@ -19,9 +19,9 @@ Steps to enable it:
 2. Copy the Key and Secret key that is displayed after sign up
 3. Create a file called CybsApiKeys.php file in this format, with REST key id and secret for your Cybs MID
 $keys = [
-    "<<YOUR CYBS MID>>" => [
-        'key_id' => "<<YOUR REST KEY ID>>",
-        'secret_key'=> "<<YOUR REST SECRET KEY>>"
+    '<<YOUR CYBS MID>>' => [
+        'key_id' => '<<YOUR REST KEY ID>>',
+        'secret_key'=> '<<YOUR REST SECRET KEY>>'
     ]
 ];
 4. Update cybsApi/RestConstants.php:

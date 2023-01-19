@@ -70,6 +70,7 @@ function getCookie($name){
                         <input id="customerUserId" class="form-control" type="hidden" name="customerUserId" value=""/>
                         <input id="currency" type="hidden" name="currency" value="GBP"/>
                         <input id="orderId" type="hidden" name="orderId" value=""/>
+                        <input id="orderHash" type="hidden" name="orderHash" value=""/>
                         <label for="autoCapture" class="form-label">Auto Capture</label>
                         <select id="autoCapture" class="form-select" name="autoCapture">
                             <option value="true" selected>Yes</option>
@@ -177,6 +178,7 @@ function getCookie($name){
         .then((result) =>{
             if(result.success){
                 document.getElementById('orderId').value = result.data.orders[0].id;
+                document.getElementById('orderHash').value = result.data.orders[0].hash;
                 checkout_form.submit();
             }else{
                 throw result.statusCode + " : " + result.messages[0];

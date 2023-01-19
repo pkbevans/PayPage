@@ -1,4 +1,16 @@
 <?php
+// Check that Order ID exists and hasn't been tampered with
+if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
+    include_once 'checkOrder.php';
+    if(!($order = checkOrder($_REQUEST['orderId'], $_REQUEST['orderHash'])))
+    {
+        echo "ERROR - INVALID PARAMETERS";
+        exit;
+    }
+}else{
+    echo "ERROR - PARAMETERS MISSING";
+    exit;
+}
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
 $defaultEmail="";

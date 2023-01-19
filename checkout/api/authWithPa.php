@@ -185,7 +185,7 @@ try {
         include "../mail/templates/receipt.php";
         $content = ob_get_contents();
         ob_end_clean();
-        $result->response->email = sendCustomerMail($incoming->order->bill_to->email, "Thanks for your Order", $content, "");
+        $result->response->email = sendCustomerMail($incoming->order->bill_to->email, "Thanks for your Order", $content, "paypage@bondevans.com");
     }
 
     if($result->responseCode == 201 || $result->responseCode == 202) {
