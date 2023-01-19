@@ -1,4 +1,10 @@
 <?php
+if(!isset($_COOKIE['accessToken'])|| !isset($_REQUEST['customerId'])){
+    $response = new Response(401, false, "Access denied", null);
+    $response->send();
+    exit;
+}
+$accessToken = $_COOKIE['accessToken'];
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
@@ -6,12 +12,7 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/addresses.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/model/Response.php';
 
-if(!isset($_COOKIE['accessToken'])|| !isset($_REQUEST['customerId'])){
-    $response = new Response(401, false, "Access denied", null);
-    $response->send();
-    exit;
-}
-$response = checkPermission($_COOKIE['accessToken'], USERTYPE_CUSTOMER, false, $_REQUEST['customerId']);
+$response = checkPermission($accessToken, USERTYPE_CUSTOMER, false, $_REQUEST['customerId']);
 if(!$response->success()){
     $response->send();
     exit;
@@ -24,7 +25,7 @@ try {
     $api = str_replace('{customerId}', $_REQUEST['customerId'], API_TMS_V2_CUSTOMER_SHIPPING_ADDRESSES);
 
     $result = ProcessRequest(MID, $api , METHOD_GET, "", CHILD_MID, AUTH_TYPE_SIGNATURE );
-//    echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
+    // echo("<BR> BODY<PRE>" .json_encode($result, JSON_PRETTY_PRINT). "</PRE><BR>");
     if($result->responseCode === 200){
         $count = $result->response->count;
         if(isset($result->response->_embedded->shippingAddresses)){

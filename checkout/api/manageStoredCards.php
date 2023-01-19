@@ -1,4 +1,10 @@
 <?php
+if(!isset($_COOKIE['accessToken'])|| !isset($_REQUEST['customerId'])){
+    $response = new Response(401, false, "Access denied", null);
+    $response->send();
+    exit;
+}
+$accessToken = $_COOKIE['accessToken'];
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
@@ -6,12 +12,7 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/addresses.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/model/Response.php';
 
-if(!isset($_COOKIE['accessToken'])|| !isset($_REQUEST['customerId'])){
-    $response = new Response(401, false, "Access denied", null);
-    $response->send();
-    exit;
-}
-$response = checkPermission($_COOKIE['accessToken'], USERTYPE_CUSTOMER, false, $_REQUEST['customerId']);
+$response = checkPermission($accessToken, USERTYPE_CUSTOMER, false, $_REQUEST['customerId']);
 if(!$response->success()){
     $response->send();
     exit;
@@ -40,9 +41,9 @@ try {
 }?>
 <!DOCTYPE html>
 <html lang="en-GB">
-<head   >
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/payPage/common/css/styles.css"/>

@@ -253,7 +253,7 @@
                 return fetch("/payPage/admin/api/submit" + action + ".php", {
                     method: "post",
                     body: JSON.stringify({
-                        // "accessToken": accessToken,
+                        "accessToken": accessToken,
                         "orderId": orderId,
                         "referenceNumber": reference,
                         "reason": reason,

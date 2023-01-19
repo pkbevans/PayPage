@@ -1,15 +1,16 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/model/Response.php';
-
-$incoming = json_decode(file_get_contents('php://input'));
 if(!isset($_COOKIE['accessToken'])|| !isset($_REQUEST['customerId'])){
     $response = new Response(401, false, "Access denied", null);
     $response->send();
     exit;
 }
-$response = checkPermission($_COOKIE['accessToken'], USERTYPE_CUSTOMER, false, $_REQUEST['customerId']);
+$accessToken = $_COOKIE['accessToken'];
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/validation.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/model/Response.php';
+
+// $incoming = json_decode(file_get_contents('php://input'));
+$response = checkPermission($accessToken, USERTYPE_CUSTOMER, false, $_REQUEST['customerId']);
 if(!$response->success()){
     $response->send();
     exit;

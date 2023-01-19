@@ -2,7 +2,7 @@
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/dbUtils.php';
 
 $incoming = json_decode(file_get_contents('php://input'));
-$url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/common/v1/controller/orders.php?orderId=' . $incoming->orderId ;
+$url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/common/v1/controller/orders.php?orderId=' . $incoming->orderId;
 [$responseCode, $response] = fetch($incoming->accessToken, METHOD_GET, $url, null);
 if($responseCode != 200){
     http_response_code($responseCode);
