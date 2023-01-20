@@ -63,12 +63,14 @@ function getCookie($name){
                     <h3>Checkout</h3>
                     <div id="formSection">
                     <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
-                        <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
-                        <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
-                        <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
-                        <input id="customerToken" class="form-control" type="hidden" name="customerToken" value=""/>
-                        <input id="customerUserId" class="form-control" type="hidden" name="customerUserId" value=""/>
-                        <input id="currency" type="hidden" name="currency" value="GBP"/>
+                        <div id="removeInputsB4Submit">
+                            <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
+                            <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
+                            <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
+                            <input id="customerToken" class="form-control" type="hidden" name="customerToken" value=""/>
+                            <input id="customerUserId" class="form-control" type="hidden" name="customerUserId" value=""/>
+                            <input id="currency" type="hidden" name="currency" value="GBP"/>
+                        </div>
                         <input id="orderId" type="hidden" name="orderId" value=""/>
                         <input id="orderHash" type="hidden" name="orderHash" value=""/>
                         <label for="autoCapture" class="form-label">Auto Capture</label>
@@ -179,6 +181,8 @@ function getCookie($name){
             if(result.success){
                 document.getElementById('orderId').value = result.data.orders[0].id;
                 document.getElementById('orderHash').value = result.data.orders[0].hash;
+                // Dont need these inputs 
+                document.getElementById('removeInputsB4Submit').innerHTML="";
                 checkout_form.submit();
             }else{
                 throw result.statusCode + " : " + result.messages[0];

@@ -1,4 +1,7 @@
 <?php
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
+
 // Check that Order ID exists and hasn't been tampered with
 if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
     include_once 'checkOrder.php';
@@ -6,19 +9,16 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
     {
         echo "ERROR - INVALID PARAMETERS";
         exit;
+    }else{
+        $defaultEmail="";
+        if(isset($order['customerId']) && !empty($order['customerId'])) {
+            include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
+            $defaultEmail = getDefaultEmail($order['customerId']);
+        }
     }
 }else{
     echo "ERROR - PARAMETERS MISSING";
     exit;
-}
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
-$defaultEmail="";
-if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
-    $defaultEmail = $_REQUEST['email'];
-}else if(isset($_REQUEST['customerToken']) && !empty($_REQUEST['customerToken'])) {
-    include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
-    $defaultEmail = getDefaultEmail($_REQUEST['customerToken']);
 }
 ?>
 <!doctype html>
@@ -50,7 +50,7 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                                 <h5>Total:</h5>
                             </div>
                             <div class="col-9">
-                                <span><?php echo "£" . $_REQUEST['amount'];?></span>
+                                <span><?php echo "£" . $order['amount'];?></span>
                             </div>
                         </div>
                         <div class="row">
@@ -70,6 +70,11 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
                                             <button id="updateEmailButton" type="button" class="btn btn-primary" onclick="nextButton('email')">Next</button>
                                         </div>
                                     </form>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
@@ -230,14 +235,14 @@ if(isset($_REQUEST['email']) && !empty($_REQUEST['email'])) {
 <script>
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
-    referenceNumber: "<?php echo $_REQUEST['reference_number'];?>",
-    orderId: "<?php echo $_REQUEST['orderId'];?>",
-    amount: "<?php echo $_REQUEST['amount'];?>",
-    currency: "<?php echo $_REQUEST['currency'];?>",
+    referenceNumber: "<?php echo $order['merchantReference'];?>",
+    orderId: "<?php echo $order['id'];?>",
+    amount: "<?php echo $order['amount'];?>",
+    currency: "<?php echo $order['currency'];?>",
     shippingAddressRequired: true,
     useShippingAsBilling: true,
-    customerUserId: <?php echo isset($_REQUEST['customerUserId'])?$_REQUEST['customerUserId']:0;?>,
-    customerId: "<?php echo isset($_REQUEST['customerToken'])?$_REQUEST['customerToken']:"";?>",
+    customerUserId: <?php echo isset($order['customerUserId'])?$order['customerUserId']:0;?>,
+    customerId: "<?php echo isset($order['customerId'])?$order['customerId']:"";?>",
     paymentInstrumentId: "",
     shippingAddressId: "",
     flexToken: "",
