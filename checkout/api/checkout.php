@@ -1,7 +1,8 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
-
+include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/paymentUtils.php';
+$accessToken=$_COOKIE['accessToken'];
 // Check that Order ID exists and hasn't been tampered with
 if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
     include_once 'checkOrder.php';
@@ -10,6 +11,8 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
         echo "ERROR - INVALID PARAMETERS";
         exit;
     }else{
+        // Update order status to INPROGRESS to prevent processing same order twice
+        updateOrder($accessToken, $order['id'], "INPROGRESS");
         $defaultEmail="";
         if(isset($order['customerId']) && !empty($order['customerId'])) {
             include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
