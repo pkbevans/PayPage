@@ -2,6 +2,7 @@
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/paymentUtils.php';
+include_once $_SERVER['DOCUMENT_ROOT'].'/ppSecure/paypage.config.php';
 $accessToken=$_COOKIE['accessToken'];
 // Check that Order ID exists and hasn't been tampered with
 if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
@@ -18,6 +19,23 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
             include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
             $defaultEmail = getDefaultEmail($order['customerId']);
         }
+        $orderItems = [
+            [
+                'productCode' => '10000001',
+                'description' => 'Big Brown Britches',
+                'quantity' => 2,
+                'unitPrice' => 10.99,
+                'totalAmount' => 21.98,
+            ],
+            [
+                'productCode' => '10000010',
+                'description' => 'Frilly Knickers',
+                'quantity' => 1,
+                'unitPrice' => 33.69,
+                'totalAmount' => 33.69,
+            ]
+        ];
+        $sessionId=uniqid("DF", true);
     }
 }else{
     echo "ERROR - PARAMETERS MISSING";
@@ -26,6 +44,8 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
 ?>
 <!doctype html>
 <head>
+    <!-- Device Fingrprinting -->
+    <script type="text/javascript" src="https://h.online-metrix.net/fp/tags.js?org_id=<?php echo $TMOrgId?>&session_id=<?php echo $CybsMid?><?php echo $sessionId?>"></script>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -33,9 +53,11 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/payPage/common/css/styles.css"/>
     <title>Payment Page</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://kit.fontawesome.com/ad8c8c088b.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- Threatmetrix device fingerprinting -->
+    <iframe style="width: 100px;height: 100px;border: 0;position: absolute;top: -5000px;" src="https://h.online-metrix.net/fp/tags?org_id=<?php echo $TMOrgId?>&session_id=<?php echo CHILD_MID?><?php echo $sessionId?>"></iframe>
     <!--Cardinal device data collection code START-->
     <iframe id="cardinal_collection_iframe" name="collectionIframe" height="1" width="1" style="display: none;"></iframe>
     <form id="cardinal_collection_form" method="POST" target="collectionIframe" action="">
@@ -45,63 +67,113 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
     <div class="container d-flex justify-content-center">
         <div id="inputSection" style="display: none">
             <div class="d-flex justify-content-center">
-                <div class="card">
-                    <div class="card-body" style="width: 90vw">
-                        <h5 class="card-title">Your Order</h5>
-                        <div class="row">
-                            <div class="col-3">
-                                <h5>Total:</h5>
-                            </div>
-                            <div class="col-9">
-                                <span><?php echo "£" . $order['amount'];?></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-3">
-                                <h5>Email:</h5>
-                            </div>
-                            <div class="col-9">
-                                <div id="emailText"><?php echo $defaultEmail;?></div>
-                                <div id="emailSection" style="display:<?php echo ($defaultEmail == ''?'block':'none');?>">
-                                    <form id="emailForm" class="needs-validation" novalidate>
-                                        <div class="row">
-                                            <div class="form-group mb-3">
-                                                <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <button id="updateEmailButton" type="button" class="btn btn-primary" onclick="nextButton('email')">Next</button>
-                                        </div>
-                                    </form>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-3 col-lg-1">
+                                        <!-- <h5>Your Order</h5> -->
+                                    </div>
+                                    <div class="col-9 col-lg-3 d-flex justify-content-end">
+                                        <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#orderItems" aria-expanded="false" aria-controls="orderItems">
+                                            Order Details &nbsp;<i class="fa-solid fa-angle-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="collapse" id="orderItems">
                                     <div class="row">
-                                        <div class="col-12">
-                                            <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+                                        <div class="col-2 col-lg-1"><strong>Qty</strong></div>
+                                        <div class="col-4 col-lg-1"><strong>Description</strong></div>
+                                        <div class="col-3 col-lg-1 d-flex justify-content-end"><strong>Unit Price</strong></div>
+                                        <div class="col-3 col-lg-1 d-flex justify-content-end"><strong>Total</strong></div>
+                                    </div>
+                                    <?php foreach($orderItems as $orderItem):?>
+                                    <div class="row">
+                                        <div class="col-2 col-lg-1" >
+                                            <?php echo $orderItem['quantity']?>
+                                        </div>
+                                        <div class="col-4 col-lg-1">
+                                            <?php echo $orderItem['description']?>
+                                        </div>
+                                        <div class="col-3 col-lg-1 d-flex justify-content-end">
+                                            <?php echo "£" . $orderItem['unitPrice'];?>
+                                        </div>
+                                        <div class="col-3 col-lg-1 d-flex justify-content-end">
+                                            <?php echo "£" . ($orderItem['quantity']*$orderItem['unitPrice']);?>
+                                        </div>
+                                    </div>
+                                    <?php endforeach?>
+                                    <BR>
+                                </div>
+                                <div class="row">
+                                    <div class="col-9 col-lg-1">
+                                        <h5>Total:</h5>
+                                    </div>
+                                    <div class="col-3 col-lg-3 d-flex justify-content-end">
+                                        <span><?php echo "£" . $order['amount'];?></span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-9 col-lg-1">
+                                        <h5>Email:</h5>
+                                    </div>
+                                    <div class="col-3 col-lg-3 d-flex justify-content-end">
+                                        <div id="emailText"><?php echo $defaultEmail;?></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-2 col-lg-6">
+                                        <div id="emailSection" style="display:<?php echo ($defaultEmail == ''?'block':'none');?>">
+                                            <form id="emailForm" class="needs-validation" novalidate>
+                                                <div class="row">
+                                                    <div class="form-group mb-3">
+                                                        <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <button id="updateEmailButton" type="button" class="btn btn-primary" onclick="nextButton('email')">Next</button>
+                                                </div>
+                                            </form>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <button type="button" class="btn btn-link" onclick="cancelEmailUpdate()">Cancel</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-3"></div>
-                                <div class="col-2">
-                                    <button id="editEmailButton" type="button" class="btn btn-link p-0" onclick="editEmail()" style="display:<?php echo ($defaultEmail == ''?'none':'block');?>">Edit</button>
+                                <div class="row">
+                                    <div class="col-3"></div>
+                                    <div class="col-2">
+                                        <button id="editEmailButton" type="button" class="btn btn-link p-0" onclick="editEmail()" style="display:<?php echo ($defaultEmail == ''?'none':'block');?>">Edit</button>
+                                    </div>
+                                </div>
+                                <div id="summary_delivery" style="display:none">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-6">
+                                            <hr class="solid">
+                                        </div>    
+                                    </div>    
+                                    <h5>Delivery Address</h5>
+                                    <div id="shipToText" class="card-text small" style="max-height: 999999px;"></div>
+                                    <div class="row" id="storeAddressSection" style="display:none">
+                                        <div class="col-12">
+                                            <input type="checkbox" class="form-check-input" id="storeAddress" name="storeAddress" value="1">
+                                            <label for="storeAddress" class="form-check-label">Store this address for future use</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="summary_billTo" style="display:none">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-6">
+                                            <hr class="solid">
+                                        </div>    
+                                    </div>    
+                                    <h5>Payment Card</h5>
+                                    <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
                                 </div>
                             </div>
-                        </div>
-                        <div id="summary_delivery" style="display:none">
-                            <hr class="solid">
-                            <h5 class="card-title">Delivery Address</h5>
-                            <div id="shipToText" class="card-text small" style="max-height: 999999px;"></div>
-                            <div class="row" id="storeAddressSection" style="display:none">
-                                <div class="col-12">
-                                    <input type="checkbox" class="form-check-input" id="storeAddress" name="storeAddress" value="1">
-                                    <label for="storeAddress" class="form-check-label">Store this address for future use</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="summary_billTo" style="display:none">
-                            <hr class="solid">
-                            <h5 class="card-title">Payment Card</h5>
-                            <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
                         </div>
                     </div>
                 </div>
@@ -162,13 +234,13 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group form-floating mb-3">
-                                    <input id="customerUserName" class="form-control" autocomplete="username" type="text" name="customerUserName" value="" required/>
+                                    <input id="customerUserName" class="form-control" autocomplete="off" type="text" name="customerUserName" value="" required/>
                                     <label for="customerUserName" class="form-label">Username</label>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group form-floating mb-3">
-                                <input id="customerPassword" class="form-control" type="password" name="customerPassword" value="" required/>
+                                <input id="customerPassword" class="form-control" autocomplete="off" type="password" name="customerPassword" value="" required/>
                                     <label for="customerPassword" class="form-label">Password</label>
                                 </div>
                             </div>
@@ -202,7 +274,7 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                 <div class="d-flex justify-content-center">
                     <div class="card">
                         <div class="card-body" style="width: 90vw; max-height: 999999px;">
-                            <h5 class="card-title">Authorising</h5>
+                            <h5>Authorising</h5>
                             <p class="card-text small">We are authorizing your payment. Please be patient.  Please do not press BACK or REFRESH.</p>
                         </div>
                     </div>
@@ -250,6 +322,7 @@ let orderDetails = {
     shippingAddressId: "",
     flexToken: "",
     googlePayToken: "",
+    dfSessionId: "<?php echo $sessionId?>",
     maskedPan: "",
     storeCard: false,
     storeAddress: false,
@@ -457,6 +530,12 @@ function updateEmail(update){
     // document.getElementById('emailForm').style.display = "none";
     document.getElementById('emailSection').style.display = "none";
     document.getElementById('addressSection').style.display = "block";
+}
+function cancelEmailUpdate(){
+    document.getElementById('editEmailButton').style.display = "block";
+    document.getElementById('emailText').style.display = "block";
+    document.getElementById('emailSection').style.display = "none";
+    document.getElementById('editEmailButton').style.display = "block";
 }
 function nextButton(form){
     switch(form){

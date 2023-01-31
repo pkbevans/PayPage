@@ -30,7 +30,7 @@ try {
         <div class="col-12"><h5>Choose your payment method:</h5></div>
     </div>
 <?php if ($count>0): ?>
-    <div class="d-grid gap-2">
+    <div class="d-grid gap-2 col-12 col-lg-4">
     <?php foreach ($paymentInstruments as $paymentInstrument): ?>
             <input type="hidden" id="<?php echo "pi_" . $paymentInstrument->id ;?>" value='<?php echo json_encode($paymentInstrument);?>'>
             <button type="button" class="<?php echo cardExpired($paymentInstrument)?'btn btn-warning':'btn btn-primary';?>" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')">
@@ -57,11 +57,7 @@ try {
             </button>
     <?php endforeach; ?>
         <button type="button" class="btn btn-secondary" onclick="usePaymentInstrument('NEW')">Pay with a new card</button>
-    </div>
-    <div class="row mt-2">
-        <div class="col-12">
-            <div id="googleContainer"></div>
-        </div>
+        <div id="googleContainer"></div>
     </div>
     <div class="row mt-2">
         <div class="col-12">
@@ -75,12 +71,14 @@ try {
 </div>
 <?php endif?>
 <div id="paymentDetailsSection" style="display: <?php echo ($count>0?"none":"block");?>">
-    <div id="cardInputSection" style="width: 90vw">
+    <div id="cardInputSection" style="width: 100vw">
         <div class="d-flex justify-content-center mb-3">
-            <div id="cardInput">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div id="cardInput">
                 <form onsubmit="return false;">
                     <div class="card">
-                        <div class="card-body" style="width: 90vw">
+                        <div class="card-body" style="width: 100vw">
                             <div class="row">
                                 <div id="cardError" class="alert alert-danger alert-dismissible fade show" role="alert" style="display:none">
                                     <strong>Something went wrong. Please try again.</strong>
@@ -134,6 +132,8 @@ try {
                     </div>
                 </form>
             </div>
+                </div>
+            </div>
         </div>
     </div>
     <div id="billingAddressSection">
@@ -145,13 +145,13 @@ try {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_firstName" type="text" class="form-control form-control-sm" value="" tabindex="1" placeholder="First name" maxlength="60" required>
                             <label for="bill_to_firstName" class="form-label">First name*</label>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_lastName" type="text" class="form-control form-control-sm" value="" tabindex="2" placeholder="Last Name" maxlength="60" required>
                             <label for="bill_to_lastName" class="form-label">Last name*</label>
@@ -159,13 +159,13 @@ try {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_address1" type="text" class="form-control form-control-sm" value="" tabindex="3" placeholder="1st line of address" maxlength="60" required>
                             <label for="bill_to_address1" class="form-label">Address line 1*</label>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_address2" type="text" class="form-control form-control-sm" value="" tabindex="4" placeholder="2nd line of address" maxlength="60">
                             <label for="bill_to_address2" class="form-label">Address line 2</label>
@@ -173,13 +173,13 @@ try {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_address2_locality" type="text" class="form-control form-control-sm" value="" tabindex="5" placeholder="City/County" required maxlength="50">
                             <label for="bill_to_address2_locality" class="form-label">City/County*</label>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_administrativeArea" type="text" class="form-control form-control-sm" value="" tabindex="6" placeholder="State" required maxlength="10">
                             <label for="bill_to_administrativeArea" class="form-label">PostCode*</label>
@@ -187,13 +187,13 @@ try {
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <input id="bill_to_postalCode" type="text" class="form-control form-control-sm" value="" tabindex="6" placeholder="Postcode" required maxlength="10">
                             <label for="bill_to_postalCode" class="form-label">PostCode*</label>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-6 col-lg-2">
                         <div class="form-group form-floating mb-3">
                             <select id="bill_to_country" class="form-control form-control-sm" tabindex="7" >
 <?php
@@ -210,7 +210,7 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
         </form>
     </div>
     <div class="col-12">
-        <div class="d-grid gap-2">
+        <div class="d-grid gap-2 col-12 col-lg-4">
             <button type="button" id="payButton" onclick="nextButton('pay')" class="btn btn-primary" disabled="true">Pay</button>
         </div>
     </div>

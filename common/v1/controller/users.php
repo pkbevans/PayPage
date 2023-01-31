@@ -2,6 +2,7 @@
 
 require_once('db.php');
 require_once('../model/Response.php');
+const VERIFICATION_CODE_LENGTH = 78;
 
 try{
     $writeDB = DB::connectWriteDB();
@@ -13,6 +14,19 @@ try{
     exit();
 }
 
+if(isset($_GET['verificationCode'])){
+    if (!isset($_GET['id'])) {
+        $response = new Response(405, false, "Request method not allowed", null);
+        $response->send();
+        exit();
+    }
+    $verificationCode = $_GET['verificationCode'];
+    $id = $_GET['id'];
+
+    $response = verifyUser($writeDB, $id, $verificationCode);
+    $response->send();
+    exit();
+}
 if($_SERVER['REQUEST_METHOD'] !== "POST"){
     // Only allow users to be created
     $response = new Response(405, false, "Request method not allowed", null);
@@ -82,12 +96,16 @@ try{
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-    $query = $writeDB->prepare('insert into users (firstName, lastname, userName, email, password, customerId, type, admin) values(:firstName, :lastName, :userName, :email, :password, "", "CUSTOMER", "N")');
+    // Create unique random Verification code
+    $verificationCode = bin2hex(random_bytes(VERIFICATION_CODE_LENGTH));
+
+    $query = $writeDB->prepare('insert into users (firstName, lastname, userName, email, password, customerId, type, admin, verificationCode) values(:firstName, :lastName, :userName, :email, :password, "", "CUSTOMER", "N", :verificationCode)');
     $query->bindParam(':firstName', $firstName, PDO::PARAM_STR);
     $query->bindParam(':lastName', $lastName, PDO::PARAM_STR);
     $query->bindParam(':userName', $userName, PDO::PARAM_STR);
     $query->bindParam(':email', $email, PDO::PARAM_STR);
     $query->bindParam(':password', $hashed_password, PDO::PARAM_STR);
+    $query->bindParam(':verificationCode', $verificationCode, PDO::PARAM_STR);
     $query->execute();
 
     $rowCount = $query->rowCount();
@@ -105,6 +123,16 @@ try{
     $returnData['userName'] = $userName;
     $returnData['email'] = $email;
 
+    // Send email to new user with verification code link
+    ob_start();
+    include "../../../checkout/mail/templates/newUser.php";
+    $content = ob_get_contents();
+    ob_end_clean();
+    $headers = 'From: noreply@bondevans.com\r\n/';
+    if(!mail($email, "Welcome to PayPage", $content, $headers)) {
+        error_log("Unable to generate welcome email for: ". $lastUserID, " email:". $email);
+    }
+
     $response = new Response(201, true, "User created", $returnData);
     $response->send();
     exit();    
@@ -113,4 +141,34 @@ try{
     $response = new Response(500, false, "Error creating user account - please try again", null);
     $response->send();
     exit();
+}
+function verifyUser($db, $id, $verificationCode){
+    // select users with id and verificationCode
+    try {
+        $query = $db->prepare("select verificationCode, userActive from users where id = :id and verificationCode = :verificationCode");
+        $query->bindParam(':id', $id, PDO::PARAM_INT);
+        $query->bindParam(':verificationCode', $verificationCode, PDO::PARAM_STR);
+        $query->execute();
+
+        $rowCount = $query->rowCount();
+        if ($rowCount !== 1) {
+            return new Response(409, false, "Invalid Verification Code", null);
+        }
+        // if user already active return error
+        $row = $query->fetch(PDO::FETCH_ASSOC);
+        $returnedUserActive = $row['userActive'];
+        if ($returnedUserActive !== 'N') {
+            return new Response(500, false, "User Already active", null);
+        }
+        // Update user  - set userActive = Y
+        $query = $db->prepare("update users set userActive = 'Y' where id = :id");
+        $query->bindParam(':id', $id, PDO::PARAM_INT);
+        $query->execute();
+
+        // Return success
+        return  new Response(200, true, "Thank you - your account is now active", null);
+    }catch(PDOException $ex){
+        error_log("Database query error - ".$ex, 0);
+        return new Response(500, false, "Error verifying user account - please try again", null);
+    }
 }

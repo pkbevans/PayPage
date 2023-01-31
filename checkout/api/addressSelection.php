@@ -27,16 +27,12 @@ try {
 }?>
 <?php if ($count>0): ?>
 <div id="addressButtonSection">
-    <div class="d-grid gap-2">
+    <div class="d-grid gap-2 col-12 col-lg-4">
 <?php foreach ($shippingAddresses as $shippingAddress): ?>
         <input type="hidden" id="<?php echo "sa_" . $shippingAddress->id ;?>" value='<?php echo json_encode($shippingAddress);?>'>
-        <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')">
-            <div class="row">
-                <div class="col-12">
-                    <small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>" style="max-height: 999999px;"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small>
-                </div>
-            </div>
-        </button>
+            <button type="button" class="btn btn-primary" onclick="useShippingAddress('<?php echo $shippingAddress->id;?>')">
+                <small><div id="<?php echo "shippingAddress_". $shippingAddress->id;?>" style="max-height: 999999px;"><?php echo concatinateNameAddress($shippingAddress->shipTo);?></div></small>
+            </button>
 <?php endforeach; ?>
         <button type="button" class="btn btn-secondary" onclick="showNewAddress()">Use a different address</button>
     </div>
@@ -46,13 +42,13 @@ try {
     <form id="newAddressForm" class="needs-validation mt-2" novalidate>
         <div class="form-group">
             <div class="row">
-                <div class="col-6">
+                <div class="col-6 col-lg-2">
                     <div class="form-group form-floating mb-3">
                         <input id="ship_to_firstName" type="text" class="form-control form-control-sm" value="" placeholder="First name" maxlength="60" required>
                         <label for="ship_to_firstName" class="form-label">First name*</label>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-6 col-lg-2">
                     <div class="form-group form-floating mb-3">
                         <input id="ship_to_lastName" type="text" class="form-control form-control-sm" value="" placeholder="Last Name" maxlength="60" required>
                         <label for="ship_to_lastName" class="form-label">Surname*</label>
@@ -60,13 +56,13 @@ try {
                 </div>
             </div>
             <div class="row">
-                <div class="col-6">
+                <div class="col-6 col-lg-2">
                     <div class="form-group form-floating mb-3">
                         <input id="ship_to_address_line1" type="text" class="form-control form-control-sm" value="" placeholder="1st line of address" maxlength="60" required>
                         <label for="ship_to_address_line1" class="form-label">Address line 1*</label>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-6 col-lg-2">
                     <div class="form-group form-floating mb-3">
                         <input id="ship_to_address_line2" type="text" class="form-control form-control-sm" value="" placeholder="2nd line of address" maxlength="60">
                             <label for="ship_to_address_line2" class="form-label">Address line 2</label>
@@ -74,13 +70,13 @@ try {
                 </div>
             </div>
             <div class="row">
-                <div class="col-6">
+                <div class="col-6 col-lg-2">
                     <div class="form-group form-floating mb-3">
                         <input id="ship_to_address_city" type="text" class="form-control form-control-sm" value="" placeholder="City/County" maxlength="50" required>
                         <label for="ship_to_address_city" class="form-label">City/County*</label>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-6 col-lg-2">
                     <div class="form-group form-floating mb-3">
                         <input id="ship_to_postcode" type="text" class="form-control form-control-sm" value="" placeholder="Postcode" maxlength="10" required>
                         <label for="ship_to_postcode" class="form-label">PostCode*</label>
@@ -88,7 +84,7 @@ try {
                 </div>
             </div>
             <div class="row mb-3">
-                <div class="col-12">
+                <div class="col-12 col-lg-4">
                     <div class="form-floating">
                         <select id="ship_to_address_country" class="form-control form-control-sm">
 <?php
@@ -104,7 +100,7 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
         </div>
     </form>
     <div class="row">
-        <div class="d-grid gap-2">
+        <div class="d-grid gap-2 col-12 col-lg-4">
             <button type="button" class="btn btn-primary" onclick="useShippingAddress('NEW')">Next</button>
         </div>
     </div>

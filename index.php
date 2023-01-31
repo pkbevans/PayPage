@@ -60,8 +60,8 @@ function getCookie($name){
             </div>
             <div id=contentSection style="display: none">
                 <div class="row">
-                    <h3>Checkout</h3>
                     <div id="formSection">
+                    <h3>Your Basket</h3>
                     <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
                         <div id="removeInputsB4Submit">
                             <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>

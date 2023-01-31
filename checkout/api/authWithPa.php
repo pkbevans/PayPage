@@ -159,6 +159,12 @@ try {
         $consumerAuthenticationInformation = [];    // empty
     }
     $request->consumerAuthenticationInformation = $consumerAuthenticationInformation;
+    // Add device Finger Printing sessionId if supplied
+    if(!empty($incoming->order->dfSessionId)){
+        $request->deviceInformation = [
+            "fingerprintSessionId" => $incoming->order->dfSessionId
+        ];
+    }
 
     $requestBody = json_encode($request);
 
