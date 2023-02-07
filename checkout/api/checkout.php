@@ -125,23 +125,25 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 d-flex">
+                                <div class="col-8">
                                     <b><div id="emailText"><?php echo $defaultEmail;?></div></b>
                                 </div>
-                                <div class="col-6">
-                                    <button id="editEmailButton" type="button" class="btn btn-link"  onclick="editEmail()" style="display: <?php echo  ($defaultEmail == '' ? 'none':'block');?>">Edit</button>
+                                <div class="col-4 d-flex justify-content-end">
+                                    <button id="editEmailButton" type="button" class="btn btn-link" onclick="editEmail()" style="display: <?php echo  ($defaultEmail == '' ? 'none':'block');?>">Edit</button>
                                 </div>
                             </div>
                             <div class="row">
                                 <div id="emailSection" style="display: <?php echo ($defaultEmail === '' ? 'block':'none');?>" >
                                     <form id="emailForm" class="needs-validation" novalidate>
-                                        <div class="col-6 col-lg-6">
+                                    <div class="row">
+                                        <div class="col-8 form-group form-floating">
                                             <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
                                         </div>
-                                        <div class="col-6 col-lg-6">
-                                            <button id="updateEmailButton" type="button" class="btn btn-link" onclick="nextButton('email')">Next</button>
+                                        <div class="col-4 d-flex justify-content-end form-group form-floating">
+                                            <button id="updateEmailButton" type="button" class="btn btn-link" onclick="nextButton('email')" style="display: <?php echo ($defaultEmail === '' ? 'block':'none');?>">Next</button>
                                         </div>
                                     </form>
+                               </div>
                                </div>
                             </div>
                             <div id="summary_delivery" style="display:none">
