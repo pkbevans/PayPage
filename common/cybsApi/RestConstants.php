@@ -19,7 +19,8 @@ const LOCALHOST_TARGET_ORIGIN =  "site.test";   // Replace with your localhost H
 // Endpoints
 const REQUEST_HOST =  "apitest.cybersource.com";  // CYBS TEST endpoint
 //const REQUEST_HOST = "api.cybersource.com";  // CYBS PRODUCTION endpoint
-
+const PUBLIC_KEYS_URL = "https://testflex.cybersource.com/flex/v2/public-keys/";
+const CACHE_LOCATION = "/payPage/cache/";
 // APIs
 const API_PAYMENTS = "/pts/v2/payments";
 const API_TMS_PAYMENT_INSTRUMENTS = "/tms/v1/paymentinstruments";

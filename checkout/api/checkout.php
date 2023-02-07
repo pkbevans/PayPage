@@ -45,7 +45,7 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
 <!doctype html>
 <head>
     <!-- Device Fingrprinting -->
-    <script type="text/javascript" src="https://h.online-metrix.net/fp/tags.js?org_id=<?php echo $TMOrgId?>&session_id=<?php echo $CybsMid?><?php echo $sessionId?>"></script>
+    <script type="text/javascript" src="https://h.online-metrix.net/fp/tags.js?org_id=<?php echo $TMOrgId?>&session_id=<?php echo CHILD_MID?><?php echo $sessionId?>"></script>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -64,153 +64,166 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
         <input id="cardinal_collection_form_input" type="hidden" name="JWT" value=""/>
     </form>
     </<!--Cardinal device data collection code END-->
-    <div class="container d-flex justify-content-center">
+    <div class="container">
         <div id="inputSection" style="display: none">
-            <div class="d-flex justify-content-center">
-                <div class="row">
-                    <div class="col-12 col-lg-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-3 col-lg-1">
-                                        <!-- <h5>Your Order</h5> -->
-                                    </div>
-                                    <div class="col-9 col-lg-3 d-flex justify-content-end">
-                                        <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#orderItems" aria-expanded="false" aria-controls="orderItems">
-                                            Order Details &nbsp;<i class="fa-solid fa-angle-down"></i>
-                                        </button>
-                                    </div>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-3 col-lg-3">
+                                    <!-- <h5>Your Order</h5> -->
                                 </div>
-                                <div class="collapse" id="orderItems">
-                                    <div class="row">
-                                        <div class="col-2 col-lg-1"><strong>Qty</strong></div>
-                                        <div class="col-4 col-lg-1"><strong>Description</strong></div>
-                                        <div class="col-3 col-lg-1 d-flex justify-content-end"><strong>Unit Price</strong></div>
-                                        <div class="col-3 col-lg-1 d-flex justify-content-end"><strong>Total</strong></div>
-                                    </div>
-                                    <?php foreach($orderItems as $orderItem):?>
-                                    <div class="row">
-                                        <div class="col-2 col-lg-1" >
-                                            <?php echo $orderItem['quantity']?>
-                                        </div>
-                                        <div class="col-4 col-lg-1">
-                                            <?php echo $orderItem['description']?>
-                                        </div>
-                                        <div class="col-3 col-lg-1 d-flex justify-content-end">
-                                            <?php echo "£" . $orderItem['unitPrice'];?>
-                                        </div>
-                                        <div class="col-3 col-lg-1 d-flex justify-content-end">
-                                            <?php echo "£" . ($orderItem['quantity']*$orderItem['unitPrice']);?>
-                                        </div>
-                                    </div>
-                                    <?php endforeach?>
-                                    <BR>
+                                <div class="col-9 col-lg-9 d-flex justify-content-end">
+                                    <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#orderItems" aria-expanded="false" aria-controls="orderItems">
+                                        Order Details &nbsp;<i class="fa-solid fa-angle-down"></i>
+                                    </button>
                                 </div>
+                            </div>
+                            <div class="collapse" id="orderItems">
                                 <div class="row">
-                                    <div class="col-9 col-lg-1">
-                                        <h5>Total:</h5>
+                                    <div class="col-2 col-lg-3"><strong>Qty</strong></div>
+                                    <div class="col-4 col-lg-3"><strong>Description</strong></div>
+                                    <div class="col-3 col-lg-3 d-flex justify-content-end"><strong>Unit Price</strong></div>
+                                    <div class="col-3 col-lg-3 d-flex justify-content-end"><strong>Total</strong></div>
+                                </div>
+                                <?php foreach($orderItems as $orderItem):?>
+                                <div class="row">
+                                    <div class="col-2 col-lg-3" >
+                                        <?php echo $orderItem['quantity']?>
+                                    </div>
+                                    <div class="col-4 col-lg-3">
+                                        <?php echo $orderItem['description']?>
                                     </div>
                                     <div class="col-3 col-lg-3 d-flex justify-content-end">
-                                        <span><?php echo "£" . $order['amount'];?></span>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-9 col-lg-1">
-                                        <h5>Email:</h5>
+                                        <?php echo "£" . $orderItem['unitPrice'];?>
                                     </div>
                                     <div class="col-3 col-lg-3 d-flex justify-content-end">
-                                        <div id="emailText"><?php echo $defaultEmail;?></div>
+                                        <?php echo "£" . ($orderItem['quantity']*$orderItem['unitPrice']);?>
                                     </div>
                                 </div>
+                                <?php endforeach?>
+                                <BR>
+                            </div>
+                            <div class="row">
+                                <div class="col-9 col-lg-3">
+                                    <h5>Total:</h5>
+                                </div>
+                                <div class="col-3 col-lg-9 d-flex justify-content-end">
+                                    <span><?php echo "£" . $order['amount'];?></span>
+                                </div>
+                            </div>
+                            <!-- <div class="row"> -->
+                            <div class="row">
+                                <div class="col-12 col-lg-12">
+                                    <hr class="solid">
+                                </div>    
+                            </div>    
+                            <div class="row">
+                                <div class="col-9 col-lg-2">
+                                    <h5>Email</h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 d-flex">
+                                    <b><div id="emailText"><?php echo $defaultEmail;?></div></b>
+                                </div>
+                                <div class="col-6">
+                                    <button id="editEmailButton" type="button" class="btn btn-link"  onclick="editEmail()" style="display: <?php echo  ($defaultEmail == '' ? 'none':'block');?>">Edit</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="emailSection" style="display: <?php echo ($defaultEmail === '' ? 'block':'none');?>" >
+                                    <form id="emailForm" class="needs-validation" novalidate>
+                                        <div class="col-6 col-lg-6">
+                                            <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
+                                        </div>
+                                        <div class="col-6 col-lg-6">
+                                            <button id="updateEmailButton" type="button" class="btn btn-link" onclick="nextButton('email')">Next</button>
+                                        </div>
+                                    </form>
+                               </div>
+                            </div>
+                            <div id="summary_delivery" style="display:none">
                                 <div class="row">
-                                    <div class="col-2 col-lg-6">
-                                        <div id="emailSection" style="display:<?php echo ($defaultEmail == ''?'block':'none');?>">
-                                            <form id="emailForm" class="needs-validation" novalidate>
-                                                <div class="row">
-                                                    <div class="form-group mb-3">
-                                                        <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <button id="updateEmailButton" type="button" class="btn btn-primary" onclick="nextButton('email')">Next</button>
-                                                </div>
-                                            </form>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <button type="button" class="btn btn-link" onclick="cancelEmailUpdate()">Cancel</button>
-                                                </div>
+                                    <div class="col-12 col-lg-12">
+                                        <hr class="solid">
+                                    </div>    
+                                </div>    
+                                <h5>Delivery Address</h5>
+                                <div id="shipToText" class="card-text small" style="max-height: 999999px;"></div>
+                                <div class="row" id="storeAddressSection" style="display:none">
+                                    <div class="col-12">
+                                        <input type="checkbox" class="form-check-input" id="storeAddress" name="storeAddress" value="1">
+                                        <label for="storeAddress" class="form-check-label">Store this address for future use</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="summary_billTo" style="display:none">
+                                <div class="row">
+                                    <div class="col-12 col-lg-12">
+                                        <hr class="solid">
+                                    </div>    
+                                </div>    
+                                <h5>Payment Card</h5>
+                                <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="addressSection" style="display:<?php echo ($defaultEmail == ''?'none':'block');?>">
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div >
+                                <BR>
+                                <div class="row">
+                                    <div class="col-12"><h5>Tell us where to deliver your stuff:</h5></div>
+                                </div>
+                                <div class="row">
+                                    <div id="addressSelection">
+                                        <div class="row">
+                                            <div class="d-flex justify-content-center">
+                                                <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-3"></div>
-                                    <div class="col-2">
-                                        <button id="editEmailButton" type="button" class="btn btn-link p-0" onclick="editEmail()" style="display:<?php echo ($defaultEmail == ''?'none':'block');?>">Edit</button>
-                                    </div>
-                                </div>
-                                <div id="summary_delivery" style="display:none">
-                                    <div class="row">
-                                        <div class="col-12 col-lg-6">
-                                            <hr class="solid">
-                                        </div>    
-                                    </div>    
-                                    <h5>Delivery Address</h5>
-                                    <div id="shipToText" class="card-text small" style="max-height: 999999px;"></div>
-                                    <div class="row" id="storeAddressSection" style="display:none">
-                                        <div class="col-12">
-                                            <input type="checkbox" class="form-check-input" id="storeAddress" name="storeAddress" value="1">
-                                            <label for="storeAddress" class="form-check-label">Store this address for future use</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="summary_billTo" style="display:none">
-                                    <div class="row">
-                                        <div class="col-12 col-lg-6">
-                                            <hr class="solid">
-                                        </div>    
-                                    </div>    
-                                    <h5>Payment Card</h5>
-                                    <p id="billToText" class="card-text small" style="max-height: 999999px;"></p>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="addressSection" style="display:<?php echo ($defaultEmail == ''?'none':'block');?>">
-                <BR>
-                <div class="row">
-                    <div class="col-12"><h5>Tell us where to deliver your stuff:</h5></div>
+            <div class="row" id="paymentSection" style="display:none">
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="paymentSelection"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="row">
-                    <div id="addressSelection">
+            </div>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div id="confirmSection" style="display: none">
+                        <div class="row" id="storeCardSection" style="display:none">
+                            <div class="col-12">
+                                <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" onchange="storeCardChanged()" value="1">
+                                <label for="storeCard" class="form-check-label">Store these details for future use</label>
+                            </div>
+                        </div>                
                         <div class="row">
-                            <div class="d-flex justify-content-center">
-                                <div id="mainSpinner" class="spinner-border" style="display: block;"></div>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div id="paymentSection" style="display:none">
-            </div>
-            <div id="confirmSection" style="display: none">
-                <div class="row" id="storeCardSection" style="display:none">
-                    <div class="col-12">
-                        <input type="checkbox" class="form-check-input" id="storeCard" name="storeCard" onchange="storeCardChanged()" value="1">
-                        <label for="storeCard" class="form-check-label">Store these details for future use</label>
-                    </div>
-                </div>                
-                <div class="row">
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-primary" onclick="nextButton('confirm')">Confirm</button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <button type="button" class="btn btn-link" onclick="backButton('confirm')">Back</button>
-                        <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-link" onclick="backButton('confirm')">Back</button>
+                                <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -265,33 +278,41 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                 <iframe id="manageIframe" name="manageIframe" src="" class="responsive-iframe" style="overflow: hidden; display: block; border:none; height:100vh; width:100%" ></iframe>
             </div>
         </div>
-        <div id="authSection" style="display: none;">
-            <div class="d-flex justify-content-center">
-                <div id="authSpinner" class="spinner-border"></div>
-            </div>
-            <BR>
-            <div id="authMessage" class="align-self-center">
-                <div class="d-flex justify-content-center">
-                    <div class="card">
-                        <div class="card-body" style="width: 90vw; max-height: 999999px;">
-                            <h5>Authorising</h5>
-                            <p class="card-text small">We are authorizing your payment. Please be patient.  Please do not press BACK or REFRESH.</p>
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                <div id="authSection" style="display: none;">
+                    <div class="d-flex justify-content-center">
+                        <div id="authSpinner" class="spinner-border"></div>
+                    </div>
+                    <BR>
+                    <div id="authMessage" class="align-self-center">
+                        <div class="d-flex justify-content-center">
+                            <div class="card">
+                                <div class="card-body" style="width: 90vw; max-height: 999999px;">
+                                    <h5>Authorising</h5>
+                                    <p class="card-text small">We are authorizing your payment. Please be patient.<br><br>Please do not press BACK or REFRESH.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <iframe id="step_up_iframe" style="overflow: hidden; display: none; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
+                    <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
+                        <input id="step_up_form_jwt_input" type="hidden" name="JWT" value=""/>
+                        <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
+                    </form>
                 </div>
             </div>
-            <iframe id="step_up_iframe" style="overflow: hidden; display: none; border:none; height:100vh; width:100%" name="stepUpIframe" ></iframe>
-            <form id="step_up_form" name="stepup" method="POST" target="stepUpIframe" action="">
-                <input id="step_up_form_jwt_input" type="hidden" name="JWT" value=""/>
-                <input id="MD" type="hidden" name="MD" value="HELLO MUM. GET THE KETTLE ON"/>
-            </form>
         </div>
-        <div id="resultSection" style="display: none">
-            <div id="resultText"></div>
-            <div class="row">
-                <div class="col-12">
-                    <button type="button" class="btn btn-primary" onclick="window.open('/payPage/index.php', '_parent')">Continue shopping</button>
-                    <button type="button" id="retryButton" class="btn btn-secondary" onclick="retry();">Try again</button>
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                <div id="resultSection" style="display: none">
+                    <div id="resultText"></div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" onclick="window.open('/payPage/index.php', '_parent')">Continue shopping</button>
+                            <button type="button" id="retryButton" class="btn btn-secondary" onclick="retry();">Try again</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -424,7 +445,7 @@ function showCards(){
     })
     .then((result) => result.text())
     .then(result =>{
-        document.getElementById('paymentSection').innerHTML = result;
+        document.getElementById('paymentSelection').innerHTML = result;
         onGooglePayLoaded();
     })
     .catch((error) => console.log("showCards ERROR:"+error))
@@ -517,6 +538,7 @@ function editEmail(){
     document.getElementById('emailText').style.display = "none";
     document.getElementById('emailSection').style.display = "block";
     document.getElementById('updateEmailButton').innerHTML = "Update";
+    document.getElementById('updateEmailButton').style.display = "block";
 }
 function updateEmail(update){
     if(update){
@@ -607,7 +629,7 @@ function backButton(form){
         case "confirm":
             document.getElementById("storeCardSection").style.display = "none";
             document.getElementById("confirmSection").style.display = "none";
-            document.getElementById("paymentDetailsSection").style.display = "block";
+            document.getElementById("paymentSection").style.display = "block";
             if(orderDetails.customerId === ""){
                 document.getElementById("cardSelectionSection").style.display = "block";
                 document.getElementById("summary_billTo").style.display = "none";
@@ -720,7 +742,7 @@ function onTokenCreated(tokenDetails){
     console.log(tokenDetails);
     // Hide card input, show Confirmation section
     document.getElementById("cardSelectionSection").style.display = "none";
-    document.getElementById("paymentDetailsSection").style.display = "none";
+    document.getElementById("paymentSection").style.display = "none";
     document.getElementById("confirmSection").style.display = "block";
     if(orderDetails.paymentInstrumentId === ""){
         document.getElementById("storeCardSection").style.display = "block";
@@ -780,10 +802,10 @@ function authorise() {
 function onGooglePayCardSelected(paymentData){
     console.log(JSON.stringify(paymentData, undefined, 2));
     // Hide card input, show Confirmation section
-    document.getElementById("paymentDetailsSection").style.display = "none";
+    document.getElementById("paymentSection").style.display = "none";
     document.getElementById("summary_billTo").style.display = "none";
     document.getElementById("confirmSection").style.display = "block";
-    document.getElementById("cardSelectionSection").style.display = "none";
+    // document.getElementById("cardSelectionSection").style.display = "none";
     document.getElementById("storeCardSection").style.display = "block";
 
     orderDetails.paymentInstrumentId = "";

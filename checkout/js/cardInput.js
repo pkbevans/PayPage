@@ -37,6 +37,7 @@ function createCardInput(progressName, buttonName, cvvOnlyFlag=false, panOnlyFla
     cardType = cvvOnlyCardType;
     getTokenButtonId = buttonName;
     progress = document.getElementById(progressName);
+    errorAlert = document.getElementById("cardError");
 
     document.getElementById("cardNumber").style.display = (cvvOnly?"none":"block");
     document.getElementById("cardDate").style.display = (cvvOnly?"none":"block");
@@ -51,11 +52,21 @@ function getCaptureContext(){
     return fetch("/payPage/checkout/api/getCaptureContext.php", {
       method: "post"
     })
-    .then((result) => result.text())
-    .then((result) => setUpMicroform(result))
-    .catch((error) => console.log("Capture Context ERROR"))
+    .then(result => { 
+        if(!result.ok){
+            throw Error("Unable to get Capture Context. ("+result.status +")");
+        }
+        return result.text();
+    })
+    .then((cc)=>setUpMicroform(cc))
+    .catch(error => {
+        console.log("Capture Context ERROR: "+error);
+        errorAlert.innerHTML = "ERROR 1001: Capture Context - " + error;
+        errorAlert.style.display = "block";
+    })
 }
 function setUpMicroform(captureContext){
+    console.log(captureContext);    // TODO remove
     panValid=false;
     cvnValid=false;
     expDateValid=false;
@@ -93,7 +104,6 @@ function setUpMicroform(captureContext){
     }
     setUpExpiryDate("expiryDate");
     getTokenButton = document.querySelector('#'+getTokenButtonId);
-    errorAlert = document.getElementById("cardError");
     return "OK";
 }
 function setUpPanField(){
