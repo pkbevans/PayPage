@@ -1,0 +1,13 @@
+{
+    "name": "paul/pay-page",
+    "type": "project",
+    "require": {
+        "firebase/php-jwt": "^6.3"
+    },
+    "authors": [
+        {
+            "name": "Paul Evans",
+            "email": "pkbevans@mail.com"
+        }
+    ]
+}

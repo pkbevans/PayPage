@@ -20,11 +20,8 @@ function getCookie($name){
         <title>View Basket</title>
     </head>
     <body>
-        <div class="container">
-
-        </div>
         <div class="container-fluid justify-content-center">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="#">Checkout</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,46 +45,61 @@ function getCookie($name){
                     </div>
                 </div>
             </nav>
-            <!-- <small>5200000000001047, 5200000000000007, 371449111020228, 340000000001007</small> -->
-            <div id=loginSection>
-                <h3>Login</h3>
-                <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
-                    <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
-                    <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
-                    <button type="button" class="btn btn-primary" onclick="logUserIn()">Log in</button>
-                </form>
-                <div id="loginAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
-            </div>
-            <div id=contentSection style="display: none">
-                <div class="row">
-                    <div id="formSection">
-                    <h3>Your Basket</h3>
-                    <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
-                        <div id="removeInputsB4Submit">
-                            <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
-                            <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
-                            <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
-                            <input id="customerToken" class="form-control" type="hidden" name="customerToken" value=""/>
-                            <input id="customerUserId" class="form-control" type="hidden" name="customerUserId" value=""/>
-                            <input id="currency" type="hidden" name="currency" value="GBP"/>
+            <div class="row" id=loginSection>
+                <div class="col-12 col-lg-4 justify-content-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <div >
+                                <h3>Login</h3>
+                                <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
+                                    <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
+                                    <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
+                                    <button type="button" class="btn btn-primary" onclick="logUserIn()">Log in</button>
+                                </form>
+                                <div id="loginAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
+                            </div>
                         </div>
-                        <input id="orderId" type="hidden" name="orderId" value=""/>
-                        <input id="orderHash" type="hidden" name="orderHash" value=""/>
-                        <label for="autoCapture" class="form-label">Auto Capture</label>
-                        <select id="autoCapture" class="form-select" name="autoCapture">
-                            <option value="true" selected>Yes</option>
-                            <option value="false">No</option>
-                        </select>
-                        <BR>
-                        <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
-                        <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
-                        <input id="buyNow" type="hidden" name="buyNow" value="false"/>
-                    </form>
                     </div>
-                    <iframe id="checkoutIframe" name="checkout_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: none; border:none; height:90vh; width:100vw" ></iframe>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-lg-4">
+                    <div id=contentSection style="display: none">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div id="formSection">
+                                        <h3>Your Basket</h3>
+                                        <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
+                                            <div id="removeInputsB4Submit">
+                                                <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
+                                                <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
+                                                <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
+                                                <input id="customerToken" class="form-control" type="hidden" name="customerToken" value=""/>
+                                                <input id="customerUserId" class="form-control" type="hidden" name="customerUserId" value=""/>
+                                                <input id="currency" type="hidden" name="currency" value="GBP"/>
+                                            </div>
+                                            <input id="orderId" type="hidden" name="orderId" value=""/>
+                                            <input id="orderHash" type="hidden" name="orderHash" value=""/>
+                                            <label for="autoCapture" class="form-label">Auto Capture</label>
+                                            <select id="autoCapture" class="form-select" name="autoCapture">
+                                                <option value="true" selected>Yes</option>
+                                                <option value="false">No</option>
+                                            </select>
+                                            <BR>
+                                            <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
+                                            <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
+                                            <input id="buyNow" type="hidden" name="buyNow" value="false"/>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <iframe id="checkoutIframe" name="checkout_iframe" src="about:blank" class="responsive-iframe" style="overflow: hidden; display: none; border:none; height:90vh; width:100vw" ></iframe>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
     <script src="common/js/authenticate.js"></script>
     <script src="checkout/js/authorise.js"></script>
@@ -136,7 +148,7 @@ function getCookie($name){
         validateForm();
     }
     function buttonClicked(){
-        document.getElementById('formSection').style.display="none";
+        document.getElementById('contentSection').style.display="none";
         document.getElementById('checkoutIframe').style.display="block";
         var checkout_form = document.getElementById('checkout_form');
         if(checkout_form){

@@ -2,3 +2,7 @@
 /nbproject/*
 /logs/*
 payPage.code-workspace
+
+/vendor/
+composer.lock
+/cache/
