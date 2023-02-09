@@ -5,6 +5,7 @@ class OrderException extends Exception {}
 class Order {
     private $id;
     private $merchantReference;
+    private $orderDetails;
     private $amount;
     private $refundAmount;
     private $currency;
@@ -13,9 +14,10 @@ class Order {
     private $status;
     private $datetime;
     private $customerUserId;
-public function __construct( $id, $merchantReference, $amount, $refundAmount, $currency, $customerId, $customerUserId, $customerEmail, $status, $datetime){
+public function __construct( $id, $merchantReference, $orderDetails, $amount, $refundAmount, $currency, $customerId, $customerUserId, $customerEmail, $status, $datetime){
     $this->id = $id;
     $this->merchantReference = $merchantReference;
+    $this->orderDetails = $orderDetails;
     $this->amount = $amount;
     $this->refundAmount = $refundAmount;
     $this->currency = $currency;
@@ -31,6 +33,9 @@ public function __construct( $id, $merchantReference, $amount, $refundAmount, $c
     }
     public function getMerchantReference(){
         return $this->merchantReference;
+    }
+    public function getOrderDetails(){
+        return $this->orderDetails;
     }
     public function getAmount(){
         return $this->amount;
@@ -68,6 +73,14 @@ public function __construct( $id, $merchantReference, $amount, $refundAmount, $c
         }
         $this->merchantReference = $merchantReference;
     }
+    public function setOrderDetails($orderDetails){
+        $result = json_decode($orderDetails);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new OrderException("OrderDetails error");
+        }
+        $this->orderDetails = $orderDetails;
+    }
     public function setAmount($amount){
         if($amount <0){
             throw new OrderException("Amount error");
@@ -103,6 +116,7 @@ public function __construct( $id, $merchantReference, $amount, $refundAmount, $c
         $Order = array();
         $Order['id'] = $this->getID();
         $Order['merchantReference'] = $this->getMerchantReference();
+        $Order['orderDetails'] = $this->getOrderDetails();
         $Order['amount'] = $this->getAmount();
         $Order['refundAmount'] = $this->getRefundAmount();
         $Order['currency'] = $this->getCurrency();

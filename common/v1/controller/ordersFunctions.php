@@ -3,7 +3,7 @@ function getOrders($db, $id = null, $filter = null, $page = 0, $rowsPerPage, $fi
     // attempt to query the database
     try {
         // create db query
-        $stmt = 'SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime FROM orders ';
+        $stmt = 'SELECT id, merchantReference, orderDetails, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime FROM orders ';
         if($id){
             // Get specified order
             $stmt .= 'where id = :id';
@@ -155,7 +155,7 @@ function getOrders($db, $id = null, $filter = null, $page = 0, $rowsPerPage, $fi
         // for each row returned
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             // create new order object for each row
-            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
+            $order = new Order($row['id'], $row['merchantReference'], $row['orderDetails'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
             // create order and store in array for return in json data
             $orderArray[] = $order->returnOrderAsArray();
             if($id){
@@ -489,13 +489,14 @@ function createOrder($db, $jsonData){
             return $response;
         }
         // create new order with data, if non mandatory fields not provided then set to null
-        $newOrder = new Order(null, $jsonData->merchantReference, $jsonData->amount, $jsonData->refundAmount, $jsonData->currency, $jsonData->customerId, $jsonData->customerUserId, $jsonData->customerEmail, $jsonData->status, null);
+        $newOrder = new Order(null, $jsonData->merchantReference, $jsonData->orderDetails, $jsonData->amount, $jsonData->refundAmount, $jsonData->currency, $jsonData->customerId, $jsonData->customerUserId, $jsonData->customerEmail, $jsonData->status, null);
         // get title, description, deadline, filter and store them in variables
 
         // create db query
-        $query = $db->prepare('insert into orders (merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, datetime) ' .
-            'values (:merchantReference, :amount, :refundAmount, :currency, :customerId, :customerUserId, :customerEmail, :status, NOW())');
+        $query = $db->prepare('insert into orders (merchantReference, orderDetails, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, datetime) ' .
+            'values (:merchantReference, :orderDetails, :amount, :refundAmount, :currency, :customerId, :customerUserId, :customerEmail, :status, NOW())');
         $query->bindParam(':merchantReference', $jsonData->merchantReference, PDO::PARAM_STR);
+        $query->bindParam(':orderDetails', $jsonData->orderDetails, PDO::PARAM_STR);
         $query->bindParam(':amount', $jsonData->amount, PDO::PARAM_STR);
         $query->bindParam(':refundAmount', $jsonData->refundAmount, PDO::PARAM_STR);
         $query->bindParam(':currency', $jsonData->currency, PDO::PARAM_STR);
@@ -518,7 +519,7 @@ function createOrder($db, $jsonData){
         // get last order id so we can return the Order in the json
         $lastorderId = $db->lastInsertId();
         // create db query to get newly created order - get from master db not read slave as replication may be too slow for successful read
-        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+        $query = $db->prepare('SELECT id, merchantReference, orderDetails, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $lastorderId, PDO::PARAM_INT);
         $query->execute();
 
@@ -537,7 +538,7 @@ function createOrder($db, $jsonData){
         // for each row returned - should be just one
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             // create new order object
-            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
+            $order = new Order($row['id'], $row['merchantReference'], $row['orderDetails'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
 
             // create order and store in array for return in json data
             $orderArray[] = $order->returnOrderAsArray();

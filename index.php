@@ -7,7 +7,6 @@ function getCookie($name){
         return "";
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">
@@ -45,6 +44,8 @@ function getCookie($name){
                     </div>
                 </div>
             </nav>
+        </div>
+        <div class="container">
             <div class="row" id=loginSection>
                 <div class="col-12 col-lg-4 justify-content-center">
                     <div class="card">
@@ -63,35 +64,44 @@ function getCookie($name){
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-lg-4">
+                <div class="col-12 col-lg-6">
                     <div id=contentSection style="display: none">
                         <div class="card">
                             <div class="card-body">
-                                <div class="row">
-                                    <div id="formSection">
-                                        <h3>Your Basket</h3>
-                                        <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
-                                            <div id="removeInputsB4Submit">
-                                                <label for="amount" class="form-label">Amount</label><input id="amount" class="form-control" type="text" name="amount" value="63.99" required/>
-                                                <label for="reference_number" class="form-label">Order Reference</label><input id="reference_number" class="form-control" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" required/>
-                                                <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
-                                                <input id="customerToken" class="form-control" type="hidden" name="customerToken" value=""/>
-                                                <input id="customerUserId" class="form-control" type="hidden" name="customerUserId" value=""/>
-                                                <input id="currency" type="hidden" name="currency" value="GBP"/>
+                                <div id="formSection">
+                                    <h3>Your Basket</h3>
+                                    <div class="row">
+                                        <div class="col-3 col-lg-3" >
+                                            Order Ref
+                                        </div>
+                                        <div class="col-9 col-lg-9 d-flex justify-content-end">
+                                            <input id="reference_number" class="form-control float-end text-end" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" readonly/>
+                                        </div>
+                                    </div>
+                                    <BR>
+                                    <div id="basketSection"></div>
+
+                                    <input id="currency" type="hidden" name="currency" value="GBP"/>
+                                    <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
+                                        <input id="orderId" type="hidden" name="orderId" value=""/>
+                                        <input id="orderHash" type="hidden" name="orderHash" value=""/>
+                                        <BR>
+                                        <div class="row">
+                                            <div class="col-2 col-lg-9" >
+                                                Auto-Capture
                                             </div>
-                                            <input id="orderId" type="hidden" name="orderId" value=""/>
-                                            <input id="orderHash" type="hidden" name="orderHash" value=""/>
-                                            <label for="autoCapture" class="form-label">Auto Capture</label>
+                                            <div class="col-3 col-lg-3 d-flex justify-content-end">
                                             <select id="autoCapture" class="form-select" name="autoCapture">
                                                 <option value="true" selected>Yes</option>
                                                 <option value="false">No</option>
                                             </select>
-                                            <BR>
-                                            <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
-                                            <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
-                                            <input id="buyNow" type="hidden" name="buyNow" value="false"/>
-                                        </form>
-                                    </div>
+                                            </div>
+                                        </div>
+                                        <BR>
+                                        <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
+                                        <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
+                                        <input id="buyNow" type="hidden" name="buyNow" value="false"/>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +116,12 @@ function getCookie($name){
     <script>
         var customerId;
         var customerUserId;
+    <?php echo "    var orderJson = '" . $_REQUEST['orderDetails'] . "';\n";?>
+        var orderDetails;
+
     document.addEventListener("DOMContentLoaded", function (e) {
+        orderDetails = JSON.parse(orderJson);
+        renderBasket();
     });
     function logUserIn(){
         login(document.getElementById('userName').value, document.getElementById('password').value)
@@ -131,15 +146,37 @@ function getCookie($name){
         }
         customerId=result.data.customerId;
         customerUserId=result.data.customerUserId;
-        document.getElementById("customerToken").value=customerId
-        document.getElementById("customerUserId").value=customerUserId
         document.getElementById("loginAlert").style.display='none';
         document.getElementById("loginSection").style.display="none"
         document.getElementById("contentSection").style.display="block"
     }
+    function onQtyChange(item){
+        orderDetails.orderItems[item].quantity = document.getElementById("quantity_"+item).value;
+        let subTotal=0;
+        orderDetails.orderItems.forEach((number, index, array) => {
+            orderDetails.orderItems[item].totalAmount = array[index].quantity*array[index].unitPrice;
+            subTotal+=orderDetails.orderItems[item].totalAmount;
+        });
+        let vat = subTotal*0.20;
+        orderDetails.vat = vat.toFixed(2);
+        let totalAmount = (subTotal+orderDetails.vat+orderDetails.delivery);
+        orderDetails.totalAmount = parseFloat(totalAmount).toFixed(2);
+        renderBasket();
+    }
+    function renderBasket(){
+        return fetch("/payPage/checkout/api/basket.php", {
+            method: "post",
+            body: JSON.stringify({
+                "orderDetails": orderDetails
+            })
+        })
+        .then((result) => result.text())
+        .then((result) => document.getElementById('basketSection').innerHTML = result)
+        .catch((error) => console.log("Basket ERROR:"+error))
+    }
     function buyNowClicked(){
         console.log("Buy Now");
-        id=document.getElementById('customerToken');
+        id=customerId;
         if(id.value===""){
             id.required = true;
         }else{
@@ -181,10 +218,11 @@ function getCookie($name){
                 "merchantReference": document.getElementById('reference_number').value,
                 "customerId": customerId,
                 "customerUserId": customerUserId,
-                "amount": document.getElementById('amount').value,
+                "orderDetails": JSON.stringify(orderDetails),
+                "amount": orderDetails.totalAmount,
                 "refundAmount": 0,
                 "currency": document.getElementById('currency').value,
-                "customerEmail": document.getElementById('email').value,
+                "customerEmail": "",
                 "status": "NEW"
             })
         })
@@ -193,8 +231,6 @@ function getCookie($name){
             if(result.success){
                 document.getElementById('orderId').value = result.data.orders[0].id;
                 document.getElementById('orderHash').value = result.data.orders[0].hash;
-                // Dont need these inputs 
-                document.getElementById('removeInputsB4Submit').innerHTML="";
                 checkout_form.submit();
             }else{
                 throw result.statusCode + " : " + result.messages[0];

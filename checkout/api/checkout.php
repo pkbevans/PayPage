@@ -1,3 +1,4 @@
+
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
 include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
@@ -19,23 +20,8 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
             include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
             $defaultEmail = getDefaultEmail($order['customerId']);
         }
-        $orderItems = [
-            [
-                'productCode' => '10000001',
-                'description' => 'Big Brown Britches',
-                'quantity' => 2,
-                'unitPrice' => 10.99,
-                'totalAmount' => 21.98,
-            ],
-            [
-                'productCode' => '10000010',
-                'description' => 'Frilly Knickers',
-                'quantity' => 1,
-                'unitPrice' => 33.69,
-                'totalAmount' => 33.69,
-            ]
-        ];
         $sessionId=uniqid("DF", true);
+        $orderDetails = json_decode($order['orderDetails']);
     }
 }else{
     echo "ERROR - PARAMETERS MISSING";
@@ -87,19 +73,19 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                                     <div class="col-3 col-lg-3 d-flex justify-content-end"><strong>Unit Price</strong></div>
                                     <div class="col-3 col-lg-3 d-flex justify-content-end"><strong>Total</strong></div>
                                 </div>
-                                <?php foreach($orderItems as $orderItem):?>
+                                <?php foreach($orderDetails->orderItems as $orderItem):?>
                                 <div class="row">
                                     <div class="col-2 col-lg-3" >
-                                        <?php echo $orderItem['quantity']?>
+                                        <?php echo $orderItem->quantity?>
                                     </div>
                                     <div class="col-4 col-lg-3">
-                                        <?php echo $orderItem['description']?>
+                                        <?php echo $orderItem->description?>
                                     </div>
                                     <div class="col-3 col-lg-3 d-flex justify-content-end">
-                                        <?php echo "£" . $orderItem['unitPrice'];?>
+                                        <?php echo "£" . $orderItem->unitPrice;?>
                                     </div>
                                     <div class="col-3 col-lg-3 d-flex justify-content-end">
-                                        <?php echo "£" . ($orderItem['quantity']*$orderItem['unitPrice']);?>
+                                        <?php echo "£" . $orderItem->totalAmount;?>
                                     </div>
                                 </div>
                                 <?php endforeach?>
@@ -229,46 +215,48 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                     </div>
                 </div>
             </div>
-            <div id="createAccountSection" style="display: none">
-                <form class="needs-validation" id="registerUserForm" name="" method="" target="" action="" novalidate >
-                    <div class="form-group">
+            <div class="row" id="createAccountSection" style="display: none">
+                <div class="col-12 col-lg-6">
+                    <form class="needs-validation" id="registerUserForm" name="" method="" target="" action="" novalidate >
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="firstName" class="form-control" autocomplete="given-name" type="text" name="firstName" value="" required/>
+                                        <label for="firstName" class="form-label">First name</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="lastName" class="form-control" autocomplete="family-name" type="text" name="lastName" value="" required/>
+                                        <label for="lastName" class="form-label">Last name</label>
+                                    </div>
+                                </div>
+                            </div>                    
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group form-floating mb-3">
+                                        <input id="customerUserName" class="form-control" autocomplete="off" type="text" name="customerUserName" value="" required/>
+                                        <label for="customerUserName" class="form-label">Username</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group form-floating mb-3">
+                                    <input id="customerPassword" class="form-control" autocomplete="off" type="password" name="customerPassword" value="" required/>
+                                        <label for="customerPassword" class="form-label">Password</label>
+                                    </div>
+                                </div>
+                            </div>                    
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" onclick="registerUser()">Create Account</button>
+                            <button type="button" class="btn btn-link" onclick="cancelRegisterUser()">Cancel</button>
+                        </div>
                         <div class="row">
-                            <div class="col-6">
-                                <div class="form-group form-floating mb-3">
-                                    <input id="firstName" class="form-control" autocomplete="given-name" type="text" name="firstName" value="" required/>
-                                    <label for="firstName" class="form-label">First name</label>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group form-floating mb-3">
-                                    <input id="lastName" class="form-control" autocomplete="family-name" type="text" name="lastName" value="" required/>
-                                    <label for="lastName" class="form-label">Last name</label>
-                                </div>
-                            </div>
-                        </div>                    
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group form-floating mb-3">
-                                    <input id="customerUserName" class="form-control" autocomplete="off" type="text" name="customerUserName" value="" required/>
-                                    <label for="customerUserName" class="form-label">Username</label>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group form-floating mb-3">
-                                <input id="customerPassword" class="form-control" autocomplete="off" type="password" name="customerPassword" value="" required/>
-                                    <label for="customerPassword" class="form-label">Password</label>
-                                </div>
-                            </div>
-                        </div>                    
-                    </div>
-                    <div class="col-12">
-                        <button type="button" class="btn btn-primary" onclick="registerUser()">Create Account</button>
-                        <button type="button" class="btn btn-link" onclick="cancelRegisterUser()">Cancel</button>
-                    </div>
-                    <div class="row">
-                        <div id="registerAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
-                    </div>
-                </form>
+                            <div id="registerAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
         <div class="offcanvas offcanvas-start" tabindex="-1" id="manageDataOffCanvas" aria-labelledby="offcanvasLabel">
