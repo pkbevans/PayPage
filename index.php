@@ -7,6 +7,7 @@ function getCookie($name){
         return "";
     }
 }
+$mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
 ?>
 <!DOCTYPE html>
 <html lang="en-GB">
@@ -71,26 +72,25 @@ function getCookie($name){
                                 <div id="formSection">
                                     <h3>Your Basket</h3>
                                     <div class="row">
-                                        <div class="col-3 col-lg-3" >
+                                        <div class="col-4 col-lg-3" >
                                             Order Ref
                                         </div>
-                                        <div class="col-9 col-lg-9 d-flex justify-content-end">
-                                            <input id="reference_number" class="form-control float-end text-end" type="text" name="reference_number" value="<?php echo uniqid("PayPage", false);?>" readonly/>
+                                        <div class="col-8 col-lg-9 d-flex justify-content-end">
+                                            <?php echo $mrn;?>
                                         </div>
                                     </div>
                                     <BR>
                                     <div id="basketSection"></div>
-
                                     <input id="currency" type="hidden" name="currency" value="GBP"/>
                                     <form class="needs-validation" id="checkout_form" name="checkout" method="POST" target="checkout_iframe" action="" novalidate >
                                         <input id="orderId" type="hidden" name="orderId" value=""/>
                                         <input id="orderHash" type="hidden" name="orderHash" value=""/>
                                         <BR>
                                         <div class="row">
-                                            <div class="col-2 col-lg-9" >
+                                            <div class="col-8 col-lg-9" >
                                                 Auto-Capture
                                             </div>
-                                            <div class="col-3 col-lg-3 d-flex justify-content-end">
+                                            <div class="col-4 col-lg-3 d-flex justify-content-end">
                                             <select id="autoCapture" class="form-select" name="autoCapture">
                                                 <option value="true" selected>Yes</option>
                                                 <option value="false">No</option>
@@ -114,13 +114,32 @@ function getCookie($name){
     <script src="common/js/authenticate.js"></script>
     <script src="checkout/js/authorise.js"></script>
     <script>
-        var customerId;
-        var customerUserId;
-    <?php echo "    var orderJson = '" . $_REQUEST['orderDetails'] . "';\n";?>
-        var orderDetails;
+    var customerId;
+    var customerUserId;
+    var orderDetails = {
+        orderItems:[ 
+            {
+                productCode:"10000001",
+                description:"Big Brown Britches",
+                quantity:2,
+                unitPrice:10.00,
+                totalAmount:20.00
+            },
+            {
+                productCode:"10000010",
+                description:"Frilly Knickers",
+                quantity:1,
+                unitPrice:14.00,
+                totalAmount:14.00
+            }
+        ],
+        delivery:4.99,
+        // subTotal=38.99
+        vat:7.80,
+        totalAmount:46.79
+    };
 
     document.addEventListener("DOMContentLoaded", function (e) {
-        orderDetails = JSON.parse(orderJson);
         renderBasket();
     });
     function logUserIn(){
@@ -152,15 +171,16 @@ function getCookie($name){
     }
     function onQtyChange(item){
         orderDetails.orderItems[item].quantity = document.getElementById("quantity_"+item).value;
-        let subTotal=0;
+        let subTotal=0.00;
         orderDetails.orderItems.forEach((number, index, array) => {
             orderDetails.orderItems[item].totalAmount = array[index].quantity*array[index].unitPrice;
             subTotal+=orderDetails.orderItems[item].totalAmount;
         });
+        subTotal+=orderDetails.delivery;
         let vat = subTotal*0.20;
-        orderDetails.vat = vat.toFixed(2);
-        let totalAmount = (subTotal+orderDetails.vat+orderDetails.delivery);
-        orderDetails.totalAmount = parseFloat(totalAmount).toFixed(2);
+        orderDetails.vat = vat;
+        let totalAmount = subTotal+orderDetails.vat;
+        orderDetails.totalAmount = totalAmount;
         renderBasket();
     }
     function renderBasket(){
@@ -215,7 +235,7 @@ function getCookie($name){
                 },
             method: "post",
             body: JSON.stringify({
-                "merchantReference": document.getElementById('reference_number').value,
+                "merchantReference": "<?php echo $mrn?>",
                 "customerId": customerId,
                 "customerUserId": customerUserId,
                 "orderDetails": JSON.stringify(orderDetails),

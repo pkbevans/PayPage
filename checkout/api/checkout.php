@@ -82,21 +82,35 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                                         <?php echo $orderItem->description?>
                                     </div>
                                     <div class="col-3 col-lg-3 d-flex justify-content-end">
-                                        <?php echo "£" . $orderItem->unitPrice;?>
+                                        <?php echo "£" . number_format($orderItem->unitPrice,2);?>
                                     </div>
                                     <div class="col-3 col-lg-3 d-flex justify-content-end">
-                                        <?php echo "£" . $orderItem->totalAmount;?>
+                                        <?php echo "£" . number_format($orderItem->totalAmount,2);?>
                                     </div>
                                 </div>
                                 <?php endforeach?>
                                 <BR>
+                                <div class="row">
+                                    <div class="col-3 col-lg-7">VAT</div>
+                                    <div class="col-6 col-lg-2"></div>
+                                    <div class="col-3 col-lg-3 d-flex justify-content-end">
+                                        £<?php echo number_format($orderDetails->vat,2)?>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3 col-lg-7">Delivery</div>
+                                    <div class="col-6 col-lg-2"></div>
+                                    <div class="col-3 col-lg-3 d-flex justify-content-end">
+                                        £<?php echo number_format($orderDetails->delivery,2)?>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-9 col-lg-3">
-                                    <h5>Total:</h5>
+                                    <h5>Total</h5>
                                 </div>
                                 <div class="col-3 col-lg-9 d-flex justify-content-end">
-                                    <span><?php echo "£" . $order['amount'];?></span>
+                                    <span>£<?php echo number_format($order['amount'],2);?></span>
                                 </div>
                             </div>
                             <!-- <div class="row"> -->
