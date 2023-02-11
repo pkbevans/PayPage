@@ -324,7 +324,7 @@ function updateOrder2($db, $id){
         // for each row returned - should be just one
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             // create new order object
-            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
+            $order = new Order($row['id'], $row['merchantReference'], $row['orderDetails'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
         }
         // ADD AUTH TO QUERY
         // create the query string including any query fields
@@ -423,7 +423,7 @@ function updateOrder2($db, $id){
         // for each row returned
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             // create new order object for each row returned
-            $order = new Order($row['id'], $row['merchantReference'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
+            $order = new Order($row['id'], $row['merchantReference'], $row['orderDetails'], $row['amount'], $row['refundAmount'], $row['currency'], $row['customerId'], $row['customerUserId'], $row['customerEmail'], $row['status'], $row['datetime']);
 
             // create order and store in array for return in json data
             $orderArray[] = $order->returnOrderAsArray();
@@ -458,6 +458,10 @@ function createOrder($db, $jsonData){
         // TODO - data validation
         if (!isset($jsonData->merchantReference)) {
             $response = new Response(400, false, "merchantReference not set", null);
+            return $response;
+        }
+        if (!isset($jsonData->orderDetails)) {
+            $response = new Response(400, false, "orderDetails not set", null);
             return $response;
         }
         if (!isset($jsonData->amount)) {
