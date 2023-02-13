@@ -99,7 +99,7 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
                                         </div>
                                         <BR>
                                         <button id="checkoutButton" type="button" class="btn btn-primary" onclick="validateForm()">Checkout</button>
-                                        <button type="button" class="btn btn-secondary" onclick="buyNowClicked()">Buy Now</button>
+                                        <button id="buyNowButton" type="button" class="btn btn-secondary" onclick="buyNowClicked()" disabled>Buy Now</button>
                                         <input id="buyNow" type="hidden" name="buyNow" value="false"/>
                                     </form>
                                 </div>
@@ -162,6 +162,7 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
             document.cookie = "fullName=" + fullName+';expires=;path=/';
             document.cookie = "email=" + result.data.email+';expires=;path=/';
             document.getElementById("userFullName").innerHTML=fullName;
+            document.getElementById("buyNowButton").disabled = false;
         }
         customerId=result.data.customerId;
         customerUserId=result.data.customerUserId;

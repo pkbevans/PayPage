@@ -307,7 +307,7 @@ function updateOrder2($db, $id){
         }
         // ADD AUTH TO QUERY
         // create db query to get order from database to update - use master db
-        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+        $query = $db->prepare('SELECT id, merchantReference, orderDetails, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
         $query->execute();
 
@@ -403,7 +403,7 @@ function updateOrder2($db, $id){
         }
         // ADD AUTH TO QUERY
         // create db query to return the newly edited order - connect to master database
-        $query = $db->prepare('SELECT id, merchantReference, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
+        $query = $db->prepare('SELECT id, merchantReference, orderDetails, amount, refundAmount, currency, customerId, customerUserId, customerEmail, status, DATE_FORMAT(datetime, "%d/%m/%Y %H:%i") as datetime from orders where id = :orderId');
         $query->bindParam(':orderId', $id, PDO::PARAM_INT);
         $query->execute();
 

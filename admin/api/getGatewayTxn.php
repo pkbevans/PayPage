@@ -18,12 +18,14 @@ try {
     if($result->responseCode == 200){
         $txn = $result->response;
     }else{
-        return $result->response;
+        echo json_encode($result);
+        exit;
     }
 } catch (Exception $exception) {
     $result->responseCode = 500;
     $result->exception = $exception;
-    return $result;
+    echo json_encode($result);
+    exit;
 }
 // OK if it gets here
 include $_SERVER['DOCUMENT_ROOT'].'/payPage/admin/view/'. $incoming->view;

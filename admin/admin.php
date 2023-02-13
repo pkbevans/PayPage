@@ -126,7 +126,10 @@
         document.getElementById("loginAlert").style.display='none';
         document.getElementById("loginSection").style.display="none"
         document.getElementById("formSection").style.display="block"
+        document.getElementById("ordersSection").innerHTML=""
+        document.getElementById("orderDetailSection").innerHTML=""
         document.getElementById("contentSection").style.display="block"
+        document.getElementById('backButton').style.display = "none";
         document.getElementById("logout").style.display="block"
     }
     function onSuccessfulLogout(){
@@ -238,7 +241,10 @@
         authenticate('/payPage/admin')
         .then(accessToken=>{
             back = "SUBMITACTION";
-            reason = document.getElementById('reason').value;
+            reason="";
+            if(action !== "Capture" ){
+                reason = document.getElementById('reason').value;
+            }
             reference = document.getElementById('reference').value;
             amount = Number(document.getElementById('amount').value);
             var form = document.getElementById('actionForm');

@@ -136,8 +136,11 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                                 <div id="emailSection" style="display: <?php echo ($defaultEmail === '' ? 'block':'none');?>" >
                                     <form id="emailForm" class="needs-validation" novalidate>
                                     <div class="row">
-                                        <div class="col-8 form-group form-floating">
-                                            <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
+                                        <div class="col-8">
+                                            <div class="form-group form-floating mb-3">
+                                                <input id="bill_to_email" type="email" class="form-control" value="<?php echo $defaultEmail;?>" placeholder="Please enter your email" required>
+                                                <label for="bill_to_email" class="form-label">Email</label>
+                                            </div>
                                         </div>
                                         <div class="col-4 d-flex justify-content-end form-group form-floating">
                                             <button id="updateEmailButton" type="button" class="btn btn-link" onclick="nextButton('email')" style="display: <?php echo ($defaultEmail === '' ? 'block':'none');?>">Next</button>

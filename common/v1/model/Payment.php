@@ -86,7 +86,7 @@ public function __construct( $id, $orderId, $type, $amount, $currency, $cardNumb
     }
     public function setType($type){
         if(strcmp($type, "PAYMENT") && strcmp($type, "VOID") && 
-                    strcmp($type, "REFUND") && strcmp($type, "REVERSAL") ){
+                    strcmp($type, "REFUND") && strcmp($type, "REVERSAL") && strcmp($type, "CAPTURE")){
             throw new PaymentException("Type error: ". $type);
         }
         $this->type = $type;

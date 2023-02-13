@@ -103,6 +103,7 @@
                             <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment->id;?>', 'Refund')">Refund...</button></td>
                 <?php endif?>
             <?php else:?>
+                            <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment->id;?>', 'Capture')">Capture...</button></td>
                             <td><button type="button" class="btn btn-outline-primary" onclick="showActionPage('<?php echo $payment->id;?>', 'Reversal')">Reverse...</button></td>
             <?php endif; ?>
         <?php elseif($order->status == "VOIDED" && $payment->status == "AUTHORIZED" && $payment->type == "PAYMENT" ): ?>
