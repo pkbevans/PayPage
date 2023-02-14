@@ -3,7 +3,7 @@ include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/dbUtils.php';
 
 $incoming = json_decode(file_get_contents('php://input'));
 $url = 'http://'. $_SERVER['SERVER_NAME'] . '/payPage/common/v1/controller/orders.php?email='. $incoming->email. 
-        '&customerId=' . $incoming->customerId . '&mrn=' . $incoming->mrn .'&id=' . $incoming->orderId .
+        '&mrn=' . $incoming->mrn .'&id=' . $incoming->orderId .
         '&status=' . $incoming->status . '&page='.$incoming->page . '&rows=' . $incoming->rows;
 [$responseCode, $response] = fetch($incoming->accessToken, METHOD_GET, $url, null);
 if($responseCode != 200){

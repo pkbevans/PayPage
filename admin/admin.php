@@ -1,96 +1,114 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-    <head>
-        <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' cdn.jsdelivr.net https://testflex.cybersource.com/ bondevans.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' cdn.jsdelivr.net/ bondevans.com 'unsafe-eval' 'unsafe-inline' ; frame-src 'self' https://testflex.cybersource.com/ bondevans.com; child-src https://testflex.cybersource.com/; "> -->
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-        <title>Admin Portal</title>
-    </head>
-    <body>
-        <div class="container-fluid justify-content-center">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="#">Admin Portal</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/payPage/">Home</a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="nav-link" href="../index.php">Checkout</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" id="userFullName" href="#" tabindex="-1" aria-disabled="true"></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="logout" href="#" onclick="logout()">Logout</a>
-                        </li>
-                    </ul>
-                    </div>
+<head>
+    <!-- <meta http-equiv="Content-Security-Policy" content="script-src 'self' cdn.jsdelivr.net https://testflex.cybersource.com/ bondevans.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' cdn.jsdelivr.net/ bondevans.com 'unsafe-eval' 'unsafe-inline' ; frame-src 'self' https://testflex.cybersource.com/ bondevans.com; child-src https://testflex.cybersource.com/; "> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <title>Admin Portal</title>
+</head>
+<body>
+    <div class="container-fluid justify-content-center">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Admin Portal</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/payPage/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="../index.php">Checkout</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" id="userFullName" href="#" tabindex="-1" aria-disabled="true"></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="logout" href="#" onclick="logout()">Logout</a>
+                    </li>
+                </ul>
                 </div>
-            </nav>
-            <div id=loginSection>
-                <h3>Login</h3>
-                <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
-                    <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
-                    <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
-                    <button type="button" class="btn btn-primary" onclick="logUserIn()">Log in</button>
-                </form>
-                <div id="loginAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
             </div>
-            <div id=contentSection>
-                <div id="formSection">
-                    <h3>Find Order</h3>
-                    <form class="needs-validation" id="findForm" name="checkout" method="" target="" action="" novalidate >
-                        <label for="orderId" class="form-label">Order Id</label><input id="orderId" class="form-control" type="text" name="orderId" value="" />
-                        <label for="referenceNumber" class="form-label">Order Reference</label><input id="referenceNumber" class="form-control" type="text" name="findForm" value="" />
-                        <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
-                        <label for="customerToken" class="form-label">Customer Token</label><input id="customerToken" class="form-control" type="text" name="customerToken" value=""/>
-                        <label for="status" class="form-label">Status</label><input id="status" class="form-control" type="text" name="status" value=""/>
-                        <BR>
-                        <button type="button" class="btn btn-primary" onclick="validateForm()">Find Orders</button>
-                    </form>
-                </div>
-                <div id="ordersSection"></div>
-                <div id="orderSection">
-                    <div id="orderDetailSection"></div>
-                    <div id="actionSection"></div>
-                    <div id="statusSection"></div>
-                </div>
-                <div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="requestModalLabel">Request Details</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="requestSection"></div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
+        </nav>
+    </div>
+    <div class="container-fluid">
+        <div class="row" id=loginSection>
+            <div class="col-12 col-lg-4 justify-content-center">
+                <div class="card">
+                    <div class="card-body">
+                        <div >
+                            <h3>Login</h3>
+                            <form class="needs-validation" id="loginForm" name="" method="" target="" action="" novalidate >
+                                <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
+                                <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
+                                <button type="button" class="btn btn-primary" onclick="logUserIn()">Log in</button>
+                            </form>
+                            <div id="loginAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
                         </div>
-                    </div>
-                </div>
-                <div class="row" id="backButton" style="display: none">
-                    <div class="col-12">
-                        <button type="button" class="btn btn-primary" onclick="backButton()">Back</button>
                     </div>
                 </div>
             </div>
         </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-    <script src="../common/js/authenticate.js"></script>
-    <script>
+        <div id=contentSection>
+            <div class="row" id="formSection">
+                <div class="col-12 col-lg-4 justify-content-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <div>
+                                <h3>Find Order</h3>
+                                <form class="needs-validation" id="findForm" name="checkout" method="" target="" action="" novalidate >
+                                    <label for="orderId" class="form-label">Order Id</label><input id="orderId" class="form-control" type="text" name="orderId" value="" />
+                                    <label for="referenceNumber" class="form-label">Order Reference</label><input id="referenceNumber" class="form-control" type="text" name="findForm" value="" />
+                                    <label for="email" class="form-label">Email</label><input id="email" class="form-control" type="email" name="email" value="" />
+                                    <label for="status" class="form-label">Status</label><input id="status" class="form-control" type="text" name="status" value=""/>
+                                    <label for="rowsPerPage" class="form-label">Rows Per Page</label><input id="rowsPerPage" class="form-control" type="text" name="rowsPerPage" value="15"/>
+                                    <BR>
+                                    <button type="button" class="btn btn-primary" onclick="validateForm()">Find Orders</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="ordersSection"></div>
+            <div id="orderSection">
+                <div id="orderDetailSection"></div>
+                <div id="actionSection"></div>
+                <div id="statusSection"></div>
+            </div>
+            <div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="requestModalLabel">Request Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="requestSection"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="backButton" style="display: none">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary" onclick="backButton()">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+<script src="../common/js/authenticate.js"></script>
+<script>
     let back="none";
     let selectedOrderId=0;
 
@@ -166,11 +184,10 @@
                 method: "post",
                 body: JSON.stringify({
                     "page":    page,
-                    "rows":    8,
+                    "rows":    document.getElementById('rowsPerPage').value,
                     "accessToken":    accessToken,
                     "orderId":    document.getElementById('orderId').value,
                     "mrn":        document.getElementById('referenceNumber').value,
-                    "customerId": document.getElementById('customerToken').value,
                     "email":      document.getElementById('email').value,
                     "status":     document.getElementById('status').value
                 })
@@ -423,6 +440,6 @@
     function refresh(){
         getOrders(1);
     }
-    </script>
-    </body>
+</script>
+</body>
 </html>

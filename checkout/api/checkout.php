@@ -29,6 +29,7 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
 }
 ?>
 <!doctype html>
+<html lang="en-GB">
 <head>
     <!-- Device Fingrprinting -->
     <script type="text/javascript" src="https://h.online-metrix.net/fp/tags.js?org_id=<?php echo $TMOrgId?>&session_id=<?php echo CHILD_MID?><?php echo $sessionId?>"></script>
@@ -324,8 +325,7 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 <script src="https://flex.cybersource.com/cybersource/assets/microform/0.11/flex-microform.min.js"></script>
 <script src="../js/cardInput.js"></script>
 <script src="../js/authorise.js"></script>
@@ -377,7 +377,7 @@ let orderDetails = {
         postalCode: "",
         country: ""
     }
- };
+};
 
 document.addEventListener("DOMContentLoaded", function (e) {
     start();
@@ -878,3 +878,5 @@ function stylePaymentInstrument(card, number, billTo){
     return html;
 }
 </script>
+</body>
+</html>
