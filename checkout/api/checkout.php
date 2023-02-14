@@ -1,13 +1,13 @@
 
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/paymentUtils.php';
-include_once $_SERVER['DOCUMENT_ROOT'].'/ppSecure/paypage.config.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/cards.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/countries.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/db/paymentUtils.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/ppSecure/paypage.config.php';
 $accessToken=$_COOKIE['accessToken'];
 // Check that Order ID exists and hasn't been tampered with
 if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
-    include_once 'checkOrder.php';
+    require_once 'checkOrder.php';
     if(!($order = checkOrder($_REQUEST['orderId'], $_REQUEST['orderHash'])))
     {
         echo "ERROR - INVALID PARAMETERS";
@@ -17,7 +17,7 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
         updateOrder($accessToken, $order['id'], "INPROGRESS");
         $defaultEmail="";
         if(isset($order['customerId']) && !empty($order['customerId'])) {
-            include_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
+            require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/api/getDefaultEmail.php';
             $defaultEmail = getDefaultEmail($order['customerId']);
         }
         $sessionId=uniqid("DF", true);

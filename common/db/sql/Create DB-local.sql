@@ -17,8 +17,6 @@ USE `paypage` ;
 -- -----------------------------------------------------
 -- Table `paypage`.`orders`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `paypage`.`orders` ;
-
 CREATE TABLE IF NOT EXISTS `paypage`.`orders` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `merchantReference` VARCHAR(50) NOT NULL,
@@ -29,70 +27,48 @@ CREATE TABLE IF NOT EXISTS `paypage`.`orders` (
   `customerEmail` VARCHAR(45) NOT NULL,
   `status` VARCHAR(30) NOT NULL DEFAULT 'NEW',
   `datetime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `customerUserId` INT NOT NULL,
+  `orderDetails` MEDIUMTEXT NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `MRN` (`merchantReference` ASC))
 ENGINE = InnoDB
-AUTO_INCREMENT = 235
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `paypage`.`apilogs`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `paypage`.`apilogs` ;
-
-CREATE TABLE IF NOT EXISTS `paypage`.`apilogs` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `orderId` INT NOT NULL,
-  `payload` BLOB NOT NULL,
-  `type` VARCHAR(45) NOT NULL,
-  `status` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  INDEX `ORDER_idx` (`orderId` ASC),
-  CONSTRAINT `ORDERS_APILOGS`
-    FOREIGN KEY (`orderId`)
-    REFERENCES `paypage`.`orders` (`id`))
-ENGINE = InnoDB
-AUTO_INCREMENT = 6
+AUTO_INCREMENT = 757
 DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
 -- Table `paypage`.`payments`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `paypage`.`payments` ;
-
 CREATE TABLE IF NOT EXISTS `paypage`.`payments` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `orderId` INT NOT NULL,
   `type` VARCHAR(20) NOT NULL DEFAULT 'PAYMENT',
-  `amount` FLOAT NOT NULL DEFAULT '0',
+  `amount` FLOAT NOT NULL DEFAULT 0,
   `currency` VARCHAR(3) NOT NULL DEFAULT 'GBP',
   `cardNumber` VARCHAR(19) NOT NULL,
   `cardType` VARCHAR(20) NOT NULL,
   `authCode` VARCHAR(45) NOT NULL,
   `gatewayRequestId` VARCHAR(45) NOT NULL,
   `status` VARCHAR(30) NOT NULL DEFAULT 'NEW',
-  `captured` INT NOT NULL DEFAULT '0',
+  `captured` INT NOT NULL DEFAULT 0,
   `datetime` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `ORDER` (`orderId` ASC),
   CONSTRAINT `PAYMENTS_ORDER`
     FOREIGN KEY (`orderId`)
-    REFERENCES `paypage`.`orders` (`id`))
+    REFERENCES `paypage`.`orders` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 127
+AUTO_INCREMENT = 346
 DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
 -- Table `paypage`.`users`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `paypage`.`users` ;
-
 CREATE TABLE IF NOT EXISTS `paypage`.`users` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `firstName` VARCHAR(255) NOT NULL,
@@ -102,19 +78,22 @@ CREATE TABLE IF NOT EXISTS `paypage`.`users` (
   `password` VARCHAR(255) NOT NULL,
   `userActive` VARCHAR(1) NOT NULL DEFAULT 'N',
   `loginAttempts` INT NOT NULL DEFAULT '0',
+  `customerId` VARCHAR(45) NOT NULL,
+  `type` VARCHAR(45) NOT NULL COMMENT 'CUSTOMER/INTERNAL',
+  `admin` VARCHAR(1) NOT NULL DEFAULT 'N',
+  `verificationCode` VARCHAR(256) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `username_UNIQUE` (`userName` ASC))
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
-DEFAULT CHARACTER SET = utf8mb3;
+AUTO_INCREMENT = 19
+DEFAULT CHARACTER SET = utf8mb3
+COMMENT = '	';
 
 
 -- -----------------------------------------------------
 -- Table `paypage`.`sessions`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `paypage`.`sessions` ;
-
 CREATE TABLE IF NOT EXISTS `paypage`.`sessions` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `userId` INT NOT NULL,
@@ -132,7 +111,7 @@ CREATE TABLE IF NOT EXISTS `paypage`.`sessions` (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
-AUTO_INCREMENT = 109
+AUTO_INCREMENT = 911
 DEFAULT CHARACTER SET = utf8mb3;
 
 
