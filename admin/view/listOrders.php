@@ -12,12 +12,12 @@ $buttonWidth="48px";
 <div class="row">
 <table class="table table-hover table-fixed">
     <thead><tr>
-        <th class="col-2">Date/Time</th>
+        <th class="col-1">Date/Time</th>
         <th class="col-1">Order Id</th>
-        <th class="col-2">Reference</th>
+        <th class="col-1">Reference</th>
         <th class="col-1">Currency</th>
         <th class="col-1">Amount</th>
-        <th class="col-2">Customer Email</th>
+        <th class="col-1">Customer Email</th>
         <th class="col-1">User ID</th>
         <th class="col-1">Status</th>
     </tr></thead>
