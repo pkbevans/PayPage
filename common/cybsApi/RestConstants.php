@@ -21,6 +21,8 @@ const REQUEST_HOST =  "apitest.cybersource.com";  // CYBS TEST endpoint
 //const REQUEST_HOST = "api.cybersource.com";  // CYBS PRODUCTION endpoint
 const PUBLIC_KEYS_URL = "https://testflex.cybersource.com/flex/v2/public-keys/";
 const CACHE_LOCATION = "/payPage/cache/";
+const LOGS_LOCATION =  "/payPage/logs/";
+
 // APIs
 const API_PAYMENTS = "/pts/v2/payments";
 const API_TMS_PAYMENT_INSTRUMENTS = "/tms/v1/paymentinstruments";

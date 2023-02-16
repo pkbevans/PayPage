@@ -1,6 +1,5 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/logApi.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/addresses.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/checkout/utils/mail.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/v1/controller/db.php';
@@ -176,14 +175,6 @@ try {
     }catch(Exception $exception){
         $result->response->payment = "DB ERROR";
     }
-
-    $json = json_encode($result);
-    logApi($incoming->order->referenceNumber,
-            "auth-". $incoming->paAction,           // API Type
-            $result->response->status,              // Status
-            $incoming->order->amount,               // Amount
-            $incoming->order->storeCard,            // Token created?
-            $json);                                 // Complete request + response
 
     // Send confirmation email to customer - Succesfull non-zero Auths only
     if ($incoming->order->amount > 0 && ($result->responseCode == 201 || $result->responseCode == 202)) {

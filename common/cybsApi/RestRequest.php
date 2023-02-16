@@ -1,5 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestConstants.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/logApi.php';
 
 // HTTP POST request
 function ProcessRequest($mid, $resource, $method, $payload, $child = null, $authentication = AUTH_TYPE_SIGNATURE )
@@ -74,6 +75,11 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
     $result->responseInfo = $response_info;
     $result->responseHeaders=$http_headers;
 
+    // Log complete request and response message. Use as MRN as key field
+    if( !empty($payload) && property_exists($result->request, "clientReferenceInformation")){
+        $reference = $result->request->clientReferenceInformation->code;
+        logApi($reference, json_encode($result, JSON_UNESCAPED_SLASHES)); // Complete request + response
+    }
     return $result;
 }
 
