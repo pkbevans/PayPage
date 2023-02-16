@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-center">
     <div class="card">
-        <div class="card-body" style="width: 90vw">
+        <div class="card-body">
             <h5 class="card-title">Gateway Log</h5>
             <div class="row">
                 <div class="col-3">
@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-9">
+                <div class="col-12">
                     <PRE><?php echo $prettyLog;?></PRE>
                 </div>
             </div>
