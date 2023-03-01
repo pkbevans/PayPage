@@ -1,3 +1,10 @@
+function authorisePayment(){
+    if(orderDetails.googlePayAuthenticated){
+        authorizeWithPA("","","NO_PA");
+    }else{
+        setUpPayerAuth();
+    }
+}
 function setUpPayerAuth(){
     console.log("setUpPayerAuth");
     document.getElementById('authSpinner').style.display = "block";

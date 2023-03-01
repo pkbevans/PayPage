@@ -179,7 +179,7 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
         });
         subTotal+=orderDetails.delivery;
         let vat = subTotal*0.20;
-        orderDetails.vat = vat;
+        orderDetails.vat = Math.round(vat*100) / 100;  // Round to 2 dps
         let totalAmount = subTotal+orderDetails.vat;
         orderDetails.totalAmount = totalAmount;
         renderBasket();

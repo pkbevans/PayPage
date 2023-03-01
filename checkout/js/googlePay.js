@@ -169,7 +169,7 @@ function addGooglePayButton() {
     const button =
         paymentsClient.createButton({
             buttonColor: 'white',
-            buttonType: 'pay',
+            buttonType: 'buy',
             buttonSizeMode: 'fill',
             onClick: onGooglePaymentButtonClicked,
             allowedPaymentMethods: [baseCardPaymentMethod]
@@ -189,7 +189,7 @@ function getGoogleTransactionInfo() {
         currencyCode: orderDetails.currency,
         totalPriceStatus: 'FINAL',
         // set to cart total
-        totalPrice: orderDetails.amount
+        totalPrice: orderDetails.amount.toString()
     };
 }
 

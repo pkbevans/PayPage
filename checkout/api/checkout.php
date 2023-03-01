@@ -339,8 +339,8 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
 // Order details Object. Store details submitted on index.php, for use in the various Steps.
 let orderDetails = {
     referenceNumber: "<?php echo $order['merchantReference'];?>",
-    orderId: "<?php echo $order['id'];?>",
-    amount: "<?php echo $order['amount'];?>",
+    orderId: <?php echo $order['id'];?>,
+    amount: <?php echo $order['amount'];?>,
     currency: "<?php echo $order['currency'];?>",
     shippingAddressRequired: true,
     useShippingAsBilling: true,
@@ -350,6 +350,7 @@ let orderDetails = {
     shippingAddressId: "",
     flexToken: "",
     googlePayToken: "",
+    googlePayAuthenticated: false,
     dfSessionId: "<?php echo $sessionId?>",
     maskedPan: "",
     storeCard: false,
@@ -804,23 +805,19 @@ function setBillingDetails() {
 }
 function authorise() {
     document.getElementById('authSection').style.display = "block";
-    setUpPayerAuth();
+    authorisePayment();
 }
 function onGooglePayCardSelected(paymentData){
     console.log(JSON.stringify(paymentData, undefined, 2));
-    // Hide card input, show Confirmation section
+    // Hide card input
     document.getElementById("paymentSection").style.display = "none";
-    document.getElementById("summary_billTo").style.display = "none";
-    document.getElementById("confirmSection").style.display = "block";
-    // document.getElementById("cardSelectionSection").style.display = "none";
-    document.getElementById("storeCardSection").style.display = "block";
+    // document.getElementById("summary_billTo").style.display = "none";
 
     orderDetails.paymentInstrumentId = "";
     orderDetails.useShippingAsBilling = false;
     orderDetails.maskedPan = "xxxxxxxxxxxx"+paymentData.paymentMethodData.info.cardDetails;
     orderDetails.googlePayToken = paymentData.paymentMethodData.tokenizationData.token;
     setGooglePayBillingDetails(paymentData.paymentMethodData.info.billingAddress);
-    document.getElementById("summary_billTo").style.display = "block";
     let type="";
     if(paymentData.paymentMethodData.info.cardNetwork === "VISA"){
         type="001";
@@ -834,8 +831,14 @@ function onGooglePayCardSelected(paymentData){
         expirationMonth: "",
         expirationYear: ""
     };
+    // Show Confirmation section
+    document.getElementById("confirmSection").style.display = "block";
+    document.getElementById("storeCardSection").style.display = "block";
     document.getElementById('billToText').innerHTML =
         stylePaymentInstrument(cardDetails, orderDetails.maskedPan, orderDetails.bill_to);
+    document.getElementById("summary_billTo").style.display = "block";
+    googlePayAuthenticated = paymentData.paymentMethodData.info.assuranceDetails.cardHolderAuthenticated;
+    console.log("CardholderAuthenticated="+(googlePayAuthenticated?"TRUE":"FALSE"));
 }
 function  expiredCard(){
     console.log("expired Card");
