@@ -71,13 +71,16 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
         $requestHeaders[$key] = $val;
     }
     // TODO - comment out for live
-    $result->requestHeaders = $requestHeaders;
-    $result->responseInfo = $response_info;
-    $result->responseHeaders=$http_headers;
+    // $result->requestHeaders = $requestHeaders;
+    // $result->responseInfo = $response_info;
+    // $result->responseHeaders=$http_headers;
 
     // Log complete request and response message. Use as MRN as key field
     if( !empty($payload) && property_exists($result->request, "clientReferenceInformation")){
         $reference = $result->request->clientReferenceInformation->code;
+        logApi($reference, json_encode($result, JSON_UNESCAPED_SLASHES)); // Complete request + response
+    }else{
+        $reference = "UNKNOWN";
         logApi($reference, json_encode($result, JSON_UNESCAPED_SLASHES)); // Complete request + response
     }
     return $result;

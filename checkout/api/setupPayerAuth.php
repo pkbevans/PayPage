@@ -46,5 +46,6 @@ if($result->responseCode == 201 && $result->response->status == "COMPLETED") {
     header('HTTP/1.1 201 OK');
     echo json_encode($result->response);
 }else{
-    header('HTTP/1.1 404 ERROR');
+    header('HTTP/1.1 400 '. $result->response->errorInformation->message);
+    echo json_encode($result);
 }
