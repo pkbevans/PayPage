@@ -33,7 +33,7 @@ try {
     <div class="d-grid gap-2 col-12">
     <?php foreach ($paymentInstruments as $paymentInstrument): ?>
             <input type="hidden" id="<?php echo "pi_" . $paymentInstrument->id ;?>" value='<?php echo json_encode($paymentInstrument);?>'>
-            <button type="button" class="<?php echo cardExpired($paymentInstrument)?'btn btn-warning':'btn btn-primary';?>" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')" <?php echo (cardExpired($paymentInstrument)?"DISXABLED":"") ?>>
+            <button type="button" class="<?php echo cardExpired($paymentInstrument)?'btn btn-warning':'btn btn-primary';?>" onclick="usePaymentInstrument('<?php echo $paymentInstrument->id;?>')" <?php echo (cardExpired($paymentInstrument)?"DISABLED":"") ?>>
                 <div class="row">
                     <div class="d-none col-3">
                         Pay with:&nbsp;
