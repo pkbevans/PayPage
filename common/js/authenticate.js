@@ -145,42 +145,35 @@ function registerUser(){
         })
     }
 }
-function login(userName, password){
-    var form = document.getElementById('loginForm');
-
-    if(!form.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-        form.classList.add('was-validated');
-    }else{
-        return fetch("/payPage/common/v1/controller/sessions.php", {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: "post",
-            body: JSON.stringify({
-                "userName": userName,
-                "password": password,
-            })
+function login(userName, password, type){
+    return fetch("/payPage/common/v1/controller/sessions.php", {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: "post",
+        body: JSON.stringify({
+            "userName": userName,
+            "password": password,
+            "type": type    // Ensure only correct type allowed access
         })
-        .then((result) => {
-            console.log(result);
-            if(result.ok){
-                return result.json()
-            }else{
-                throw "unauthorised"
-            }
-        })
-        .then((result)=>{
-            onSuccessfulLogin(result);
-        })
-        .catch(error => {
-            console.log("ERROR: "+error);
-            // Show error to screen
-            document.getElementById("loginAlert").innerHTML='Login unsuccesful - Please try again';
-            document.getElementById("loginAlert").style.display='block';
-        })
-    }
+    })
+    .then((result) => {
+        console.log(result);
+        if(result.ok){
+            return result.json()
+        }else{
+            throw "unauthorised"
+        }
+    })
+    .then((result)=>{
+        onSuccessfulLogin(result);
+    })
+    .catch(error => {
+        console.log("ERROR: "+error);
+        // Show error to screen
+        document.getElementById("loginAlert").innerHTML='Login unsuccesful - Please try again';
+        document.getElementById("loginAlert").style.display='block';
+    })
 }
 function logout(){
     return fetch("/payPage/common/v1/controller/sessions.php?sessionid="+getCookie('sessionId'), {

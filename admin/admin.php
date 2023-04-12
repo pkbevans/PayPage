@@ -121,7 +121,14 @@
         .catch(error=>console.log(error));
     });
     function logUserIn(){
-        login(document.getElementById('userName').value, document.getElementById('password').value)
+        var form = document.getElementById('loginForm');
+        if(!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            form.classList.add('was-validated');
+        }else{ 
+           login(document.getElementById('userName').value, document.getElementById('password').value, "INTERNAL")
+        }
     }
     function onSuccessfulLogin(result){
         console.log(result);
@@ -134,18 +141,12 @@
         document.cookie = "sessionId=" + result.data.sessionId+';expires=; ';
         document.cookie = "accessToken=" + result.data.accessToken+';expires=;';
         document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;';
-        // Special handling for Guest user
-        if(result.data.userName !== "guest"){
-            fullName = result.data.firstName + " " + result.data.lastName;
-            document.cookie = "fullName=" + fullName+';expires=; ';
-            document.cookie = "email=" + result.data.email+';expires=;';
-            document.getElementById("userFullName").innerHTML=fullName;
-        }
         document.getElementById("loginAlert").style.display='none';
         document.getElementById("loginSection").style.display="none"
         document.getElementById("formSection").style.display="block"
         document.getElementById("ordersSection").innerHTML=""
         document.getElementById("orderDetailSection").innerHTML=""
+        document.getElementById('actionSection').innerHTML = "";
         document.getElementById("contentSection").style.display="block"
         document.getElementById('backButton').style.display = "none";
         document.getElementById("logout").style.display="block"
@@ -159,6 +160,7 @@
         document.getElementById("logout").style.display="none"
         document.getElementById("loginSection").style.display="block"
         document.getElementById('backButton').style.display = "none";
+        document.getElementById('actionSection').innerHTML = "";
         document.getElementById("contentSection").style.display="none"
     }
     function validateForm(){

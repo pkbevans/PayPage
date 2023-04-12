@@ -59,6 +59,7 @@ window.addEventListener("message", (event) => {
  * request is NOT performed.  In the latter case the cardholder authentication step is performed and a combined
  * validation + Authorization request is generated.
  */
+var pausedRequestId="";
 function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
     console.log("\nAuthorizing +" + paAction + " ...\n");
     let httpCode = 0;
@@ -68,6 +69,7 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
             "order": orderDetails,
             "paAction": paAction,
             "referenceID": dfReferenceId,
+            "pausedRequestId": pausedRequestId,
             "authenticationTransactionID": authenticationTransactionID
         })
     })
@@ -88,6 +90,8 @@ function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
         // Successfull response (but could be declined)
         if (status === "PENDING_AUTHENTICATION") {
             // Card is enrolled - Kick off the cardholder authentication
+            pausedRequestId=res.id;
+            console.log("pausedRequestId: "+pausedRequestId);
             showStepUpScreen(res.consumerAuthenticationInformation.stepUpUrl, res.consumerAuthenticationInformation.accessToken);
         } else if (status === "AUTHORIZED") {
             if (orderDetails.storeCard || orderDetails.storeAddress) {

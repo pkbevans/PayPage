@@ -92,12 +92,21 @@ function loginSession($db){
         $response->send();
         return;
     }
+    if(isset($jsonData->type)){
+        if($jsonData->type !== "CUSTOMER" && $jsonData->type !== "INTERNAL"){
+            $response = new Response(400, false, null, null);
+            $response->addMessage("invalid type");
+            $response->send();
+            return;
+        }
+        $required_type = $jsonData->type;
+    }
 
     try{
         $userName = trim($jsonData->userName);
         $password = $jsonData->password;
 
-        $query = $db->prepare("select id, firstName, lastName, userName, email, customerId, password, userActive, loginAttempts from users where userName = :userName");
+        $query = $db->prepare("select id, firstName, lastName, userName, email, customerId, password, userActive, loginAttempts, type from users where userName = :userName");
         $query->bindParam(':userName', $userName, PDO::PARAM_STR);
         $query->execute();
 
@@ -118,6 +127,7 @@ function loginSession($db){
         $returned_password = $row['password'];
         $returned_userActive = $row['userActive'];
         $returned_loginAttempts = $row['loginAttempts'];
+        $returned_type = $row['type'];
         
         if($returned_userActive != 'Y'){
             $response = new Response(401, false, "User account not active", null);
@@ -126,6 +136,11 @@ function loginSession($db){
         }
         if($returned_loginAttempts>= MAX_LOGIN_ATTEMPTS){
             $response = new Response(401, false, "User account is currently locked out", null);
+            $response->send();
+            return;
+        }
+        if(isset($required_type) && $required_type !== $returned_type){
+            $response = new Response(401, false, "User account does not have access", null);
             $response->send();
             return;
         }

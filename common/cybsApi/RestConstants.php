@@ -26,7 +26,6 @@ const LOGS_LOCATION =  "/payPage/logs/";
 // APIs
 const API_PAYMENTS = "/pts/v2/payments";
 const API_TMS_PAYMENT_INSTRUMENTS = "/tms/v1/paymentinstruments";
-const API_FLEX_V1_KEYS = '/flex/v1/keys';
 const API_FLEX_V2_SESSIONS = '/flex/v2/sessions';
 const API_MICROFORM_SESSIONS = '/microform/v2/sessions';
 const API_TSS_V2_SEARCHES = '/tss/v2/searches';

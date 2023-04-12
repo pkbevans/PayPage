@@ -44,6 +44,7 @@ function ProcessRequest($mid, $resource, $method, $payload, $child = null, $auth
 
     // Send the request
     $response = curl_exec($curl);
+
     $http_header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
     $http_headers = httpParseHeaders(substr($response, 0, $http_header_size));
     $http_body = substr($response, $http_header_size);

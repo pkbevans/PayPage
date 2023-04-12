@@ -121,29 +121,36 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
             {
                 productCode:"10000001",
                 description:"Big Brown Britches",
-                quantity:2,
+                quantity:3,
                 unitPrice:10.00,
-                totalAmount:20.00
+                totalAmount:30.00
             },
             {
                 productCode:"10000010",
                 description:"Frilly Knickers",
                 quantity:1,
-                unitPrice:14.00,
-                totalAmount:14.00
+                unitPrice:2521.01,
+                totalAmount:2521.01
             }
         ],
         delivery:4.99,
-        // subTotal=38.99
-        vat:7.80,
-        totalAmount:46.79
+        // subTotal=2556.03
+        vat:511.21,
+        totalAmount:3067.24
     };
 
     document.addEventListener("DOMContentLoaded", function (e) {
         renderBasket();
     });
     function logUserIn(){
-        login(document.getElementById('userName').value, document.getElementById('password').value)
+        var form = document.getElementById('loginForm');
+        if(!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            form.classList.add('was-validated');
+        }else{ 
+           login(document.getElementById('userName').value, document.getElementById('password').value, "CUSTOMER")
+        }
     }
     function onSuccessfulLogin(result){
         console.log(result);
@@ -156,7 +163,7 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
         document.cookie = "sessionId=" + result.data.sessionId+';expires=;path=/';
         document.cookie = "accessToken=" + result.data.accessToken+';expires=;path=/';
         document.cookie = "refreshToken=" + result.data.refreshToken+';expires=;path=/';
-        // Special handling for Guest user
+        // Special handling for guest user
         if(result.data.userName !== "guest"){
             fullName = result.data.firstName + " " + result.data.lastName;
             document.cookie = "fullName=" + fullName+';expires=;path=/';

@@ -46,6 +46,12 @@ if($result->responseCode == 201 && $result->response->status == "COMPLETED") {
     header('HTTP/1.1 201 OK');
     echo json_encode($result->response);
 }else{
-    header('HTTP/1.1 400 '. $result->response->errorInformation->message);
+    $msg="Unknown error";
+    if(isset($result->response->errorInformation)){
+        $msg = $result->response->errorInformation->message;
+    }elseif(isset($result->response->message)){
+        $msg = $result->response->message;
+    }
+    header('HTTP/1.1 400 '. $msg);
     echo json_encode($result);
 }

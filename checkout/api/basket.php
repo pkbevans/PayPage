@@ -5,7 +5,7 @@ $itemIndex = 0;
 foreach ($orderDetails->orderItems as $orderItem):?>
 <div class="row">
     <div class="col-3 col-lg-2" >
-        <input id="quantity_<?php echo $itemIndex?>" type="number" class="form-control" onchange="onQtyChange(<?php echo $itemIndex?>)" value="<?php echo $orderItem->quantity?>" tabindex="1"  maxlength="2" min="1" required>
+        <input id="quantity_<?php echo $itemIndex?>" type="number" class="form-control" onchange="onQtyChange(<?php echo $itemIndex?>)" value="<?php echo $orderItem->quantity?>" tabindex="1"  maxlength="2" min="0" required>
     </div>
     <div class="col-4 col-lg-4">
         <?php echo $orderItem->description?>

@@ -151,6 +151,7 @@ try {
         ];
     }else if($incoming->paAction == "VALIDATE_CONSUMER_AUTHENTICATION"){
         // PA Validation
+        $request->clientReferenceInformation->pausedRequestId = $incoming->pausedRequestId;
         $consumerAuthenticationInformation = [
             "authenticationTransactionId" => $incoming->authenticationTransactionID
         ];

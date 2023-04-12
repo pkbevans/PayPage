@@ -35,7 +35,7 @@ if (!isset($_SERVER['HTTP_AUTHORIZATION']) || strlen($_SERVER['HTTP_AUTHORIZATIO
 // get supplied access token from authorisation header - used for delete (log out) and patch (refresh)
 $accessToken = $_SERVER['HTTP_AUTHORIZATION'];
 
-// attempt to query the database to check token details - use write connection as it needs to be synchronous for token
+// attempt to query the database so check token details - use write connection as it needs to be synchronous for token
 $response = validateAccessToken($readDB, $accessToken);
 if ($response->success()) {
     $data = $response->getData();
