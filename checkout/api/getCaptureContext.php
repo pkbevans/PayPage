@@ -4,7 +4,6 @@ use Firebase\JWT\JWK;
 require '../../vendor/autoload.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/payPage/common/cybsApi/RestRequest.php';
 
-$incoming = json_decode(file_get_contents('php://input'));
 $targetOrigin = "https://" . $_SERVER['HTTP_HOST'];
 
 $request = [
@@ -37,7 +36,7 @@ function verifyToken($jwt)
     $alg = $header->alg;
     // echo "KID: " . $kid . "<BR><BR>";
     try {
-        // See if we have this key in cache
+        // See if we have this KID key in cache
         $key = getKeyFromCache($kid);
     }catch(NotInCacheException $e){
         // Get public key with given kid from Cybs
@@ -50,8 +49,8 @@ function verifyToken($jwt)
     $pk = json_decode($key, true);
     $pk['alg'] = $alg;
     $jwks['keys'][0] = $pk;
-    // echo '<pre>' . json_encode($jwks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
-    // Verify the JWT against the given public key
+    // echo '<pre>JWKS:' . json_encode($jwks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
+    // Verify the JWT against the given public key - JWT::decode will throw an exception if NOT verified
     JWT::$leeway = 60; // $leeway in seconds
     JWT::decode($jwt, JWK::parseKeySet($jwks));
     // echo '<pre>' . json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '</pre>';
