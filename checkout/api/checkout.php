@@ -445,6 +445,7 @@ function retry(){
 //Disable Back Button
 window.history.pushState(null, null, window.location.href);
 window.onpopstate = function () {
+    console.log("BACK BUTTON PRESSED");
     window.history.go(1);
 };
 function showCards(){
