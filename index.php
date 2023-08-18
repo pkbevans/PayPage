@@ -57,6 +57,7 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
                                 <label for="userName" class="form-label">Username</label><input id="userName" class="form-control" autocomplete="username" type="text" name="userName" value="" required/>
                                 <label for="password" class="form-label">Password</label><input id="password" class="form-control" autocomplete="current-password" type="password" name="password" value="" required/>
                                 <button type="button" class="btn btn-primary" onclick="logUserIn()">Log in</button>
+                                <button type="button" class="btn btn-secondary" onclick="guestLogin()">Continue as Guest</button>
                             </form>
                             <div id="loginAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
                         </div>
@@ -120,14 +121,14 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
         orderItems:[ 
             {
                 productCode:"10000001",
-                description:"Big Brown Britches",
+                description:"Stuff",
                 quantity:3,
                 unitPrice:10.00,
                 totalAmount:30.00
             },
             {
                 productCode:"10000010",
-                description:"Frilly Knickers",
+                description:"Other stuff",
                 quantity:1,
                 unitPrice:2521.01,
                 totalAmount:2521.01
@@ -151,6 +152,9 @@ $mrn=uniqid("PayPage", false);  // Unique Merchant Reference No. for each visit
         }else{ 
            login(document.getElementById('userName').value, document.getElementById('password').value, "CUSTOMER")
         }
+    }
+    function guestLogin(){
+        login('guest', 'password', "CUSTOMER");
     }
     function onSuccessfulLogin(result){
         console.log(result);

@@ -39,7 +39,7 @@ const tokenizationSpecification = {
     type: 'PAYMENT_GATEWAY',
     parameters: {
         'gateway': 'cybersource',
-        'gatewayMerchantId': "paulspants45011"
+        'gatewayMerchantId': "pkbevanstest"
     }
 };
 

@@ -59,7 +59,7 @@ window.addEventListener("message", (event) => {
  * request is NOT performed.  In the latter case the cardholder authentication step is performed and a combined
  * validation + Authorization request is generated.
  */
-var pausedRequestId="";
+var pausedRequestId;
 function authorizeWithPA(dfReferenceId, authenticationTransactionID, paAction) {
     console.log("\nAuthorizing +" + paAction + " ...\n");
     let httpCode = 0;
