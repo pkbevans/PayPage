@@ -2,6 +2,7 @@
 
 require_once('db.php');
 require_once('../model/Response.php');
+require_once('../../../checkout/utils/mail.php');
 const VERIFICATION_CODE_LENGTH = 78;
 
 try{
@@ -24,6 +25,7 @@ if(isset($_GET['verificationCode'])){
     $id = $_GET['id'];
 
     $response = verifyUser($writeDB, $id, $verificationCode);
+    // TODO - send proper page on success.
     $response->send();
     exit();
 }
@@ -89,7 +91,7 @@ try{
 
     $rowCount = $query->rowCount();
     if($rowCount !== 0){
-        $response = new Response(409, false, "userName already exists", null);
+        $response = new Response(409, false, "userName [".$userName."] already exists", null);
         $response->send();
         exit();
     }
@@ -128,9 +130,10 @@ try{
     include "../../../checkout/mail/templates/newUser.php";
     $content = ob_get_contents();
     ob_end_clean();
-    $headers = 'From: noreply@bondevans.com\r\n/';
-    if(!mail($email, "Welcome to PayPage", $content, $headers)) {
-        error_log("Unable to generate welcome email for: ". $lastUserID, " email:". $email);
+    if(!sendCustomerMail($email, "Welcome to PayPage", $content, "noreply@bondevans.com")){
+        $returnData['mailError1'] = $email;
+        $returnData['mailError2'] = $content;
+        error_log("Unable to generate welcome email for: ". $lastUserID. " email:". $email);
     }
 
     $response = new Response(201, true, "User created", $returnData);
