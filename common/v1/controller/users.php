@@ -30,7 +30,7 @@ if(isset($_GET['verificationCode'])){
     exit();
 }
 if($_SERVER['REQUEST_METHOD'] !== "POST"){
-    // Only allow users to be created
+    // Only allow pp_usrs to be created
     $response = new Response(405, false, "Request method not allowed", null);
     $response->send();
     exit();
@@ -85,7 +85,7 @@ $email = trim($jsonData->email);
 $password = $jsonData->password;
 
 try{
-    $query = $writeDB->prepare("select id from users where userName = :userName");
+    $query = $writeDB->prepare("select id from pp_usrs where userName = :userName");
     $query->bindParam(':userName', $userName, PDO::PARAM_STR);
     $query->execute();
 
@@ -101,7 +101,7 @@ try{
     // Create unique random Verification code
     $verificationCode = bin2hex(random_bytes(VERIFICATION_CODE_LENGTH));
 
-    $query = $writeDB->prepare('insert into users (firstName, lastname, userName, email, password, customerId, type, admin, verificationCode) values(:firstName, :lastName, :userName, :email, :password, "", "CUSTOMER", "N", :verificationCode)');
+    $query = $writeDB->prepare('insert into pp_usrs (firstName, lastname, userName, email, password, customerId, type, admin, verificationCode) values(:firstName, :lastName, :userName, :email, :password, "", "CUSTOMER", "N", :verificationCode)');
     $query->bindParam(':firstName', $firstName, PDO::PARAM_STR);
     $query->bindParam(':lastName', $lastName, PDO::PARAM_STR);
     $query->bindParam(':userName', $userName, PDO::PARAM_STR);
@@ -146,9 +146,9 @@ try{
     exit();
 }
 function verifyUser($db, $id, $verificationCode){
-    // select users with id and verificationCode
+    // select pp_usrs with id and verificationCode
     try {
-        $query = $db->prepare("select verificationCode, userActive from users where id = :id and verificationCode = :verificationCode");
+        $query = $db->prepare("select verificationCode, userActive from pp_usrs where id = :id and verificationCode = :verificationCode");
         $query->bindParam(':id', $id, PDO::PARAM_INT);
         $query->bindParam(':verificationCode', $verificationCode, PDO::PARAM_STR);
         $query->execute();
@@ -164,7 +164,7 @@ function verifyUser($db, $id, $verificationCode){
             return new Response(500, false, "User Already active", null);
         }
         // Update user  - set userActive = Y
-        $query = $db->prepare("update users set userActive = 'Y' where id = :id");
+        $query = $db->prepare("update pp_usrs set userActive = 'Y' where id = :id");
         $query->bindParam(':id', $id, PDO::PARAM_INT);
         $query->execute();
 

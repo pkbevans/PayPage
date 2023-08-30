@@ -106,7 +106,7 @@ function loginSession($db){
         $userName = trim($jsonData->userName);
         $password = $jsonData->password;
 
-        $query = $db->prepare("select id, firstName, lastName, userName, email, customerId, password, userActive, loginAttempts, type from users where userName = :userName");
+        $query = $db->prepare("select id, firstName, lastName, userName, email, customerId, password, userActive, loginAttempts, type from pp_usrs where userName = :userName");
         $query->bindParam(':userName', $userName, PDO::PARAM_STR);
         $query->execute();
 
@@ -146,7 +146,7 @@ function loginSession($db){
         }
 
         if(!password_verify($password, $returned_password)){
-            $query = $db->prepare("update users set loginAttempts = loginAttempts+1 where id = :id");
+            $query = $db->prepare("update pp_usrs set loginAttempts = loginAttempts+1 where id = :id");
             $query->bindParam(':id', $returned_id, PDO::PARAM_INT);
             $query->execute();
 
@@ -170,11 +170,11 @@ function loginSession($db){
     try{
         $db->beginTransaction();
 
-        $query = $db->prepare("update users set loginAttempts = 0 where id = :id");
+        $query = $db->prepare("update pp_usrs set loginAttempts = 0 where id = :id");
         $query->bindParam(':id', $returned_id, PDO::PARAM_INT);
         $query->execute();
 
-        $query = $db->prepare("insert into sessions (userid, accessToken, accessTokenexpiry, refreshToken, refreshTokenexpiry) values(:userid, :accessToken, date_add(NOW(), INTERVAL :accessTokenExpirySecs SECOND), :refreshToken, date_add(NOW(), INTERVAL :refreshTokenExpirySecs SECOND))");
+        $query = $db->prepare("insert into pp_sessions (userid, accessToken, accessTokenexpiry, refreshToken, refreshTokenexpiry) values(:userid, :accessToken, date_add(NOW(), INTERVAL :accessTokenExpirySecs SECOND), :refreshToken, date_add(NOW(), INTERVAL :refreshTokenExpirySecs SECOND))");
         $query->bindParam(':userid', $returned_id, PDO::PARAM_INT);
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
         $query->bindParam(':accessTokenExpirySecs', $accessTokenExpirySecs, PDO::PARAM_INT);
@@ -211,7 +211,7 @@ function loginSession($db){
 }
 function logoutSession($db, $sessionId, $accessToken){
     try {
-        $query = $db->prepare("delete from sessions where id = :id and accessToken = :accessToken");
+        $query = $db->prepare("delete from pp_sessions where id = :id and accessToken = :accessToken");
         $query->bindParam(':id', $sessionId, PDO::PARAM_INT);
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
         $query->execute();
@@ -259,7 +259,7 @@ function refreshAccessToken($db, $sessionId, $accessToken){
 
     try {
         $refreshToken = $jsonData->refreshToken;
-        $stmt ='select sessions.id as sessionid, sessions.userid as userid, accessToken, refreshToken, userActive, loginAttempts, accessTokenexpiry, refreshTokenexpiry from sessions, users where users.id = sessions.userid and sessions.id = :sessionid and sessions.accessToken = :accessToken and sessions.refreshToken = :refreshToken';
+        $stmt ='select pp_sessions.id as sessionid, pp_sessions.userid as userid, accessToken, refreshToken, userActive, loginAttempts, accessTokenexpiry, refreshTokenexpiry from pp_sessions, pp_usrs where pp_usrs.id = pp_sessions.userid and pp_sessions.id = :sessionid and pp_sessions.accessToken = :accessToken and pp_sessions.refreshToken = :refreshToken';
         $query = $db->prepare($stmt);
         $query->bindParam(':sessionid', $sessionId, PDO::PARAM_INT);
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
@@ -308,7 +308,7 @@ function refreshAccessToken($db, $sessionId, $accessToken){
         $accessTokenExpirySecs = ACCESS_TOKEN_EXPIRY_SECS;
         $refreshTokenExpirySecs = REFRESH_TOKEN_EXPIRY_SECS;
         //HERE
-        $query = $db->prepare('update sessions set accessToken = :accessToken, accessTokenexpiry = date_add(NOW(), INTERVAL :accessTokenExpirySecs SECOND), refreshToken = :refreshToken, refreshTokenexpiry = date_add(NOW(), INTERVAL :refreshTokenExpirySecs SECOND) where id = :sessionid and userid= :userid and accessToken = :returnedaccessToken and refreshToken = :returnedrefreshToken');
+        $query = $db->prepare('update pp_sessions set accessToken = :accessToken, accessTokenexpiry = date_add(NOW(), INTERVAL :accessTokenExpirySecs SECOND), refreshToken = :refreshToken, refreshTokenexpiry = date_add(NOW(), INTERVAL :refreshTokenExpirySecs SECOND) where id = :sessionid and userid= :userid and accessToken = :returnedaccessToken and refreshToken = :returnedrefreshToken');
         $query->bindParam(':userid', $returned_userid, PDO::PARAM_INT);
         $query->bindParam(':sessionid', $returned_sessionid, PDO::PARAM_INT);
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);

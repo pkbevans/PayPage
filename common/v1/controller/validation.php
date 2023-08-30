@@ -31,7 +31,7 @@ function checkPermission($accessToken, $requiredType, $adminRequired, $customerI
 function validateAccessToken($db, $accessToken){
     try {
         // create db query to check access token is equal to the one provided
-        $query = $db->prepare('select userId, accessTokenExpiry, userActive, loginAttempts, type, admin, customerId from sessions, users where sessions.userId = users.id and accessToken = :accessToken');
+        $query = $db->prepare('select userId, accessTokenExpiry, userActive, loginAttempts, type, admin, customerId from pp_sessions, pp_usrs where pp_sessions.userId = pp_usrs.id and accessToken = :accessToken');
         $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
         $query->execute();
     

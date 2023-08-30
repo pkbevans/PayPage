@@ -266,7 +266,7 @@ function insertPayment($type, $orderDetails, $request){
         }
         // Update User with customerId if new customer token created for Guest user
         if($type == "PAYMENT" && $request->response->status === "AUTHORIZED" && $orderDetails->storeCard && empty($orderDetails->customerId)){
-            $userSql = "UPDATE users set " .
+            $userSql = "UPDATE pp_usrs set " .
                 "customerId = '" . $request->response->tokenInformation->customer->id . "' " .
                 "WHERE id = " . $orderDetails->customerUserId;
                 $result->userSql=$userSql;

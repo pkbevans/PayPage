@@ -36,7 +36,7 @@ $accessToken = $_SERVER['HTTP_AUTHORIZATION'];
 // attempt to query the database to check token details - use write connection as it needs to be synchronous for token
 try {
     // create db query to check access token is equal to the one provided
-    $query = $writeDB->prepare('select userId, accessTokenExpiry, userActive, loginAttempts from sessions, users where sessions.userId = users.id and accessToken = :accessToken');
+    $query = $writeDB->prepare('select userId, accessTokenExpiry, userActive, loginAttempts from pp_sessions, pp_usrs where pp_sessions.userId = pp_usrs.id and accessToken = :accessToken');
     $query->bindParam(':accessToken', $accessToken, PDO::PARAM_STR);
     $query->execute();
 
