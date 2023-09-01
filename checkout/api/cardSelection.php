@@ -29,6 +29,9 @@ try {
     <div class="row">
         <div class="col-12"><h5>Choose your payment method:</h5></div>
     </div>
+    <div class="row text-danger">
+        <div class="col-12"><h5>IMPORTANT: THIS IS A SANDBOX ENVIRONMENT - NO PAYMENTS ARE TAKEN.</h5></div>
+    </div>
 <?php if ($count>0): ?>
     <div class="d-grid gap-2 col-12">
     <?php foreach ($paymentInstruments as $paymentInstrument): ?>
