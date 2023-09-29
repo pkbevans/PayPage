@@ -66,7 +66,7 @@ try {
     <div class="row mt-2">
         <div class="col-12">
             <button type="button" class="btn btn-link" onclick="backButton('cardSelection')">Back</button>
-            <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+
 <?php if ($count>0): ?>
             <button type="button" class="btn btn-link" onclick="showManageIframe('CARDS')">Manage my cards</button>
 <?php endif ?>
@@ -224,7 +224,7 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
     <div class="row">
         <div class="col-12">
             <button type="button" class="btn btn-link" onclick="backButton('<?php echo ($count>0?"pay":"pay_new");?>')">Back</button>
-            <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+
         </div>
     </div>
 </div>

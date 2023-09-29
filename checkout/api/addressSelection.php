@@ -108,7 +108,6 @@ echo "<option value=\"". $key ."\">" . $value . "</option>\n";
 <div class="row">
     <div class="col-12">
         <button type="button" class="btn btn-link" onclick="hideNewAddress()" style="display: none" id="newAddressBackButton">Back</button>
-        <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
 <?php if ($count>0): ?>
         <button type="button" class="btn btn-link" onclick="showManageIframe('ADDRESS')">Manage my addresses</button>
 <?php endif ?>

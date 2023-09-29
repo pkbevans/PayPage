@@ -230,7 +230,7 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                         <div class="row">
                             <div class="col-12">
                                 <button type="button" class="btn btn-link" onclick="backButton('confirm')">Back</button>
-                                <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
+
                             </div>
                         </div>
                     </div>
@@ -277,6 +277,11 @@ if(isset($_REQUEST['orderHash']) && isset($_REQUEST['orderId'])){
                             <div id="registerAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
                         </div>
                     </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <button type="button" class="btn btn-link" onclick="cancel()">Cancel</button>
                 </div>
             </div>
         </div>
